@@ -3912,6 +3912,10 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
     [data-odrp].odrp-one #remind_body{ padding-left:20px !important; padding-right:20px !important; }
   }
   [data-odrp].odrp-one #remind_body .owl-nav{ display:none !important; }
+  /* PC: 창을 화면 세로 가운데에 (아임웹 기본은 위에서 80px 고정) */
+  @media (min-width:820px){
+    .odrp-modal::before{ content:"" !important; display:inline-block !important; height:100% !important; vertical-align:middle !important; margin-right:-.3em !important; }
+  }
   [data-odrp] .odrp-row .odrp-btn{ width:auto !important; min-width:0 !important; padding:0 16px !important; height:36px !important; line-height:34px !important; border-radius:8px !important; font-size:13px !important; }
   [data-odrp] .odrp-date{ font-size:13px !important; color:#8494A7 !important; letter-spacing:0 !important; }
   [data-odrp] .odrp-btn{ letter-spacing:0 !important; font-weight:600 !important; color:#1E2A3A !important; -webkit-text-fill-color:#1E2A3A !important; border-color:#C9D3DE !important; }
