@@ -4297,3 +4297,24 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
 })();
 </script>
 <!-- ===================== /모바일 메뉴 ===================== -->
+
+<!-- ===================== 메인 홈 맨 아래 남은 글자 정리 =====================
+     · 메인 홈 위젯 코드 끝에 남아 있던 "@ondirev_official" 글자(왼쪽 아래에 그대로 보이던 것)만 지움
+     · 위젯 안 섹션(.odh) 바로 옆에 '글자만' 따로 놓인 경우만 대상 — 다른 곳의 인스타 계정 표기는 건드리지 않음
+     ============================================================ -->
+<script>
+(function(){
+  "use strict";
+  function clean(){
+    [].forEach.call(document.querySelectorAll("._widget_data"), function(box){
+      if(!box.querySelector(":scope > section.odh")) return;
+      [].forEach.call(box.childNodes, function(n){
+        if(n.nodeType === 3 && /^\s*@ondirev_official\s*$/.test(n.nodeValue)) n.nodeValue = "";
+      });
+    });
+  }
+  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", clean); else clean();
+  window.addEventListener("load", clean);
+})();
+</script>
+<!-- ===================== /메인 홈 맨 아래 남은 글자 정리 ===================== -->
