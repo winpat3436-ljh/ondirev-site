@@ -3889,8 +3889,30 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
 <style>
   [data-odrp], [data-odrp] *{ word-break:keep-all !important; }
   [data-odrp] .od-ptags{ display:none !important; }
-  [data-odrp] img.odrp-img{ width:100% !important; height:100% !important; max-width:100% !important; max-height:100% !important; object-fit:contain !important; object-position:center !important; }
-  [data-odrp] .odrp-pic{ background:#EEF2F6 !important; border-radius:12px !important; overflow:hidden !important; }
+  [data-odrp] img.odrp-img{ display:block !important; width:100% !important; height:100% !important; max-width:100% !important; max-height:100% !important; object-fit:cover !important; object-position:center !important; }
+  [data-odrp] .odrp-pic{ background:#EDF0F3 !important; border-radius:10px !important; overflow:hidden !important; }
+  /* 가로형: 왼쪽 사진(3:4) · 오른쪽 상품명/날짜/버튼 */
+  [data-odrp] .odrp-row{ display:grid !important; grid-template-columns:110px minmax(0,1fr) !important; grid-template-areas:"pic head" "pic foot" !important; column-gap:16px !important; row-gap:10px !important; align-content:center !important; align-items:center !important; text-align:left !important; }
+  [data-odrp] .odrp-row > .odrp-pic{ grid-area:pic !important; width:110px !important; height:147px !important; margin:0 !important; padding:0 !important; }
+  [data-odrp] .odrp-row > .item-head{ grid-area:head !important; align-self:end !important; margin:0 !important; padding:0 !important; text-align:left !important; }
+  [data-odrp] .odrp-row > .item-head *{ text-align:left !important; }
+  [data-odrp] .odrp-row > .item-foot{ grid-area:foot !important; align-self:start !important; margin:0 !important; padding:0 !important; text-align:left !important; }
+  /* 아임웹 기본 창은 414px 이하에서만 세로로 쌓이고, 415~819px(아이폰 Pro Max·플러스, 폴드 펼침, 작은 태블릿)에선 800px 고정이라 화면 밖으로 넘침 → 이 구간도 세로로 쌓기 */
+  @media (min-width:415px) and (max-width:819px){
+    .odrp-modal .modal-dialog{ width:calc(100% - 32px) !important; max-width:480px !important; }
+    .odrp-modal .modal-table{ display:block !important; width:auto !important; }
+    .odrp-modal .modal-left, .odrp-modal #remind_body{ display:block !important; width:auto !important; border-right:0 !important; }
+  }
+  /* 휴대폰: 아임웹 기본 좌우 여백(100px) 때문에 상품 칸이 160px로 좁아짐 → 여백 줄이고 화살표를 안쪽으로 */
+  @media (max-width:819px){
+    [data-odrp] #remind_body{ padding-left:48px !important; padding-right:48px !important; }
+    [data-odrp] #remind_body .remider_prod_list{ width:auto !important; max-width:320px !important; margin-left:auto !important; margin-right:auto !important; }
+    [data-odrp] #remind_body .owl-prev{ left:-44px !important; right:auto !important; }
+    [data-odrp] #remind_body .owl-next{ right:-44px !important; left:auto !important; }
+    [data-odrp].odrp-one #remind_body{ padding-left:20px !important; padding-right:20px !important; }
+  }
+  [data-odrp].odrp-one #remind_body .owl-nav{ display:none !important; }
+  [data-odrp] .odrp-row .odrp-btn{ width:auto !important; min-width:0 !important; padding:0 16px !important; height:36px !important; line-height:34px !important; border-radius:8px !important; font-size:13px !important; }
   [data-odrp] .odrp-date{ font-size:13px !important; color:#8494A7 !important; letter-spacing:0 !important; }
   [data-odrp] .odrp-btn{ letter-spacing:0 !important; font-weight:600 !important; color:#1E2A3A !important; -webkit-text-fill-color:#1E2A3A !important; border-color:#C9D3DE !important; }
   [data-odrp] .odrp-btn:hover{ border-color:#1E2A3A !important; }
@@ -3899,6 +3921,8 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
 (function(){
   "use strict";
   if(window.__odrpInit) return; window.__odrpInit = true;
+  /* 상품코드 → 전체가 보이는 상품 대표 사진 (상품이 늘면 여기에 추가) */
+  var OD_RP_IMG = { "s20260731e7e814860b63c": "https://cdn.imweb.me/thumbnail/20261113/0516f1f62d0ec.jpg" };
   function squash(s){ return (s || "").replace(/\s+/g,""); }
   /* '다시 보지 않기'와 '리뷰 작성'을 함께 가진 가장 작은 상자 = 리뷰 안내 창 */
   function roots(){
@@ -3916,6 +3940,7 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
   }
   function fix(root){
     if(!root.hasAttribute("data-odrp")) root.setAttribute("data-odrp","1");
+    var md = root.closest(".modal"); if(md && !md.classList.contains("odrp-modal")) md.classList.add("odrp-modal");
     /* 1) 효능 태그: 지우고, 상품명에 표시를 남겨 다시 붙지 않게 */
     [].forEach.call(root.querySelectorAll(".od-ptags"), function(b){ b.remove(); });
     [].forEach.call(root.querySelectorAll("[data-od-pn]"), function(h){ h.classList.remove("od-pname-b"); });
@@ -3935,11 +3960,28 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
     /* 3) 상품 사진: 잘리지 않게 전체 보이기 */
     [].forEach.call(root.querySelectorAll("img"), function(img){
       if(img.closest(".odrp-btn")) return;
-      var r = img.getBoundingClientRect(); if(r.width < 80 && (img.naturalWidth || 0) < 80) return;   /* 아이콘·화살표 제외 */
+      var r = img.getBoundingClientRect(); if(r.width < 80 && (img.naturalWidth || 0) < 80){ if(!img.complete && !img.__odrpW){ img.__odrpW = 1; img.addEventListener("load", schedule); } return; }   /* 아이콘·화살표 제외 (아직 안 불러온 사진은 불러온 뒤 다시 확인) */
       if(!img.classList.contains("odrp-img")) img.classList.add("odrp-img");
       var box = img.parentElement;
       if(box && !box.classList.contains("odrp-pic")) box.classList.add("odrp-pic");
     });
+    /* 4) 가로형 배치 + 잘린 썸네일 → 상품 전체 사진 */
+    [].forEach.call(root.querySelectorAll(".item"), function(it){
+      var pic = it.querySelector(":scope > .odrp-pic"), hd = it.querySelector(":scope > .item-head"), ft = it.querySelector(":scope > .item-foot");
+      if(pic && hd && ft && !it.classList.contains("odrp-row")) it.classList.add("odrp-row");
+      var bt = it.querySelector(".odrp-btn"), im = it.querySelector("img.odrp-img");
+      var m = bt && /'(s\d{8}[0-9a-f]+)'/.exec(bt.getAttribute("onclick") || "");
+      var full = m && OD_RP_IMG[m[1]];
+      if(im && full && im.getAttribute("src") !== full){ im.removeAttribute("srcset"); im.setAttribute("src", full); }
+    });
+    /* 상품이 1개면 좌우 화살표 숨김 · 칸 너비가 바뀌었으면 슬라이드 너비 다시 계산 */
+    var list = root.querySelector(".remider_prod_list");
+    if(list){
+      var one = list.querySelectorAll(".owl-item:not(.cloned)").length <= 1;
+      if(one !== root.classList.contains("odrp-one")) root.classList.toggle("odrp-one", one);
+      var oi = list.querySelector(".owl-item");
+      if(oi && Math.abs(oi.offsetWidth - list.clientWidth) > 2 && !list.__odrpRz){ list.__odrpRz = 1; setTimeout(function(){ try{ window.dispatchEvent(new Event("resize")); }catch(e){} }, 50); }
+    }
   }
   function run(){ if(!document.body) return; roots().forEach(function(r){ try{ fix(r); }catch(e){} }); }
   var tm = 0;
