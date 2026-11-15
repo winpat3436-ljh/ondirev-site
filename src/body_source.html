@@ -1,0 +1,1322 @@
+<script>
+/* 수량 맞추기 공용 함수: 처음 값과의 차이만큼만 +/− 를 정확히 누른다.
+   (누를 때마다 값을 다시 읽으면 아임웹 화면 갱신이 늦어 과하게 눌려 23개가 되던 문제 방지)
+   같은 칸에 새 요청이 오면 이전 요청은 멈춘다. 끝난 뒤 값이 다르면 숫자를 직접 넣어 맞춘다. */
+/* 공용: 비회원인지, 로그인 주소 */
+window.__odIsGuest = function(){
+  if(document.querySelector(".member-info.guest")) return true;
+  if(document.body && document.body.classList.contains("member_login")) return false;
+  if(document.querySelector(".profile-area .member-info")) return false;
+  var vis=function(e){ return e && e.offsetParent!==null; };
+  var login=[].some.call(document.querySelectorAll('a[href*="/login"]'), vis), logout=[].some.call(document.querySelectorAll('a[href*="logout"]'), vis);
+  return !(logout && !login);
+};
+window.__odLoginHref = function(){ try{ return "/login?back_url=" + encodeURIComponent(btoa(location.pathname + location.search)) + "&used_login_btn=Y"; }catch(e){ return "/login"; } };
+window.__odSetQty = function(inp, n, minus, plus){
+  if(!inp) return;
+  var job = (inp.__odJob = (inp.__odJob||0) + 1);
+  var start = parseInt(inp.value,10) || 1, diff = n - start, btn = diff > 0 ? plus : minus, k = Math.abs(diff), i = 0;
+  function fire(el, type){ try{ el.dispatchEvent(new Event(type, {bubbles:true})); }catch(e){} }
+  function verify(){
+    if(inp.__odJob !== job) return;
+    if((parseInt(inp.value,10)||1) !== n){ inp.value = n; fire(inp,"input"); fire(inp,"change"); fire(inp,"keyup"); fire(inp,"blur"); }
+  }
+  if(!k){ verify(); return; }
+  if(!btn){ verify(); return; }
+  (function click(){
+    if(inp.__odJob !== job) return;
+    if(i++ >= k){ setTimeout(verify, 300); return; }
+    btn.click(); setTimeout(click, 120);
+  })();
+};
+</script>
+
+<style>
+/* 상품 페이지: 쿠폰 칸 교체가 끝나기 전까지 아임웹 원래 쿠폰 칸을 가린다 (깜빡임 방지) */
+html.od-prod:not(.od-ready) [class*="coupon" i]:not(.od-kcoupon),
+html.od-prod:not(.od-ready) [id*="coupon" i]{ visibility:hidden !important; }
+</style>
+<script>
+(function(){
+  if(/[?&]idx=\d+/.test(location.search)){
+    document.documentElement.classList.add("od-prod");
+    /* 혹시 처리가 늦어져도 3초 뒤에는 무조건 보이게 */
+    setTimeout(function(){ document.documentElement.classList.add("od-ready"); }, 3000);
+  }
+})();
+</script>
+
+<style>
+/* ============================================================
+   ONDIREV — 모바일 메뉴 v5
+   적용: 관리자 > 사이트 설정 > 코드 삽입 > <head> (style + script 모두)
+   ============================================================ */
+
+/* ---------- 패널 전체: 흰 배경 ---------- */
+.mobile_slide_menu_container,
+.mobile_slide_menu_container .mobile_slide_menu,
+.mobile_slide_menu_container .mobile_slide_menu > *,
+.mobile_slide_menu_container .viewport-nav.mobile,
+.mobile_slide_menu_container .viewport-nav.mobile ul,
+.mobile_slide_menu_container .viewport-nav.mobile li,
+.mobile_slide_menu_container .viewport-nav.mobile li a,
+.mobile_slide_menu_container .viewport-nav.mobile li li ul,
+.new_header_site .mobile_slide_menu_container .mobile_slide_menu,
+.new_header_site .mobile_slide_menu_container.slide_open .mobile_slide_menu,
+.admin.new_header_mode .mobile_slide_menu_container .mobile_slide_menu,
+.admin.new_header_mode .mobile_slide_menu_container.slide_open .mobile_slide_menu {
+  background: #FFFFFF !important;
+  background-color: #FFFFFF !important;
+  background-image: none !important;
+}
+
+/* ---------- 닫기 X ---------- */
+/* 아임웹 기본 X: 숨김 (스크립트가 패널 안에 새 X를 만듦) */
+.mobile_slide_menu_container .navbar-toggle.slide-close {
+  display: none !important;
+}
+
+.od-close {
+  position: absolute;
+  top: 0;
+  right: -22px;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  z-index: 20;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.od-close::before,
+.od-close::after {
+  content: "";
+  position: absolute;
+  width: 22px;
+  height: 1.5px;
+  background: #111111;
+  transform: rotate(45deg);
+}
+
+.od-close::after {
+  transform: rotate(-45deg);
+}
+
+.mobile_slide_menu_container .mobile_slide_menu,
+.mobile_slide_menu_container .mobile_slide_menu .profile-area {
+  position: relative;
+  overflow: visible !important;
+}
+
+/* ---------- 상단 프로필 영역 ---------- */
+.mobile_slide_menu_container .mobile_slide_menu .profile-area {
+  background: #FFFFFF !important;
+  padding: 8px 24px 24px !important;
+  margin: 0 !important;
+  border-bottom: 1px solid rgba(30, 42, 58, 0.10);
+}
+
+.mobile_slide_menu_container .mobile_slide_menu .profile-area .member-info,
+.mobile_slide_menu_container .mobile_slide_menu .profile-area .btn-group {
+  color: #1E2A3A !important;
+}
+
+/* 비로그인 상태: 아임웹 기본 안내문·버튼 숨김 (아래 od-auth로 대체) */
+.mobile_slide_menu_container .mobile_slide_menu .profile-area .member-info.guest {
+  display: none !important;
+}
+
+/* od-guest 영역은 X 버튼 자리 확보 + 버튼 외 요소 숨김 */
+.mobile_slide_menu_container .mobile_slide_menu .profile-area.od-guest > *:not(.od-auth):not(.od-close) {
+  display: none !important;
+}
+
+.mobile_slide_menu_container .mobile_slide_menu .profile-area.od-guest {
+  padding-top: 12px !important;
+  min-height: 0 !important;
+  height: auto !important;
+}
+
+/* ---------- 새 로그인/회원가입 버튼 ---------- */
+.od-auth {
+  display: flex;
+  gap: 12px;
+  padding: 22px 0 0;
+}
+
+.od-auth a {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 52px;
+  border: 1px solid rgba(30, 42, 58, 0.35);
+  border-radius: 2px;
+  color: #1E2A3A;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  background: transparent;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.od-auth a.od-join {
+  border-color: #1E2A3A;
+}
+
+.od-auth a.od-join::before {
+  content: "카카오 가입 시 5,000원 쿠폰";
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 3px 10px;
+  background: #1E2A3A;
+  color: #FFFFFF;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  border-radius: 2px;
+  white-space: nowrap;
+  line-height: 1.4;
+  animation: od-float 2s ease-in-out infinite;
+}
+
+@keyframes od-float {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50%      { transform: translateX(-50%) translateY(-3px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .od-auth a.od-join::before { animation: none; }
+}
+
+/* 로그인 상태에서는 새 버튼 숨김 */
+body.member_login .od-auth,
+.profile-area .member-info:not(.guest) ~ .od-auth {
+  display: none;
+}
+
+/* ---------- 메뉴 ---------- */
+.mobile_slide_menu_container .viewport-nav.mobile {
+  padding: 16px 24px 24px !important;
+}
+
+.mobile_slide_menu_container .viewport-nav.mobile li.depth-01,
+.mobile_slide_menu_container .viewport-nav.mobile li.depth-01:last-child {
+  border-top: 0 !important;
+  border-bottom: 0 !important;
+  background: transparent !important;
+}
+
+.mobile_slide_menu_container .viewport-nav.mobile li.depth-01 > a {
+  padding: 16px 0 !important;
+  font-size: 22px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.02em !important;
+  line-height: 1.2 !important;
+  color: #1E2A3A !important;
+  background: transparent !important;
+}
+
+.mobile_slide_menu_container .viewport-nav.mobile li.depth-01 > a span {
+  color: #1E2A3A !important;
+}
+
+/* 하위메뉴: 기본 접힘, 상위 메뉴 터치로 펼침 */
+.mobile_slide_menu_container .viewport-nav.mobile li.depth-01 > ul {
+  display: none !important;
+  height: auto !important;
+  padding: 0 0 10px 0 !important;
+  margin: -6px 0 0 0 !important;
+  background: transparent !important;
+}
+
+.mobile_slide_menu_container .viewport-nav.mobile li.depth-01.od-open > ul {
+  display: block !important;
+}
+
+/* 펼치기 쉐브론 (하위메뉴 있는 항목만) */
+.mobile_slide_menu_container .viewport-nav.mobile li.depth-01.od-has-sub > a {
+  position: relative;
+  padding-right: 44px !important;
+}
+
+.mobile_slide_menu_container .viewport-nav.mobile li.depth-01.od-has-sub > a::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  width: 9px;
+  height: 9px;
+  border-right: 1.5px solid #1E2A3A;
+  border-bottom: 1.5px solid #1E2A3A;
+  transform: translateY(-65%) rotate(45deg);
+  transition: transform .2s ease;
+}
+
+.mobile_slide_menu_container .viewport-nav.mobile li.depth-01.od-open > a::after {
+  transform: translateY(-25%) rotate(225deg);
+}
+
+.mobile_slide_menu_container .viewport-nav.mobile li li a {
+  padding: 9px 0 !important;
+  font-size: 15px !important;
+  font-weight: 400 !important;
+  color: rgba(30, 42, 58, 0.62) !important;
+  background: transparent !important;
+}
+
+.mobile_slide_menu_container .viewport-nav.mobile li li a span {
+  color: rgba(30, 42, 58, 0.62) !important;
+}
+
+.mobile_slide_menu_container .viewport-nav.mobile li a.active-real {
+  background: transparent !important;
+}
+
+.mobile_slide_menu_container .viewport-nav.mobile .toggle-btn {
+  display: none !important;
+}
+
+/* ---------- 하단 푸터 ---------- */
+.im-mobile-slide-footer {
+  background: #FFFFFF !important;
+  color: rgba(30, 42, 58, 0.62) !important;
+  padding: 20px 24px 40px !important;
+  border-top: 1px solid rgba(30, 42, 58, 0.10);
+}
+
+.im-mobile-slide-footer .btn {
+  color: rgba(30, 42, 58, 0.62) !important;
+  font-size: 14px !important;
+  background: transparent !important;
+}
+
+@media (max-width: 360px) {
+  .mobile_slide_menu_container .viewport-nav.mobile li.depth-01 > a {
+    font-size: 20px !important;
+    padding: 14px 0 !important;
+  }
+}
+</style>
+
+<script>
+/* 비로그인 상태일 때 profile-area 안에 로그인/회원가입 버튼 삽입 */
+(function () {
+  function injectClose() {
+    var area = document.querySelector('.mobile_slide_menu_container .profile-area');
+    if (!area || area.querySelector('.od-close')) return;
+    var orig = document.querySelector('.mobile_slide_menu_container .navbar-toggle.slide-close');
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'od-close';
+    btn.setAttribute('aria-label', '메뉴 닫기');
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (orig) { orig.click(); return; }
+      if (window.MOBILE_SLIDE_MENU && MOBILE_SLIDE_MENU.slideNavToggle) {
+        MOBILE_SLIDE_MENU.slideNavToggle();
+      }
+    });
+    area.appendChild(btn);
+  }
+
+  function bindToggles() {
+    var items = document.querySelectorAll('.mobile_slide_menu_container .viewport-nav.mobile li.depth-01');
+    for (var i = 0; i < items.length; i++) {
+      var li = items[i];
+      if (li.getAttribute('data-od-bound')) continue;
+      var sub = li.querySelector(':scope > ul');
+      var link = li.querySelector(':scope > a');
+      if (!sub || !link) continue;
+      li.setAttribute('data-od-bound', '1');
+      li.classList.add('od-has-sub');
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var parent = this.parentNode;
+        var opening = !parent.classList.contains('od-open');
+        /* 다른 열린 메뉴는 닫음 */
+        var opened = document.querySelectorAll('.viewport-nav.mobile li.depth-01.od-open');
+        for (var j = 0; j < opened.length; j++) opened[j].classList.remove('od-open');
+        if (opening) parent.classList.add('od-open');
+      }, true);
+    }
+  }
+
+  function inject() {
+    injectClose();
+    bindToggles();
+    var area = document.querySelector('.mobile_slide_menu_container .profile-area');
+    if (!area || area.querySelector('.od-auth')) return;
+    var guest = area.querySelector('.member-info.guest');
+    if (!guest) return; /* 로그인 상태면 아무것도 안 함 */
+    area.classList.add('od-guest');
+    var url = '/login?back_url=Lw%3D%3D&used_login_btn=Y';
+    var wrap = document.createElement('div');
+    wrap.className = 'od-auth';
+    wrap.innerHTML =
+      '<a class="od-login" href="' + url + '">로그인</a>' +
+      '<a class="od-join" href="' + url + '">회원가입</a>';
+    area.appendChild(wrap);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', inject);
+  } else {
+    inject();
+  }
+  /* 아임웹이 메뉴를 늦게 그리는 경우 대비 */
+  setTimeout(inject, 800);
+  setTimeout(inject, 2000);
+})();
+</script>
+
+<style>
+/* 카카오 가입 쿠폰 말풍선 — PC 헤더의 로그인(마이페이지) 아이콘 바로 위, 아이콘·상단 띠와 겹치지 않게
+   · 모바일(768px 이하)에서는 표시하지 않음
+   · 이미 로그인한 회원에게는 표시하지 않음 */
+.ond-bubble{
+  position:fixed; z-index:9999; left:0; top:0;
+  background:#1d2b4a; color:#fff; -webkit-text-fill-color:#fff;
+  font-size:11.5px; font-weight:500; letter-spacing:-0.2px;
+  padding:5px 10px; border-radius:14px; line-height:1.2;
+  white-space:nowrap; cursor:pointer;
+  box-shadow:0 3px 10px rgba(29,43,74,.22);
+  animation:ond-float 1.6s ease-in-out infinite;
+  display:none;
+}
+.ond-bubble::after{
+  content:""; position:absolute; left:var(--ond-ax,50%); bottom:-5px;
+  transform:translateX(-50%);
+  border:5px solid transparent; border-top-color:#1d2b4a; border-bottom:0;
+}
+@keyframes ond-float{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-3px)}
+}
+@media (max-width:768px){ .ond-bubble{display:none !important} }
+</style>
+
+<div class="ond-bubble" id="ondBubble">카카오 가입 시 5,000원 쿠폰</div>
+
+<script>
+(function(){
+  var b=document.getElementById('ondBubble'); if(!b) return;
+  function isMember(){ return document.body.classList.contains('member_login') || !!document.querySelector('.profile-area .member-info:not(.guest)'); }
+  /* 헤더 오른쪽의 로그인/마이페이지 아이콘 (상단 띠 안의 링크는 제외) */
+  function findIcon(){
+    var list=[].slice.call(document.querySelectorAll('.login_btn_item a, header a[href*="login"], header a[href*="mypage"], #doz_header a[href*="login"], #doz_header a[href*="mypage"]'))
+      .filter(function(a){ if(a.closest('._text_table')) return false; var r=a.getBoundingClientRect(); return r.width>0 && r.height>0 && r.width<80; });
+    list.sort(function(x,y){ return y.getBoundingClientRect().left - x.getBoundingClientRect().left; });
+    return list[0]||null;
+  }
+  /* 상단 띠(가입 쿠폰 띠)의 아래 끝 — 말풍선이 띠를 덮지 않게 */
+  function bannerBottom(){
+    var bt=0;
+    [].forEach.call(document.querySelectorAll('._text_table'),function(t){ var r=t.getBoundingClientRect(); if(r.height>0 && r.top<60 && r.bottom>bt) bt=r.bottom; });
+    return bt;
+  }
+  function hide(){ b.style.display='none'; }
+  function place(){
+    if(window.innerWidth<=768 || isMember()) return hide();
+    var icon=findIcon(); if(!icon) return hide();
+    var r=icon.getBoundingClientRect();
+    if(r.bottom<0 || r.top>window.innerHeight) return hide();
+    b.style.display='block';
+    var w=b.offsetWidth, h=b.offsetHeight, cx=r.left+r.width/2;
+    var left=Math.max(8, Math.min(cx - w/2, window.innerWidth - w - 8));
+    var top=r.top - h - 9;                                  /* 아이콘 바로 위, 화살표 포함 간격 */
+    var minTop=bannerBottom()+4; if(top<minTop) top=minTop;  /* 상단 띠와 안 겹치게 */
+    if(top+h+5>r.top){ return hide(); }                     /* 아이콘 위 공간이 없으면(헤더가 줄어든 경우) 숨김 */
+    b.style.left=left+'px'; b.style.top=top+'px';
+    b.style.setProperty('--ond-ax', Math.max(10, Math.min(cx-left, w-10))+'px');  /* 화살표는 아이콘 가운데를 가리킴 */
+  }
+  var last='';
+  function loop(){
+    var icon=findIcon(), key=window.innerWidth+','+(icon?(function(r){return r.left+','+r.top;})(icon.getBoundingClientRect()):'x')+','+bannerBottom();
+    if(key!==last){ last=key; place(); }
+    requestAnimationFrame(loop);
+  }
+  place(); requestAnimationFrame(loop);
+  window.addEventListener('resize',place);
+  b.addEventListener('click',function(){ var icon=findIcon(); if(icon) location.href=icon.href; });
+})();
+</script>
+
+<!-- ONDIREV 상품 페이지: 기본 쿠폰 칸 → 카카오톡 가입 유도 버튼으로 교체
+     넣는 곳: Body Code 맨 아래 (기존 카카오 말풍선 코드 아래에 이어 붙이기) -->
+<style>
+  .od-kcoupon{
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    width:100%; min-height:52px; padding:14px 18px; margin:14px 0;
+    background:#FEE500; color:#191919 !important; border-radius:10px; text-decoration:none !important;
+    font-family:"Pretendard Variable",Pretendard,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+    font-size:15px; font-weight:500; letter-spacing:-.01em; line-height:1.35; text-align:center;
+    box-sizing:border-box; transition:filter .2s;
+  }
+  .od-kcoupon:hover{ filter:brightness(.96); }
+  .od-kcoupon.is-channel{ background:#1b3a5c; color:#fff !important; margin-top:-6px; }
+  .od-kcoupon.is-channel svg path{ fill:#fff; }
+  .od-kcoupon.is-channel:hover{ filter:brightness(1.12); }
+  .od-kcoupon b{ font-weight:800; }
+  .od-kcoupon svg{ width:20px; height:20px; flex:none; }
+  .od-kcoupon svg path{ fill:#191919; }
+  @media (max-width:760px){ .od-kcoupon{ font-size:14px; min-height:48px; } }
+</style>
+<script>
+/* ============================================================
+   가입 쿠폰은 카카오로 가입·로그인한 회원에게만 보여준다
+   - 카카오 로그인에서 돌아온 브라우저에 표시(od_kakao=1)를 남긴다
+   - 비회원: 쿠폰 칸 → "카카오톡 1초 가입 후 5,000원 쿠폰 받기" 버튼
+   - 일반 가입 회원: 쿠폰 칸 숨김 (쿠폰받기 버튼 자체가 안 보임)
+   - 카카오 회원: 아임웹 쿠폰 칸 그대로 (쿠폰받기 가능)
+   ============================================================ */
+(function(){
+  var FIND = "회원가입 기념 쿠폰";   // 아임웹 쿠폰 칸에 적힌 문구 (쿠폰 이름을 바꾸면 여기도 같이)
+  var KEY = "od_kakao";
+
+  /* 1) 카카오 로그인에서 돌아왔는지 확인 → 표시 남기기 */
+  (function mark(){
+    var href = "", ref = document.referrer || "";
+    try{ href = decodeURIComponent(decodeURIComponent(location.href)); }catch(e){ href = location.href; }
+    if(/kakao_sync|kakao_login|oauth[^\s]*kakao/i.test(href) || /(kauth|accounts)\.kakao\.com/i.test(ref)){
+      try{ localStorage.setItem(KEY, "1"); }catch(e){}
+    }
+  })();
+  function isKakao(){ try{ return localStorage.getItem(KEY) === "1"; }catch(e){ return false; } }
+  function isGuest(){
+    if(document.querySelector(".member-info.guest")) return true;
+    if(document.body.classList.contains("member_login")) return false;
+    if(document.querySelector(".profile-area .member-info")) return false;
+    return true;   // 판단이 안 되면 비회원으로 본다
+  }
+  function loginHref(){
+    try{ return "/login?back_url=" + encodeURIComponent(btoa(location.pathname + location.search)) + "&used_login_btn=Y"; }
+    catch(e){ return "/login"; }
+  }
+  function makeBtn(){
+    var a = document.createElement("a");
+    a.className = "od-kcoupon"; a.href = loginHref();
+    a.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3C6.9 3 3 6.3 3 10.3c0 2.5 1.6 4.7 4.1 6l-.9 3.4c-.1.3.2.5.5.4l4-2.7c.4 0 .9.1 1.3.1 5.1 0 9-3.3 9-7.2S17.1 3 12 3z"/></svg>'
+                + '<span>카카오톡 1초 가입 후 <b>5,000원 쿠폰</b> 받기</span>';
+    return a;
+  }
+  var CHANNEL_URL = "https://pf.kakao.com/_lkcJX/friend";   // 채널 친구 추가 바로가기
+  var CH_KEY = "od_channel";
+  function isChannel(){ try{ return localStorage.getItem(CH_KEY) === "1"; }catch(e){ return false; } }
+  function makeChannelBtn(){
+    var a = document.createElement("a");
+    a.className = "od-kcoupon is-channel"; a.href = CHANNEL_URL; a.target = "_blank"; a.rel = "noopener";
+    /* 누르면 이 브라우저에 '채널 추가함' 표시 → 다음부터 채널 버튼 숨김 */
+    a.addEventListener("click", function(){ try{ localStorage.setItem(CH_KEY, "1"); }catch(e){} setTimeout(function(){ document.querySelectorAll(".od-kcoupon.is-channel").forEach(function(b){ b.remove(); }); }, 300); });
+    a.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3C6.9 3 3 6.3 3 10.3c0 2.5 1.6 4.7 4.1 6l-.9 3.4c-.1.3.2.5.5.4l4-2.7c.4 0 .9.1 1.3.1 5.1 0 9-3.3 9-7.2S17.1 3 12 3z"/></svg>'
+                + '<span>카카오 채널 추가 시 <b>2,000원 쿠폰</b> 지급</span>';
+    return a;
+  }
+  function findBoxes(){
+    var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null), n, out=[];
+    while((n = walker.nextNode())){
+      var pe = n.parentElement; if(!pe || /^(SCRIPT|STYLE|NOSCRIPT|TEXTAREA)$/.test(pe.tagName)) continue;
+      if(n.nodeValue.indexOf(FIND) === -1 || pe.closest("[data-od-kc]")) continue;
+      var box = pe;
+      while(box.parentElement && box.parentElement !== document.body && !(/쿠폰\s*받기/.test(box.textContent) && box.textContent.length < 300)) box = box.parentElement;
+      if(!(/쿠폰\s*받기/.test(box.textContent) && box.textContent.length < 300)) box = pe;
+      if(out.indexOf(box) === -1) out.push(box);
+    }
+    return out;
+  }
+  /* 누구에게 무엇을 보여줄지
+     비회원·일반 회원          : 가입 버튼 + 채널 버튼  (쿠폰 칸 숨김)
+     카카오 회원, 채널 미추가   : 채널 버튼만             (쿠폰 칸 그대로 → 5,000원 받기)
+     카카오 회원, 채널 추가     : 버튼 없음               (쿠폰 칸 그대로) */
+  function apply(){
+    var kakaoMember = isKakao() && !isGuest();
+    var showJoin = !kakaoMember, showChannel = !(kakaoMember && isChannel());
+    findBoxes().forEach(function(box){
+      if(box.hasAttribute("data-od-kc")) return;
+      box.setAttribute("data-od-kc","1");
+      var after = box.nextSibling;
+      if(showJoin) box.parentNode.insertBefore(makeBtn(), box);
+      if(!kakaoMember) box.style.setProperty("display","none","important");
+      if(showChannel) box.parentNode.insertBefore(makeChannelBtn(), after);
+    });
+    if(document.querySelector("[data-od-kc]")) document.documentElement.classList.add("od-ready");
+  }
+  function start(){
+    apply();
+    var mo = new MutationObserver(apply);
+    mo.observe(document.body, {childList:true, subtree:true});
+    setTimeout(function(){ mo.disconnect(); }, 15000);
+  }
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", start); else start();
+})();
+</script>
+
+<!-- ============================================================
+     로그인 페이지: "카카오로 시작하기" 아래 쿠폰 안내 배너 + 기존 회원 / 비회원 주문조회 탭
+     ============================================================ -->
+<style>
+  .od-lgx{ word-break:keep-all; margin:18px 0 0; font-family:"Pretendard Variable",Pretendard,"Apple SD Gothic Neo","Noto Sans KR",sans-serif; color:#1E2A3A; }
+  .od-lgx *{ box-sizing:border-box; }
+  .od-lgx-banner{
+    position:relative; display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding:24px 22px; border-radius:16px; overflow:hidden; text-decoration:none !important; color:#1E2A3A !important;
+    background:linear-gradient(135deg,#F7F9FC 0%,#E6EDF5 55%,#D3DFEC 100%);
+    border:1px solid rgba(30,42,58,.08);
+  }
+  .od-lgx-txt{ position:relative; z-index:1; min-width:0; }
+  .od-lgx-label{ font-size:11px; letter-spacing:.28em; text-transform:uppercase; color:#6E8299; margin-bottom:12px; }
+  .od-lgx-lead{ font-size:14px; line-height:1.4; margin-bottom:6px; }
+  .od-lgx-big{ font-size:30px; font-weight:800; letter-spacing:-.02em; line-height:1.15; color:#1b3a5c; }
+  .od-lgx-big small{ font-size:20px; font-weight:700; }
+  .od-lgx-sub{ margin-top:10px; font-size:13px; line-height:1.5; color:#1E2A3A; opacity:.8; }
+  .od-lgx-sub b{ color:#1b3a5c; font-weight:700; opacity:1; }
+  /* 테마 스타일이 덮어써서 PC에서 원이 찌그러지지 않도록 크기·비율을 고정 */
+  .od-lgx-txt{ text-align:left !important; flex:1 1 auto; }
+  .od-lgx-txt > div{ text-align:left !important; margin-left:0 !important; padding-left:0 !important; }
+  .od-lgx-orbit{ position:relative !important; z-index:0; flex:0 0 118px !important; width:118px !important; height:118px !important; min-width:118px !important; max-width:118px !important; aspect-ratio:1/1; }
+  .od-lgx-orbit svg{ position:absolute !important; inset:0 !important; width:100% !important; height:100% !important; max-width:none !important; display:block !important; overflow:visible; filter:drop-shadow(0 5px 10px rgba(27,58,92,.18)); }
+  .od-lgx-orbit .od-lgx-badge{
+    position:absolute !important; left:50% !important; top:50% !important; transform:translate(-50%,-50%) !important;
+    display:flex !important; flex-direction:column !important; align-items:center !important; justify-content:center !important;
+    width:66px !important; height:66px !important; min-width:66px !important; padding:0 !important; margin:0 !important; border-radius:50% !important;
+    background:#1b3a5c !important; color:#fff !important; text-align:center !important;
+    font-size:15px !important; font-weight:800 !important; line-height:1.05 !important; letter-spacing:-.02em !important; box-shadow:0 6px 16px rgba(27,58,92,.25);
+  }
+  .od-lgx-badge span{ display:block !important; font-size:8.5px !important; font-weight:500 !important; letter-spacing:.12em !important; line-height:1 !important; margin-top:4px !important; opacity:.85; }
+  .od-lgx-tabs{ display:grid; grid-template-columns:1fr 1fr; gap:0; margin-top:22px; margin-bottom:22px; padding:4px; border-radius:999px; background:#EEF2F7; }
+  .od-lgx-tabs button{
+    height:48px !important; border:0 !important; border-radius:999px !important; background:transparent !important; cursor:pointer; box-shadow:none !important;
+    font-family:inherit; font-size:15px !important; font-weight:600; letter-spacing:.02em; color:#6E8299 !important; padding:0 !important; margin:0 !important; width:100% !important;
+    transition:background .2s,color .2s; -webkit-tap-highlight-color:transparent;
+  }
+  /* 로그인 페이지 체크박스: 체크 시 짙은 검회색 */
+  html.od-login input[type="checkbox"]{ accent-color:#2F3237 !important; }
+  html.od-login input[type="checkbox"]:checked + label::before,
+  html.od-login input[type="checkbox"]:checked + span::before,
+  html.od-login input[type="checkbox"]:checked + i,
+  html.od-login label input[type="checkbox"]:checked + *::before{ background-color:#2F3237 !important; border-color:#2F3237 !important; }
+  .od-lgx-guest{ margin:0 0 12px; }
+  .od-lgx-gorder{ display:flex !important; align-items:center; justify-content:center; width:100% !important; height:52px !important; border-radius:999px !important;
+    background:#1b3a5c !important; color:#fff !important; -webkit-text-fill-color:#fff !important; border:0 !important; font-family:inherit; font-size:15px !important; font-weight:600; letter-spacing:.04em; cursor:pointer; }
+  .od-lgx-gnote{ margin:10px 4px 0; font-size:13px; line-height:1.5; color:#6E8299; text-align:center; }
+  .od-lgx-tabs button.is-on{ background:#1b3a5c !important; color:#fff !important; }
+  @media (max-width:380px){
+    .od-lgx-banner{ padding:20px 16px; }
+    .od-lgx-big{ font-size:26px; }
+    .od-lgx-orbit{ flex-basis:96px !important; width:96px !important; height:96px !important; min-width:96px !important; max-width:96px !important; }
+    .od-lgx-orbit .od-lgx-badge{ width:56px !important; height:56px !important; min-width:56px !important; font-size:13px !important; }
+  }
+</style>
+<script>
+(function(){
+  if(location.pathname.indexOf("/login") !== 0) return;
+  document.documentElement.classList.add("od-login");
+  var CHANNEL_URL = "https://pf.kakao.com/_lkcJX/friend";
+
+  function findByText(re, sel){
+    var els = document.querySelectorAll(sel || "a,button,div,span,p");
+    for(var i=0;i<els.length;i++){
+      var t = (els[i].textContent||"").replace(/\s+/g,"");
+      if(re.test(t) && t.length < 40 && !els[i].closest(".od-lgx")) return els[i];
+    }
+    return null;
+  }
+  /* 화면에 실제로 보이는 것 중에서 찾기 (PC·모바일 영역이 따로 있을 수 있음) */
+  function visibleByText(re, sel){
+    var els = document.querySelectorAll(sel || "a,button");
+    for(var i=0;i<els.length;i++){
+      var t = (els[i].textContent||"").replace(/\s+/g,"");
+      if(re.test(t) && t.length < 40 && els[i].offsetParent !== null && !els[i].closest(".od-lgx")) return els[i];
+    }
+    return null;
+  }
+
+  function build(){
+    if(document.querySelector(".od-lgx")) return true;
+    var kakao = visibleByText(/카카오로시작|카카오로그인|카카오.*시작/, "a,button") || findByText(/카카오로시작|카카오로그인/, "a,button");
+    if(!kakao) return false;
+
+    var wrap = document.createElement("div");
+    wrap.className = "od-lgx";
+    wrap.innerHTML =
+      '<a class="od-lgx-banner" href="#" data-odl="kakao">' +
+        '<div class="od-lgx-txt">' +
+          '<div class="od-lgx-label">Welcome Benefit</div>' +
+          '<div class="od-lgx-lead">카카오로 1초 가입하면</div>' +
+          '<div class="od-lgx-big">5,000<small>원 쿠폰</small></div>' +
+          '<div class="od-lgx-sub">채널 추가하면 <b>2,000원</b> 더</div>' +
+        '</div>' +
+        '<div class="od-lgx-orbit" aria-hidden="true">' +
+          '<svg viewBox="0 0 120 120" fill="none">' +
+            '<circle cx="60" cy="60" r="57" stroke="#1b3a5c" stroke-opacity=".10"/>' +
+            '<circle cx="60" cy="60" r="47" stroke="#1b3a5c" stroke-opacity=".16" stroke-dasharray="2 5"/>' +
+            '<circle cx="60" cy="60" r="38" stroke="#4B86B4" stroke-opacity=".35"/>' +
+            '<path d="M60 3a57 57 0 0 1 49 28" stroke="#4B86B4" stroke-width="1.6" stroke-linecap="round"/>' +
+            '<circle cx="109" cy="31" r="2.6" fill="#4B86B4"/>' +
+            /* 가운데 남색 원과 글자를 그림 안에 그려서, 테마 글꼴·크기와 상관없이 항상 원 안에 맞게 */
+            '<circle cx="60" cy="60" r="40" fill="#1b3a5c"/>' +
+            '<text x="60" y="63" text-anchor="middle" fill="#fff" font-size="19" font-weight="800" textLength="58" lengthAdjust="spacingAndGlyphs" style="font-family:Pretendard,\'Apple SD Gothic Neo\',sans-serif">+7,000</text>' +
+            '<text x="60" y="78" text-anchor="middle" fill="#fff" fill-opacity=".85" font-size="9.5" font-weight="500" textLength="44" lengthAdjust="spacingAndGlyphs" style="font-family:Pretendard,\'Apple SD Gothic Neo\',sans-serif">COUPON</text>' +
+          '</svg>' +
+        '</div>' +
+      '</a>' +
+      '<div class="od-lgx-tabs" role="tablist">' +
+        '<button type="button" class="is-on" data-odl="member" role="tab" aria-selected="true">기존 회원</button>' +
+        '<button type="button" data-odl="guest" role="tab" aria-selected="false">비회원 주문</button>' +
+      '</div>' +
+      '<div class="od-lgx-guest" hidden>' +
+        '<button type="button" class="od-lgx-gorder">비회원으로 주문하기</button>' +
+      '</div>';
+
+    /* 카카오 버튼을 감싼 덩어리 바로 아래에 넣는다 */
+    var anchor = kakao;
+    while(anchor.parentElement && anchor.parentElement.children.length === 1 && anchor.parentElement !== document.body) anchor = anchor.parentElement;
+    anchor.parentNode.insertBefore(wrap, anchor.nextSibling);
+
+    /* 배너: 카카오 버튼을 대신 눌러 준다 */
+    wrap.querySelector('[data-odl="kakao"]').addEventListener("click", function(e){ e.preventDefault(); kakao.click(); });
+
+    /* 탭: 기존 회원 = 이메일 로그인 영역, 비회원 주문조회 = 비회원 주문배송 조회 버튼 */
+    var tabs = wrap.querySelectorAll(".od-lgx-tabs button");
+    function setOn(btn){ tabs.forEach(function(b){ var on = b===btn; b.classList.toggle("is-on", on); b.setAttribute("aria-selected", on); }); }
+    /* 숨길 때 원래 display 값을 기억했다가 그대로 되돌린다 */
+    function show(el, on){
+      if(!el) return;
+      if(!el.hasAttribute("data-od-disp")) el.setAttribute("data-od-disp", (el.style.getPropertyValue("display")||"") + "|" + (el.style.getPropertyPriority("display")||""));
+      if(on){ var v = el.getAttribute("data-od-disp").split("|"); if(v[0]) el.style.setProperty("display", v[0], v[1]); else el.style.removeProperty("display"); }
+      else el.style.setProperty("display","none","important");
+    }
+    function parts(){
+      var P = { member:[], guest:null };
+      var email = document.querySelector('input[type="email"], input[name*="email" i], input[name*="uid" i]') || document.querySelector('input[type="text"]:not([type="hidden"])');
+      var pw = document.querySelector('input[type="password"]');
+      var find = findByText(/비밀번호찾기|아이디.*찾기/, "a,button,span");
+      var g = findByText(/비회원주문(배송)?조회/, "a,button") || findByText(/비회원주문/, "a,button");
+      /* 아임웹 기본 '비회원 구매/비회원 주문하기' (조회 버튼과 구분) */
+      var go = null; [].some.call(document.querySelectorAll("a,button"), function(x){ if(x.closest(".od-lgx")) return false; var t=x.textContent.replace(/\s+/g,""); if(/^비회원(으로)?(구매|주문)(하기)?$/.test(t)){ go=x; return true; } return false; });
+      P.gorder = go;
+      if(go){ var gow=go; while(gow.parentElement && gow.parentElement!==document.body && gow.parentElement.textContent.replace(/\s+/g,"")===go.textContent.replace(/\s+/g,"")) gow=gow.parentElement; P.gorderWrap=gow; }
+      if(g){ var gw = g; while(gw.parentElement && gw.parentElement !== document.body && gw.parentElement.textContent.replace(/\s+/g,"") === g.textContent.replace(/\s+/g,"")) gw = gw.parentElement; P.guest = gw; }
+      var a = email || pw, b = find || pw;
+      if(!a) return P;
+      /* 이메일 입력칸과 '아이디·비밀번호 찾기'를 함께 품은 가장 작은 상자 */
+      var L = a; while(L && b && !L.contains(b)) L = L.parentElement;
+      if(!L) return P;
+      var hasOther = function(x){ return x.contains(wrap) || x.contains(kakao) || (P.guest && x.contains(P.guest)); };
+      if(!hasOther(L)){ P.member = [L]; return P; }
+      /* 같은 상자에 카카오·배너·비회원 버튼까지 있으면, 그 사이 형제들만 로그인 영역으로 본다 */
+      var kids = Array.prototype.slice.call(L.children), start = -1, end = kids.length;
+      kids.forEach(function(k,i){ if(k.contains(wrap) || k.contains(kakao)) start = i; if(P.guest && k.contains(P.guest) && end === kids.length) end = i; });
+      for(var i = start+1; i < end; i++){ if(!/^또는$/.test(kids[i].textContent.trim())) P.member.push(kids[i]); }
+      return P;
+    }
+    /* 구분선 '또는'은 항상 숨김 */
+    function hideOr(){
+      var els = document.querySelectorAll("div,p,span,li,h4,h5");
+      for(var i=0;i<els.length;i++){
+        var el = els[i]; if(el.closest(".od-lgx")) continue;
+        if(el.textContent.trim() === "또는" && !el.querySelector("input,button,a")){
+          var w = el; while(w.parentElement && w.parentElement !== document.body && w.parentElement.textContent.trim() === "또는" && !w.parentElement.querySelector("input,button,a")) w = w.parentElement;
+          w.style.setProperty("display","none","important");
+        }
+      }
+    }
+    /* 회원가입 · 아이디·비밀번호 찾기 글자는 검정, 로그인상태유지 체크는 짙은 검회색 */
+    function tone(){
+      ["회원가입", "비밀번호찾기"].forEach(function(t){
+        var els = document.querySelectorAll("a,button,span");
+        for(var i=0;i<els.length;i++){
+          var el = els[i]; if(el.closest(".od-lgx")) continue;
+          var tx = el.textContent.replace(/\s+/g,"");
+          if(tx.length < 16 && tx.indexOf(t) !== -1){ el.style.setProperty("color","#111111","important"); el.querySelectorAll("*").forEach(function(c){ c.style.setProperty("color","#111111","important"); }); }
+        }
+      });
+      document.querySelectorAll('input[type="checkbox"]').forEach(function(cb){ cb.style.setProperty("accent-color","#2F3237","important"); });
+    }
+    function mode(m){
+      tone();
+      var P = parts();
+      P.member.forEach(function(x){ show(x, m === "member"); });
+      show(P.guest, m === "guest");
+      if(P.gorderWrap) show(P.gorderWrap, false);   /* 아임웹 기본 버튼은 숨기고 우리 버튼으로 대신 */
+      var gbox = wrap.querySelector(".od-lgx-guest"); gbox.hidden = (m !== "guest");
+      wrap.__gorder = P.gorder;
+      hideOr();
+    }
+    wrap.querySelector(".od-lgx-gorder").addEventListener("click", function(){
+      /* 아임웹 비회원 구매 버튼이 있으면 그걸 누르고, 없으면 상품 목록으로 바로 이동 */
+      var go = wrap.__gorder;
+      if(go){ go.click(); return; }
+      location.href = "https://www.ondirev.com/prdouct";
+    });
+    wrap.querySelector('[data-odl="member"]').addEventListener("click", function(){ setOn(this); mode("member"); });
+    wrap.querySelector('[data-odl="guest"]').addEventListener("click", function(){ setOn(this); mode("guest"); });
+    mode("member");
+    setTimeout(function(){ if(wrap.querySelector('[data-odl="member"]').classList.contains("is-on")) mode("member"); }, 800);
+    return true;
+  }
+
+  /* 아임웹 기본 "플친 쿠폰 지급" 말풍선 숨김 */
+  function hideBubble(){
+    var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null), n;
+    while((n = walker.nextNode())){
+      var pe = n.parentElement; if(!pe || /^(SCRIPT|STYLE)$/.test(pe.tagName) || pe.closest(".od-lgx")) continue;
+      if(/플친\s*쿠폰/.test(n.nodeValue)){
+        var el = pe;   /* 말풍선 꼬리까지 같이 숨기도록 글자만 든 가장 작은 상자 */
+        while(el.parentElement && el.parentElement.textContent.replace(/\s+/g,"").length <= 12) el = el.parentElement;
+        el.style.setProperty("display","none","important");
+      }
+    }
+  }
+  function start(){
+    hideBubble();
+    var mo2 = new MutationObserver(hideBubble);
+    mo2.observe(document.body, {childList:true, subtree:true});
+    setTimeout(function(){ mo2.disconnect(); }, 15000);
+    if(build()) return;
+    var mo = new MutationObserver(function(){ if(build()) mo.disconnect(); });
+    mo.observe(document.body, {childList:true, subtree:true});
+    setTimeout(function(){ mo.disconnect(); }, 15000);
+  }
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", start); else start();
+})();
+</script>
+
+<!-- ============================================================
+     상품 페이지: 수량별 구매 혜택 카드 (회원가 기준)
+     ============================================================ -->
+<style>
+  .od-qty{ display:grid; gap:10px; margin:18px 0; padding:14px; border-radius:14px; background:#F3F6FA;
+    font-family:"Pretendard Variable",Pretendard,"Apple SD Gothic Neo","Noto Sans KR",sans-serif; color:#1E2A3A; word-break:keep-all; }
+  .od-qty *{ box-sizing:border-box; }
+  .od-qty-card{ position:relative; display:flex; align-items:center; justify-content:space-between; gap:12px;
+    width:100%; padding:18px 18px; background:#fff; border:1px solid rgba(30,42,58,.12); border-radius:12px;
+    text-align:left; cursor:pointer; font:inherit; color:inherit; transition:border-color .2s, box-shadow .2s; }
+  .od-qty-card:hover{ border-color:rgba(27,58,92,.45); }
+  .od-qty-card.is-on{ border-color:#1b3a5c; box-shadow:0 0 0 1px #1b3a5c inset; }
+  .od-qty-flag{ position:absolute; top:-1px; left:16px; padding:4px 9px; border-radius:0 0 6px 6px; background:#1b3a5c; color:#fff; font-size:11px; font-weight:700; letter-spacing:.08em; }
+  .od-qty-l{ min-width:0; }
+  .od-qty-sub{ font-size:13px; color:#6E8299; margin-bottom:4px; }
+  .od-qty-name{ font-size:16px; font-weight:700; display:flex; align-items:center; flex-wrap:wrap; gap:6px; }
+  .od-qty-tag{ font-size:11px; font-weight:700; padding:3px 8px; border-radius:999px; background:#E6EEF6; color:#1b3a5c; }
+  .od-qty-r{ flex:none; text-align:right; }
+  .od-qty-off{ display:inline-block; padding:3px 9px; border-radius:999px; background:#1b3a5c; color:#fff; font-size:12px; font-weight:700; margin-bottom:6px; }
+  .od-qty-unit{ font-size:16px; font-weight:800; white-space:nowrap; }
+  .od-qty-unit small{ font-size:12px; font-weight:500; color:#6E8299; margin-left:2px; }
+  .od-qty-total{ font-size:12px; color:#6E8299; margin-top:2px; white-space:nowrap; }
+  .od-qty-card.has-flag{ padding-top:28px; }
+  .od-qty-head{ display:flex; align-items:center; justify-content:space-between; gap:8px; padding:2px 4px 2px; font-size:13px; font-weight:700; color:#1b3a5c; }
+  .od-qty-head small{ font-size:11.5px; font-weight:500; color:#6E8299; }
+  .od-qty-head small a{ color:#1b3a5c !important; text-decoration:underline !important; font-weight:600; }
+  /* "카카오 1초 가입 후 적용" 전체가 로그인 버튼 */
+  .od-qty-head a.od-qty-login{ flex:none; font-size:11.5px; font-weight:500; color:#6E8299 !important; -webkit-text-fill-color:#6E8299 !important; text-decoration:none !important; cursor:pointer; }
+  .od-qty-head a.od-qty-login u{ color:#1b3a5c; -webkit-text-fill-color:#1b3a5c; text-decoration:underline; font-weight:600; }
+  @media (max-width:420px){ .od-qty{ padding:10px; } .od-qty-card{ padding:16px 14px; } .od-qty-card.has-flag{ padding-top:26px; } .od-qty-name{ font-size:15px; } }
+</style>
+<script>
+(function(){
+  /* ===== 설정 (상품 번호별) =====
+     base: 판매가, member: 회원가, rate: 수량별 추가 할인율(아임웹 '수량별 혜택'과 같게), free: 무료배송 기준 금액 */
+  var PRODUCTS = {
+    "1": { base:32000, member:26800, free:50000,
+      tiers:[
+        { n:1, sub:"처음 써보는 분께",   name:"단품 1개",  rate:0  },
+        { n:2, sub:"나눠 쓰기 좋은",      name:"2개 세트",  rate:5,  flag:"BEST" },
+        { n:3, sub:"가장 큰 혜택",        name:"3개 세트",  rate:10, flag:"최대할인" }
+      ] }
+  };
+  var m = location.search.match(/[?&]idx=(\d+)/); if(!m || !PRODUCTS[m[1]]) return;
+  var P = PRODUCTS[m[1]];
+  var won = function(v){ return v.toLocaleString("ko-KR") + "원"; };
+
+  function qtyInput(){
+    var ins = document.querySelectorAll('input[type="text"], input[type="number"], input:not([type])');
+    for(var i=0;i<ins.length;i++){ var el=ins[i]; if(el.offsetParent===null) continue; if(/^\d+$/.test(el.value) && el.closest("div") && /수량/.test((el.closest("div").parentElement||{}).textContent||"")) return el; }
+    for(var j=0;j<ins.length;j++){ if(ins[j].offsetParent!==null && /^\d+$/.test(ins[j].value) && ins[j].value.length<4) return ins[j]; }
+    return null;
+  }
+  /* 아임웹 수량 +/− 버튼을 눌러서 원하는 수량으로 맞춘다 */
+  function setQty(n){
+    var inp = qtyInput(); if(!inp) return;
+    var box = inp.parentElement, btns = box ? box.querySelectorAll("button,a,span[class*='plus'],span[class*='minus']") : [];
+    window.__odSetQty(inp, n, btns[0], btns[btns.length-1]);
+  }
+
+  function hasNativeInPageBuy(){
+    var els=document.querySelectorAll("a,button");
+    for(var i=0;i<els.length;i++){ var e=els[i]; if(e.closest(".od-buybar,.od-mbuy")) continue;
+      var t=(e.textContent||"").replace(/\s+/g,""); if(!/^(구매하기|바로구매)$/.test(t) || e.offsetParent===null) continue;
+      var fx=false; for(var a=e;a&&a!==document.body;a=a.parentElement){ if(getComputedStyle(a).position==="fixed"){fx=true;break;} } if(!fx) return true; }
+    return false;
+  }
+  function build(){
+    if(document.querySelector(".od-qty")) return true;
+    if(!hasNativeInPageBuy()) return false;   /* 모바일처럼 본문 구매 영역이 없는 화면은 아래 '모바일 구매 영역'이 대신 그림 */
+    /* 위치: 카카오 쿠폰 버튼들 아래 → 없으면 아임웹 '구매하면 … 추가 할인' 띠 위 */
+    var anchor = document.querySelector(".od-kcoupon.is-channel") || document.querySelectorAll(".od-kcoupon")[0];
+    var promo = null, els = document.querySelectorAll("div,p,span");
+    for(var i=0;i<els.length;i++){ var t=els[i].textContent.replace(/\s+/g,""); if(/개이상구매하면.*추가할인/.test(t) && t.length<30){ promo = els[i]; } }
+    if(!anchor && !promo) return false;
+
+    var wrap = document.createElement("div"); wrap.className = "od-qty";
+    wrap.appendChild((function(){ var hd=document.createElement("div"); hd.className="od-qty-head"; hd.innerHTML = window.__odIsGuest() ? '<span>회원 전용 세트가</span><a class="od-qty-login" href="'+window.__odLoginHref()+'"><u>카카오 1초 가입</u> 후 적용</a>' : '<span>회원 전용 세트가</span><small>회원·카카오 회원 적용</small>'; return hd; })());
+    P.tiers.forEach(function(t){
+      var unit = Math.round(P.member * (100 - t.rate) / 100 / 10) * 10, total = unit * t.n;
+      var off = Math.floor((1 - unit / P.base) * 100 + 1e-6);
+      var btn = document.createElement("button"); btn.type = "button";
+      btn.className = "od-qty-card" + (t.flag ? " has-flag" : ""); btn.setAttribute("data-n", t.n);
+      btn.innerHTML =
+        (t.flag ? '<span class="od-qty-flag">'+t.flag+'</span>' : '') +
+        '<div class="od-qty-l"><div class="od-qty-sub">'+t.sub+'</div><div class="od-qty-name">'+t.name+
+          (total >= P.free ? '<span class="od-qty-tag">무료배송</span>' : '')+'</div></div>' +
+        '<div class="od-qty-r"><span class="od-qty-off">-'+off+'%</span>' +
+          '<div class="od-qty-unit">'+won(unit)+(t.n>1?'<small>/ 1개당</small>':'')+'</div>' +
+          (t.n>1 ? '<div class="od-qty-total">총 '+won(total)+'</div>' : '') + '</div>';
+      btn.addEventListener("click", function(){
+        /* 비회원도 선택 가능 (결제 금액은 비회원가로 계산됨) */
+        wrap.querySelectorAll(".od-qty-card").forEach(function(c){ c.classList.toggle("is-on", c===btn); });
+        setQty(t.n);
+      });
+      wrap.appendChild(btn);
+    });
+
+    if(promo){ var pw = promo; while(pw.parentElement && pw.parentElement.textContent.replace(/\s+/g,"") === promo.textContent.replace(/\s+/g,"")) pw = pw.parentElement; pw.parentNode.insertBefore(wrap, pw); pw.style.setProperty("display","none","important"); }
+    else anchor.parentNode.insertBefore(wrap, anchor.nextSibling);
+    var cur = qtyInput(); var cv = cur ? parseInt(cur.value,10) : 1;
+    wrap.querySelectorAll(".od-qty-card").forEach(function(c){ c.classList.toggle("is-on", +c.getAttribute("data-n") === (cv>=3?3:cv)); });
+    return true;
+  }
+  function start(){
+    if(build()) return;
+    var mo = new MutationObserver(function(){ if(build()) mo.disconnect(); });
+    mo.observe(document.body, {childList:true, subtree:true});
+    setTimeout(function(){ mo.disconnect(); }, 15000);
+  }
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", start); else start();
+})();
+</script>
+
+<!-- ============================================================
+     상품 페이지: 구매 영역 따라오기
+     - PC(1024px 이상): 오른쪽 구매 칸은 처음엔 페이지와 같이 내려가다가, 구매하기 버튼까지 다 보이면 그때부터 화면에 붙어 따라옴
+     - 모바일: 본문 구매하기 버튼을 지나 내려가면 하단 구매 바(장바구니·구매하기)가 나타남
+     ============================================================ -->
+<style>
+  /* 칸 안 스크롤 없음: 페이지와 함께 내려가다가, 칸의 맨 아래(구매하기 버튼)가 화면 아래에 닿으면 그 자리에 붙어서 따라옴 */
+  .od-sticky-col{ position:sticky !important; top:var(--od-top,90px) !important; align-self:flex-start !important; }
+
+  .od-buybar{ position:fixed; left:0; right:0; bottom:0; z-index:2147482000; background:#fff; border-top:1px solid rgba(30,42,58,.12);
+    box-shadow:0 -6px 20px rgba(30,42,58,.08); transform:translateY(110%); transition:transform .28s cubic-bezier(.22,.61,.36,1);
+    font-family:"Pretendard Variable",Pretendard,"Apple SD Gothic Neo","Noto Sans KR",sans-serif; color:#1E2A3A; }
+  .od-buybar.is-on{ transform:none; }
+  .od-buybar-in{ display:flex; gap:8px; padding:10px 12px calc(10px + env(safe-area-inset-bottom)); box-sizing:border-box; }
+  .od-buybar button{ height:50px; border-radius:999px; font-family:inherit; font-size:15px; font-weight:600; cursor:pointer; letter-spacing:.02em; }
+  .od-buybar .od-cart{ flex:0 0 34%; background:#fff; color:#1b3a5c; border:1px solid #1b3a5c; }
+  .od-buybar .od-buy{ flex:1; background:#1b3a5c; color:#fff; border:1px solid #1b3a5c; }
+</style>
+<script>
+(function(){
+  if(!/[?&]idx=\d+/.test(location.search)) return;
+  /* 상품 상세페이지에서만 (방향찾기 설문처럼 주소에 idx가 붙은 일반 페이지는 제외) */
+  if(document.body && !document.body.classList.contains("shop_view")) return;
+  var PC = function(){ return window.innerWidth >= 1024; };
+  function txt(el){ return (el.textContent||"").replace(/\s+/g,""); }
+  function fixedAncestor(el){ for(var e=el; e && e!==document.body; e=e.parentElement){ var p=getComputedStyle(e).position; if(p==="fixed") return e; } return null; }
+  function inPage(re){
+    var els = document.querySelectorAll("a,button");
+    for(var i=0;i<els.length;i++){ var e=els[i]; if(e.closest(".od-buybar")) continue; if(re.test(txt(e)) && txt(e).length<12 && e.offsetParent!==null && !fixedAncestor(e)) return e; }
+    return null;
+  }
+  function nativeBar(){
+    var els = document.querySelectorAll("div,section,footer,nav,form");
+    for(var i=0;i<els.length;i++){
+      var e=els[i]; if(e.closest(".od-buybar")) continue;
+      var cs=getComputedStyle(e); if(cs.position!=="fixed" || cs.display==="none") continue;
+      if(!/구매하기|바로구매/.test(txt(e))) continue;
+      var r=e.getBoundingClientRect(); if(r.height>0 && r.height<220 && r.bottom >= window.innerHeight-4) return e;
+    }
+    return null;
+  }
+  function headerH(){
+    var hd = document.querySelector("header, #doz_header, .doz_header, [class*='header_fixed'], [id*='header']");
+    if(!hd) return 90; var cs=getComputedStyle(hd), r=hd.getBoundingClientRect();
+    return (cs.position==="fixed"||cs.position==="sticky") && r.top<=0 ? Math.max(0, r.bottom) + 16 : 24;
+  }
+
+  /* ---------- PC: 오른쪽 칸 붙이기 ---------- */
+  var col = null;
+  function stickPC(){
+    var buy = inPage(/^(구매하기|바로구매)$/); if(!buy) return false;
+    /* 구매 버튼을 품은 상자 중, 가로로 나란한 두 칸 중 하나인 것(오른쪽 정보 칸) */
+    var c = buy;
+    while(c.parentElement && c.parentElement !== document.body){
+      var p = c.parentElement, pr = p.getBoundingClientRect(), cr = c.getBoundingClientRect();
+      if(cr.width < pr.width * 0.7 && pr.width > window.innerWidth * 0.55){
+        var sib = Array.prototype.some.call(p.children, function(s){ if(s===c) return false; var r=s.getBoundingClientRect(); return r.width>100 && r.height>200 && Math.abs(r.top - cr.top) < 200; });
+        if(sib) break;
+      }
+      c = p;
+    }
+    if(c === buy || c.parentElement === document.body) return false;
+    col = c;
+    /* sticky가 먹도록 위쪽 상자들의 overflow 숨김을 풀어 줌 */
+    for(var a=c.parentElement; a && a!==document.body; a=a.parentElement){
+      var cs=getComputedStyle(a); if(/(hidden|auto|scroll)/.test(cs.overflowY) || /(hidden|auto|scroll)/.test(cs.overflow)) a.style.setProperty("overflow","visible","important");
+    }
+    var pcs = getComputedStyle(c.parentElement);
+    if(pcs.display.indexOf("flex")===-1 && pcs.display.indexOf("grid")===-1 && getComputedStyle(c).float==="none"){ /* 일반 블록 배치면 sticky가 의미 없음 */ }
+    col.classList.add("od-sticky-col");
+    setTop();
+    return true;
+  }
+  function setTop(){
+    if(!col) return;
+    var hh = headerH(), vh = window.innerHeight;
+    /* 기준은 칸 안의 '구매하기' 버튼: 버튼이 화면 아래에 닿는 순간부터 고정 */
+    var buy = inPage(/^(구매하기|바로구매)$/), ch = col.offsetHeight;
+    if(buy && col.contains(buy)) ch = buy.getBoundingClientRect().bottom - col.getBoundingClientRect().top;
+    var top = (ch + hh + 24 <= vh) ? hh : (vh - ch - 24);   /* 짧으면 헤더 아래에 바로 붙고, 길면 구매하기 버튼이 화면 바닥에 닿는 위치 */
+    document.documentElement.style.setProperty("--od-top", top+"px");
+  }
+  function unstickPC(){ if(col){ col.classList.remove("od-sticky-col"); } }
+
+  /* ---------- 모바일: 하단 구매 바 ---------- */
+  var bar=null, nat=null, on=null;
+  function makeBar(){
+    bar = document.createElement("div"); bar.className="od-buybar";
+    bar.innerHTML = '<div class="od-buybar-in"><button type="button" class="od-cart">장바구니</button><button type="button" class="od-buy">구매하기</button></div>';
+    bar.querySelector(".od-buy").onclick = function(){ if(window.__odOpenNative){ window.__odOpenNative("buy"); return; } var b=inPage(/^(구매하기|바로구매)$/); if(b) b.click(); else if(nat){ var nb=[].find.call(nat.querySelectorAll("a,button"),function(x){return /구매/.test(txt(x));}); if(nb) nb.click(); } };
+    bar.querySelector(".od-cart").onclick = function(){ if(window.__odOpenNative){ window.__odOpenNative("cart"); return; } var c=inPage(/^장바구니$/); if(c) c.click(); else if(nat){ var nc=[].find.call(nat.querySelectorAll("a,button"),function(x){return /장바구니/.test(txt(x));}); if(nc) nc.click(); } };
+    document.body.appendChild(bar);
+  }
+  /* 기본 바 숨김: display:none 대신 화면 아래로 내림 → 구매창(옵션 시트)이 그 안에서 열려도 다시 보이게 할 수 있음 */
+  function sheetOpen(){
+    return [].some.call(document.querySelectorAll("input"), function(i){ if(i.offsetParent===null || i.closest(".od-mbuy") || !/^\d+$/.test(i.value)) return false;
+      for(var a=i;a&&a!==document.body;a=a.parentElement){ if(getComputedStyle(a).position==="fixed") return true; } return false; });
+  }
+  function hideNative(){
+    if(!nat) return;
+    var opening = window.__odNativeOpen && (Date.now() - window.__odNativeOpen < 1500 || sheetOpen());
+    if(!opening) window.__odNativeOpen = 0;
+    nat.style.setProperty("transform", opening ? "none" : "translateY(140%)", "important");
+    nat.style.setProperty("pointer-events", opening ? "" : "none", "important");
+    if(bar) bar.style.visibility = opening ? "hidden" : "";
+  }
+  function mobile(){
+    var buy = inPage(/^(구매하기|바로구매)$/);
+    hideNative();   /* 아임웹 기본 하단 바는 숨기고 우리 바로 통일 (구매창이 열릴 땐 잠시 보임) */
+    if(!bar) makeBar();
+    var show = buy ? buy.getBoundingClientRect().bottom < 0 : true;   /* 본문 버튼이 없으면 항상 표시 */
+    if(show === on) return; on = show;
+    bar.classList.toggle("is-on", show);
+  }
+
+  function update(){
+    if(PC()){ if(bar) bar.classList.remove("is-on"); if(nat){ nat.style.removeProperty("display"); nat.style.removeProperty("transform"); nat.style.removeProperty("pointer-events"); } on=null; if(!col || !col.classList.contains("od-sticky-col")) stickPC(); else setTop(); }
+    else { unstickPC(); mobile(); }
+  }
+  function start(){
+    var tries=0, t=setInterval(function(){
+      nat = nat || nativeBar();
+      if(inPage(/^(구매하기|바로구매)$/) || ++tries>40){ clearInterval(t); update(); window.addEventListener("scroll", function(){ if(!PC()) mobile(); }, {passive:true}); window.addEventListener("resize", function(){ on=null; update(); }); setInterval(function(){
+          if(PC()){ setTop(); return; }
+          /* 모바일: 아임웹 기본 하단 바가 늦게 그려져도 찾아서 숨기고, 본문 버튼 위치를 다시 확인 */
+          var n = nativeBar(); if(n && n!==nat){ nat = n; }
+          on = null; mobile();
+        }, 500); }
+    }, 150);
+  }
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", start); else start();
+})();
+</script>
+
+<!-- ============================================================
+     모바일 상품 페이지: 배송 정보 아래에 구매 영역 (수량별 카드 + 수량 + 총 금액 + 구매하기·장바구니·찜)
+     아임웹 모바일은 본문에 구매 버튼이 없고 하단 바만 있어서, 본문 구매 영역을 새로 만든다.
+     구매하기·장바구니는 아임웹 기본 구매창(옵션 시트)을 열고 고른 수량을 맞춰 준다.
+     ============================================================ -->
+<style>
+  .od-mbuy{ margin:24px 0 8px; font-family:"Pretendard Variable",Pretendard,"Apple SD Gothic Neo","Noto Sans KR",sans-serif; color:#1E2A3A; word-break:keep-all; }
+  .od-mbuy *{ box-sizing:border-box; }
+  .od-mbuy .od-qty{ margin:0 0 14px; }
+  .od-mqty{ background:#F7F7F8; border-radius:4px; padding:14px 14px 16px; }
+  .od-mqty-label{ font-size:13px; padding-bottom:12px; border-bottom:1px dashed rgba(30,42,58,.15); margin-bottom:14px; }
+  .od-mqty-row{ display:flex; align-items:center; justify-content:space-between; }
+  .od-step{ display:flex; border:1px solid rgba(30,42,58,.25); background:#fff; }
+  .od-step button{ width:34px; height:32px; border:0; background:#fff; font-size:18px; line-height:1; color:#1E2A3A; cursor:pointer; padding:0; }
+  .od-step input{ width:44px; height:32px; border:0; border-left:1px solid rgba(30,42,58,.25); border-right:1px solid rgba(30,42,58,.25); text-align:center; font-size:14px; padding:0; border-radius:0; -webkit-appearance:none; }
+  .od-mqty-price{ font-size:14px; }
+  .od-mtotal{ display:flex; align-items:baseline; justify-content:space-between; padding:16px 2px; border-top:1px solid rgba(30,42,58,.12); margin-top:14px; }
+  .od-mtotal small{ font-size:13px; color:#6E8299; }
+  .od-mtotal strong{ font-size:20px; font-weight:700; }
+  .od-mbuy .od-mline{ margin:-10px 2px 14px; }
+  .od-mbtns{ display:grid; grid-template-columns:1.2fr 1fr .8fr; gap:8px; }
+  .od-mbtns button{ height:48px; border-radius:999px; font-family:inherit; font-size:15px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; }
+  .od-mbtns .od-m-buy{ background:#1b3a5c; color:#fff; border:1px solid #1b3a5c; }
+  .od-mbtns .od-m-cart{ background:#fff; color:#1b3a5c; border:1px solid rgba(30,42,58,.25); }
+  .od-mbtns .od-m-wish{ background:#fff; color:#1E2A3A; border:1px solid rgba(30,42,58,.25); font-weight:500; }
+  .od-mbtns .od-m-wish svg{ width:18px; height:18px; }
+  .od-mnote{ font-size:11px; color:#93A6BA; margin-top:8px; text-align:right; }
+</style>
+<script>
+(function(){
+  var m = location.search.match(/[?&]idx=(\d+)/); if(!m) return;
+  var CFG = { "1": { member:26800, base:32000, free:50000,
+    tiers:[ {n:1, sub:"처음 써보는 분께", name:"단품 1개", rate:0},
+            {n:2, sub:"나눠 쓰기 좋은", name:"2개 세트", rate:5, flag:"BEST"},
+            {n:3, sub:"가장 큰 혜택", name:"3개 세트", rate:10, flag:"최대할인"} ] } }[m[1]];
+  if(!CFG) return;
+  var won = function(v){ return v.toLocaleString("ko-KR")+"원"; };
+  function txt(el){ return (el.textContent||"").replace(/\s+/g,""); }
+  function isFixed(el){ for(var a=el;a&&a!==document.body;a=a.parentElement){ if(getComputedStyle(a).position==="fixed") return a; } return null; }
+  function rate(n){ var r=0; CFG.tiers.forEach(function(t){ if(n>=t.n) r=t.rate; }); return r; }
+  function unit(n){ return Math.round(CFG.member*(100-rate(n))/100/10)*10; }
+  /* 본문 수량·총액: 회원은 회원가, 비회원은 판매가 기준 (수량별 할인은 둘 다 적용) */
+  function payUnit(n){ var p = window.__odIsGuest() ? CFG.base : CFG.member; return Math.round(p*(100-rate(n))/100/10)*10; }
+
+  function hasNativeInPageBuy(){
+    var els=document.querySelectorAll("a,button");
+    for(var i=0;i<els.length;i++){ var e=els[i]; if(e.closest(".od-buybar,.od-mbuy")) continue;
+      if(/^(구매하기|바로구매)$/.test(txt(e)) && e.offsetParent!==null && !isFixed(e)) return true; }
+    return false;
+  }
+  /* 아임웹 기본 하단 바 안의 버튼 (숨겨져 있어도 찾음) */
+  function nativeBtn(re){
+    var els=document.querySelectorAll("a,button");
+    for(var i=0;i<els.length;i++){ var e=els[i]; if(e.closest(".od-buybar,.od-mbuy")) continue;
+      if(re.test(txt(e)) && isFixed(e) && e.offsetParent!==null) return e; }   /* 화면에 그려진(접힌 시트 안이 아닌) 버튼 우선 */
+    for(var k=0;k<els.length;k++){ var g=els[k]; if(g.closest(".od-buybar,.od-mbuy")) continue;
+      if(re.test(txt(g)) && isFixed(g)) return g; }
+    for(var j=0;j<els.length;j++){ var f=els[j]; if(f.closest(".od-buybar,.od-mbuy")) continue; if(re.test(txt(f))) return f; }
+    return null;
+  }
+  /* 기본 구매창이 열리면 그 안의 수량을 맞춘다 */
+  function setSheetQty(n){
+    var tries=0;
+    (function wait(){
+      var ins=[].filter.call(document.querySelectorAll('input'), function(i){ return i.offsetParent!==null && /^\d+$/.test(i.value) && !i.closest(".od-mbuy") && isFixed(i); });
+      if(!ins.length){ if(++tries<30) setTimeout(wait,100); return; }
+      var inp=ins[0], box=inp.parentElement, bs=box.querySelectorAll("button,a,span,i"), minus=bs[0], plus=bs[bs.length-1], g=0;
+      window.__odSetQty(inp, n, minus, plus);
+    })();
+  }
+
+  var qty=1, el=null;
+  function render(){
+    if(!el) return;
+    el.querySelector(".od-step input").value=qty;
+    el.querySelector(".od-mqty-price").textContent=won(payUnit(qty)*qty);
+    el.querySelector(".od-mtotal small").textContent="총 상품금액("+qty+"개)";
+    el.querySelector(".od-mtotal strong").textContent=won(payUnit(qty)*qty);
+    el.querySelector(".od-mnote").textContent = window.__odIsGuest() ? "비회원은 판매가 기준 · 회원 전용 세트가는 로그인 후 적용" : "회원가 기준 금액입니다";
+    /* 비회원: 총 상품금액 아래에 회원가입 시 적용가 */
+    var ml=el.querySelector(".od-mline");
+    if(window.__odIsGuest()){
+      if(!ml){ ml=document.createElement("div"); ml.className="od-mline"; el.querySelector(".od-mtotal").insertAdjacentElement("afterend", ml); }
+      var mt=unit(qty)*qty, sv=payUnit(qty)*qty-mt;
+      ml.innerHTML='<span>회원가</span><strong>'+won(mt)+'</strong>';
+    } else if(ml){ ml.remove(); }
+    el.querySelectorAll(".od-qty-card").forEach(function(c){ c.classList.toggle("is-on", +c.getAttribute("data-n")===Math.min(qty,3)); });
+  }
+  function build(){
+    if(document.querySelector(".od-mbuy")) return true;
+    if(window.innerWidth>=1024 || hasNativeInPageBuy()) return false;
+    /* 위치: '적립·혜택·구매·배송' 정보 표 바로 아래 */
+    var spot=null, els=document.querySelectorAll("div,table,dl,ul,section");
+    for(var i=0;i<els.length;i++){ var t=txt(els[i]); if(/적립/.test(t) && /배송/.test(t) && /무료배송|기본/.test(t) && t.length<400 && !els[i].closest(".od-mbuy")) spot=els[i]; }
+    if(!spot){ var ch=document.querySelector(".od-kcoupon.is-channel"); if(ch) spot=ch; }
+    if(!spot) return false;
+    /* 가장 작은 상자 고르기: 같은 조건을 만족하는 것 중 마지막(=가장 안쪽)이 spot. 그 바로 뒤에 넣음 */
+
+    el=document.createElement("div"); el.className="od-mbuy";
+    var cards='<div class="od-qty">' + (function(){ var hd=document.createElement("div"); hd.className="od-qty-head"; hd.innerHTML = window.__odIsGuest() ? '<span>회원 전용 세트가</span><a class="od-qty-login" href="'+window.__odLoginHref()+'"><u>카카오 1초 가입</u> 후 적용</a>' : '<span>회원 전용 세트가</span><small>회원·카카오 회원 적용</small>'; return hd; })().outerHTML;
+    CFG.tiers.forEach(function(t){
+      var u=unit(t.n), tot=u*t.n, off=Math.floor((1-u/CFG.base)*100+1e-6);
+      cards+='<button type="button" class="od-qty-card'+(t.flag?' has-flag':'')+'" data-n="'+t.n+'">'+(t.flag?'<span class="od-qty-flag">'+t.flag+'</span>':'')+
+        '<div class="od-qty-l"><div class="od-qty-sub">'+t.sub+'</div><div class="od-qty-name">'+t.name+(tot>=CFG.free?'<span class="od-qty-tag">무료배송</span>':'')+'</div></div>'+
+        '<div class="od-qty-r"><span class="od-qty-off">-'+off+'%</span><div class="od-qty-unit">'+won(u)+(t.n>1?'<small>/ 1개당</small>':'')+'</div>'+(t.n>1?'<div class="od-qty-total">총 '+won(tot)+'</div>':'')+'</div></button>';
+    });
+    cards+='</div>';
+    var wishCount=(function(){ var w=document.querySelector('[class*="wish" i],[class*="like" i]'); var mm=w&&w.textContent.match(/\d+/); return mm?mm[0]:""; })();
+    el.innerHTML = cards +
+      '<div class="od-mqty"><div class="od-mqty-label">수량</div><div class="od-mqty-row"><div class="od-step"><button type="button" data-d="-1" aria-label="수량 빼기">−</button><input type="text" inputmode="numeric" value="1" aria-label="수량"><button type="button" data-d="1" aria-label="수량 더하기">+</button></div><div class="od-mqty-price"></div></div></div>' +
+      '<div class="od-mtotal"><small></small><strong></strong></div>' +
+      '<div class="od-mbtns"><button type="button" class="od-m-buy">구매하기</button><button type="button" class="od-m-cart">장바구니</button>' +
+      '<button type="button" class="od-m-wish" aria-label="찜하기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg><span>'+wishCount+'</span></button></div>' +
+      '<div class="od-mnote">회원가 기준 금액입니다</div>';
+    spot.parentNode.insertBefore(el, spot.nextSibling);
+
+    el.querySelectorAll(".od-qty-card").forEach(function(c){ c.onclick=function(){ qty=+c.getAttribute("data-n"); render(); }; });
+    el.querySelectorAll(".od-step button").forEach(function(b){ b.onclick=function(){ qty=Math.max(1, qty+(+b.getAttribute("data-d"))); render(); }; });
+    el.querySelector(".od-step input").onchange=function(){ qty=Math.max(1, parseInt(this.value,10)||1); render(); };
+    function openNative(btn){ window.__odNativeOpen = Date.now(); var fx=isFixed(btn); if(fx){ fx.style.setProperty("transform","none","important"); fx.style.setProperty("pointer-events","","important"); } setTimeout(function(){ btn.click(); setSheetQty(qty); }, 30); }
+    /* 본문 버튼과 하단 바 버튼이 같은 동작을 쓰도록 공용 함수로 */
+    window.__odOpenNative = function(kind){ var b = kind==="cart" ? nativeBtn(/^장바구니$/) : nativeBtn(/^(구매하기|바로구매)$/); if(b) openNative(b); };
+    el.querySelector(".od-m-buy").onclick=function(){ window.__odOpenNative("buy"); };
+    el.querySelector(".od-m-cart").onclick=function(){ window.__odOpenNative("cart"); };
+    el.querySelector(".od-m-wish").onclick=function(){
+      var w=document.querySelector('[class*="wish" i]:not(.od-m-wish),[class*="like" i]:not(.od-m-wish)'); if(w) w.click();
+      var me=this; setTimeout(function(){ var mm=w&&w.textContent.match(/\d+/); if(mm) me.querySelector("span").textContent=mm[0]; me.classList.toggle("is-on"); }, 400);
+    };
+    render();
+    return true;
+  }
+  function start(){
+    var n=0, t=setInterval(function(){ if(build() || ++n>60) clearInterval(t); }, 200);
+  }
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", start); else start();
+})();
+</script>
+
+<!-- ============================================================
+     모바일 구매창(아임웹 옵션 시트)이 열렸을 때
+     - 시트 안에 수량별 혜택 카드 넣기 (누르면 시트 수량이 바뀜)
+     - 수량 옆 금액 왼쪽에 할인율(빨간 글씨) 표시
+     - 시트가 열려 있는 동안 카카오 문의 버튼 숨김
+     ============================================================ -->
+<style>
+  html.od-sheet-open #od-kakao{ visibility:hidden !important; opacity:0 !important; pointer-events:none !important; }
+  .od-qty.is-sheet{ margin:10px 16px 12px; padding:10px; gap:8px; }
+  .od-qty.is-sheet .od-qty-card{ padding:12px 14px; }
+  .od-qty.is-sheet .od-qty-card.has-flag{ padding-top:22px; }
+  .od-qty.is-sheet .od-qty-flag{ font-size:10px; padding:3px 8px; }
+  .od-qty.is-sheet .od-qty-sub{ display:none; }
+  .od-qty.is-sheet .od-qty-name{ font-size:14px; }
+  .od-qty.is-sheet .od-qty-off{ margin:0 6px 0 0; font-size:11px; padding:2px 8px; }
+  .od-qty.is-sheet .od-qty-r{ display:flex; align-items:center; }
+  .od-qty.is-sheet .od-qty-unit{ font-size:14px; }
+  .od-qty.is-sheet .od-qty-total{ display:none; }
+  /* 아이폰 사파리에서 아임웹이 글자색을 -webkit-text-fill-color 로 덮어써서 color 만으로는 안 바뀜 → 둘 다 지정 */
+  /* 비회원: 총 상품금액 숫자 바로 아래, 오른쪽 정렬 빨간 글씨 '회원가 00,000원' */
+  .od-mline{ display:block; text-align:right; margin:4px 0 0; line-height:1.2; white-space:nowrap; font-family:"Pretendard Variable",Pretendard,"Apple SD Gothic Neo","Noto Sans KR",sans-serif; }
+  .od-mline, .od-mline *{ color:#E03131 !important; -webkit-text-fill-color:#E03131 !important; }
+  .od-mline span{ font-size:13px; font-weight:600; margin-right:6px; }
+  .od-mline strong{ font-size:17px; font-weight:800; }
+  .od-rate, .od-rate *{ color:#E03131 !important; -webkit-text-fill-color:#E03131 !important; font-weight:700 !important; margin-left:6px; }
+  .od-qty .od-qty-flag, .od-qty .od-qty-off, .od-qty .od-qty-flag *, .od-qty .od-qty-off *{ color:#fff !important; -webkit-text-fill-color:#fff !important; opacity:1 !important; }
+</style>
+<script>
+(function(){
+  var m = location.search.match(/[?&]idx=(\d+)/); if(!m) return;
+  var CFG = { "1": { member:26800, base:32000, free:50000,
+    tiers:[ {n:1, name:"단품 1개", rate:0}, {n:2, name:"2개 세트", rate:5, flag:"BEST"}, {n:3, name:"3개 세트", rate:10, flag:"최대할인"} ] } }[m[1]];
+  if(!CFG) return;
+  var won = function(v){ return v.toLocaleString("ko-KR")+"원"; };
+  function txt(el){ return (el.textContent||"").replace(/\s+/g,""); }
+  function fixedOf(el){ for(var a=el;a&&a!==document.body;a=a.parentElement){ if(getComputedStyle(a).position==="fixed") return a; } return null; }
+  function sheetInput(){
+    var ins=document.querySelectorAll("input");
+    for(var i=0;i<ins.length;i++){ var x=ins[i]; if(x.offsetParent===null || x.closest(".od-mbuy,.od-buybar") || !/^\d+$/.test(x.value)) continue; var f=fixedOf(x); if(f && x.getBoundingClientRect().top < window.innerHeight) return {inp:x, sheet:f}; }
+    return null;
+  }
+  function setQty(inp, n){
+    var bs=inp.parentElement.querySelectorAll("button,a,span,i");
+    window.__odSetQty(inp, n, bs[0], bs[bs.length-1]);
+  }
+  function cards(inp){
+    var w=document.createElement("div"); w.className="od-qty is-sheet";
+    w.appendChild((function(){ var hd=document.createElement("div"); hd.className="od-qty-head"; hd.innerHTML = window.__odIsGuest() ? '<span>회원 전용 세트가</span><a class="od-qty-login" href="'+window.__odLoginHref()+'"><u>카카오 1초 가입</u> 후 적용</a>' : '<span>회원 전용 세트가</span><small>회원·카카오 회원 적용</small>'; return hd; })());
+    CFG.tiers.forEach(function(t){
+      var u=Math.round(CFG.member*(100-t.rate)/100/10)*10, tot=u*t.n, off=Math.floor((1-u/CFG.base)*100+1e-6);
+      var b=document.createElement("button"); b.type="button"; b.className="od-qty-card"+(t.flag?" has-flag":""); b.setAttribute("data-n",t.n);
+      b.innerHTML=(t.flag?'<span class="od-qty-flag">'+t.flag+'</span>':'')+'<div class="od-qty-l"><div class="od-qty-name">'+t.name+(tot>=CFG.free?'<span class="od-qty-tag">무료배송</span>':'')+'</div></div>'+
+        '<div class="od-qty-r"><span class="od-qty-off">-'+off+'%</span><div class="od-qty-unit">'+won(u)+(t.n>1?'<small>/ 1개당</small>':'')+'</div></div>';
+      b.onclick=function(){ setQty(inp, t.n); };
+      w.appendChild(b);
+    });
+    return w;
+  }
+  /* 시트 안 가격 글자들 (위→아래 순서): [수량 옆 금액, (수량별 할인), 총 상품금액] */
+  function priceVal(el){ var t=""; el.childNodes.forEach(function(n){ if(n.nodeType===3) t+=n.nodeValue; }); return parseInt(t.replace(/[^\d]/g,""),10)||0; }
+  function priceEls(sheet){
+    var out=[], wk=document.createTreeWalker(sheet, NodeFilter.SHOW_TEXT, null), n;
+    while((n=wk.nextNode())){ var pe=n.parentElement; if(!pe || pe.closest(".od-qty,.od-rate,.od-mline")) continue; if(/^\s*-?[\d,]+\s*원\s*$/.test(n.nodeValue) && pe.offsetParent!==null) out.push(pe); }
+    return out;
+  }
+  /* 할인율 표시 공용: scope 안의 '수량별 할인' 글자 옆에 (총 상품금액 ÷ 판매가×수량) 기준 할인율 */
+  function applyRate(scope, qty){
+    var ps=priceEls(scope); if(ps.length<1) return;
+    var row=ps[0], total=ps[ps.length-1];
+    var tv=priceVal(total), base=CFG.base*qty;
+    var off=base && tv ? Math.floor((1-tv/base)*100+1e-6) : 0;
+    var label=null, lw=document.createTreeWalker(scope, NodeFilter.SHOW_TEXT, null), ln;
+    while((ln=lw.nextNode())){ if(/수량별\s*할인/.test(ln.nodeValue) && ln.parentElement && !ln.parentElement.closest(".od-qty,.od-mbuy") && ln.parentElement.offsetParent!==null){ label=ln.parentElement; break; } }
+    var host = label || row;
+    scope.querySelectorAll(".od-rate").forEach(function(r){ if(r.parentElement!==host) r.remove(); });
+    var tag=host.querySelector(".od-rate");
+    if(off>0){ if(!tag){ tag=document.createElement("span"); tag.className="od-rate"; tag.style.setProperty("color","#E03131","important"); tag.style.setProperty("-webkit-text-fill-color","#E03131","important"); if(label) host.appendChild(tag); else host.insertBefore(tag,host.firstChild); } tag.textContent=off+"%"; }
+    else if(tag){ tag.remove(); }
+  }
+  /* 비회원: '총 상품금액' 줄 바로 아래에 회원가입 시 실제 적용 금액 */
+  function memberLine(scope, qty){
+    var old=scope.querySelector(".od-mline");
+    if(!window.__odIsGuest()){ if(old) old.remove(); return; }
+    var ps=priceEls(scope); if(!ps.length) return;
+    var total=ps[ps.length-1];
+    var r=0; CFG.tiers.forEach(function(t){ if(qty>=t.n) r=t.rate; });
+    var mUnit=Math.round(CFG.member*(100-r)/100/10)*10, mTot=mUnit*qty;
+    var gTot=priceVal(total), save=gTot-mTot;
+    /* 총 상품금액 숫자 칸 안쪽 맨 아래에 넣어서 숫자 바로 밑에 붙게 */
+    if(old && old.parentElement!==total){ old.remove(); old=null; }
+    if(!old){ old=document.createElement("div"); old.className="od-mline"; total.appendChild(old); total.style.setProperty("text-align","right","important"); }
+    var key=qty+"|"+mTot+"|"+save; if(old.getAttribute("data-k")===key) return; old.setAttribute("data-k",key);
+    old.innerHTML='<span>회원가</span><strong>'+won(mTot)+'</strong>';
+  }
+  /* PC 본문 구매 영역(화면 고정이 아닌 곳)의 '수량별 할인' */
+  function pcRate(){
+    var ins=document.querySelectorAll("input"), inp=null;
+    for(var i=0;i<ins.length;i++){ var x=ins[i]; if(x.offsetParent===null || x.closest(".od-mbuy,.od-buybar") || !/^\d+$/.test(x.value) || fixedOf(x)) continue; inp=x; break; }
+    if(!inp) return;
+    /* 수량 칸과 '총 상품금액'을 함께 품은 가장 작은 상자 */
+    var scope=inp; while(scope && scope!==document.body && !/총상품금액/.test(txt(scope))) scope=scope.parentElement;
+    if(!scope || scope===document.body) return;
+    applyRate(scope, parseInt(inp.value,10)||1);
+    memberLine(scope, parseInt(inp.value,10)||1);
+  }
+  function tick(){
+    pcRate();
+    var s=sheetInput();
+    document.documentElement.classList.toggle("od-sheet-open", !!s);
+    if(!s) return;
+    var sheet=s.sheet, inp=s.inp, qty=parseInt(inp.value,10)||1;
+
+    /* 1) 수량별 카드 넣기: 아임웹 '…구매하면 …추가 할인!' 띠 자리에, 없으면 수량 칸 위에 */
+    if(!sheet.querySelector(".od-qty")){
+      var strip=null, els=sheet.querySelectorAll("div,p,span");
+      for(var i=0;i<els.length;i++){ var t=txt(els[i]); if(/구매하면.*추가할인/.test(t) && t.length<30) strip=els[i]; }
+      if(strip){ var sw=strip; while(sw.parentElement && sw.parentElement!==sheet && txt(sw.parentElement)===txt(strip)) sw=sw.parentElement; sw.parentNode.insertBefore(cards(inp), sw); sw.style.setProperty("display","none","important"); }
+      else { var box=inp; while(box.parentElement && box.parentElement!==sheet && !/수량/.test(txt(box.parentElement).slice(0,4))) box=box.parentElement; box=box.parentElement||box; box.parentNode.insertBefore(cards(inp), box); }
+    }
+    sheet.querySelectorAll(".od-qty-card").forEach(function(c){ c.classList.toggle("is-on", +c.getAttribute("data-n")===Math.min(qty,3)); });
+
+    /* 2) 할인율, 비회원이면 회원가 적용 금액 */
+    applyRate(sheet, qty);
+    memberLine(sheet, qty);
+  }
+  setInterval(tick, 250);
+})();
+</script>
+
+<script>
+/* 남색 뱃지(BEST·최대할인·-16% 등) 글씨를 흰색으로 강제 (테마·구매창 스타일보다 우선) */
+(function(){
+  function paint(){
+    document.querySelectorAll(".od-qty-flag, .od-qty-off").forEach(function(e){
+      if(e.getAttribute("data-od-w")) return; e.setAttribute("data-od-w","1");
+      e.style.setProperty("color","#fff","important"); e.style.setProperty("-webkit-text-fill-color","#fff","important"); e.style.setProperty("opacity","1","important");
+    });
+  }
+  setInterval(paint, 300);
+})();
+</script>

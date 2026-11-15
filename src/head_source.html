@@ -1,0 +1,330 @@
+<!-- ===================== 상품 상세: 아임웹 쿠폰 카드 글자크기 자동조절 오류 방지 =====================
+     아임웹 기본 코드(adjustPriceCardFontSize)가 쿠폰 칸 크기를 잘못 읽으면 끝없이 반복하다 오류로 멈추고,
+     그 뒤에 있는 아임웹 코드까지 실행되지 않음. 해당 글자 칸의 id 만 바꿔서 그 함수가 바로 끝나게 함 -->
+<script>
+(function(){
+  if(!/[?&]idx=\d+/.test(location.search)) return;
+  var ids = ["dynamic-card-text","dynamic-coupon-text"];
+  function fix(){ for(var i=0;i<ids.length;i++){ var e = document.getElementById(ids[i]); if(e) e.id = ids[i] + "-od"; } }
+  var mo = new MutationObserver(fix);
+  mo.observe(document.documentElement, { childList:true, subtree:true });
+  document.addEventListener("DOMContentLoaded", function(){ fix(); setTimeout(function(){ mo.disconnect(); }, 3000); });
+})();
+</script>
+<meta name="google-site-verification" content="GMa2LWAn4l6em-b8NhP-3TM_lNtaPIBdHUXbYWxtHGU" />
+<script>
+/* ============================================================
+   ONDIREV — 카카오 가입 쿠폰 안내 팝업 v3
+   · 카카오로 "처음" 가입한 회원에게만, 가입 직후 1회 표시
+   · 조건 (모두 만족해야 표시, 로그인 회원만 탭당 1번 확인)
+       1) 카카오 연결 회원
+       2) 오늘 가입한 회원 (회원 코드 안의 가입일)
+       3) 쿠폰함에 "카카오 회원가입 기념 쿠폰"이 실제로 있음
+       4) 이 회원에게 아직 안 보여줌
+   · 디자인 미리보기: 아무 페이지 주소 끝에 ?od_welcome_preview=1
+          → 일반 가입자, 탈퇴 후 재가입(쿠폰 미발급) 회원에게는 안 뜸
+   · 쿠폰 이름을 바꾸면 KK_NAME 도 같이 바꿀 것
+   ============================================================ */
+(function () {
+  var KK_NAME = /카카오\s*회원가입\s*기념\s*쿠폰/;
+  var DONE = 'od_kk_checked';
+
+  function today() {
+    var d = new Date();
+    return String(d.getFullYear()) + ('0' + (d.getMonth() + 1)).slice(-2) + ('0' + d.getDate()).slice(-2);
+  }
+  /* 로그인 여부: 아임웹 메뉴의 비회원 표시로 판단 (비회원이면 서버 확인 생략) */
+  function isGuest() {
+    if (document.querySelector('.member-info.guest')) return true;
+    if (document.querySelector('.od-login, a.od-join')) return true;
+    return false;
+  }
+
+  function check() {
+    /* 미리보기: 주소 끝에 ?od_welcome_preview=1 */
+    if (/[?&]od_welcome_preview=1/.test(location.search)) { show({ code: 'preview', amount: '5,000', cond: '20,000원 이상 구매시' }, true); return; }
+    if (isGuest()) return;
+    try { if (sessionStorage.getItem(DONE)) return; } catch (x) {}
+    fetch('/dialog/join.cm', { method: 'POST', credentials: 'include',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8', 'X-Requested-With': 'XMLHttpRequest' }, body: 'back_url=' })
+    .then(function (r) { return r.text(); })
+    .then(function (h) {
+      var d = new DOMParser().parseFromString(h, 'text/html');
+      if (!d.querySelector('input[name="mode"][value="edit"]')) return null;           /* 로그인 전이면 다음 페이지에서 다시 */
+      try { sessionStorage.setItem(DONE, '1'); } catch (x) {}                          /* 로그인 회원은 이 탭에서 1번만 확인 */
+      var code = (d.querySelector('input[name="code"]') || {}).value || '';
+      var disc = d.querySelector('._kakao_sync_disconnect');
+      var kakao = disc && !/display\s*:\s*none/i.test(disc.getAttribute('style') || '');
+      var m = /^m(\d{8})/.exec(code);
+      if (!kakao || !m || m[1] !== today()) return null;                                /* 카카오 회원 + 오늘 가입 */
+      try { if (localStorage.getItem('od_kk_welcome_' + code)) return null; } catch (x) {}  /* 이미 본 회원 */
+      return fetch('/shop/mypage_coupon_list.cm', { method: 'POST', credentials: 'include', headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(function (r) { return r.json(); })
+        .then(function (res) {
+          var c = new DOMParser().parseFromString((res && res.html) || '', 'text/html');
+          var hit = null;
+          [].forEach.call(c.querySelectorAll('.mypage-coupon-wrap'), function (w) {
+            var nm = w.querySelector('.sale-coupon-name-text');
+            if (!hit && nm && KK_NAME.test(nm.textContent || '')) hit = w;
+          });
+          if (!hit) return null;                                                         /* 쿠폰이 실제로 있어야 (재가입 제외) */
+          var t = hit.querySelector('.discount-title'), ds = hit.querySelector('.coupon-desc');
+          var am = /([\d,]+)\s*원/.exec(t ? t.textContent : '');
+          return { code: code, amount: am ? am[1] : '5,000', cond: ds ? ds.textContent.replace(/\s+/g, ' ').trim() : '' };
+        });
+    })
+    .then(function (info) { if (info) show(info); })
+    ['catch'](function () {});
+  }
+
+  function show(info, preview) {
+    if (document.querySelector('.od-welcome')) return;
+    if (!preview) { try { localStorage.setItem('od_kk_welcome_' + info.code, '1'); } catch (x) {} }
+    var st = document.createElement('style');
+    st.textContent =
+      '.od-welcome{position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;background:rgba(30,42,58,.45);font-family:"Pretendard Variable",Pretendard,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;letter-spacing:-.01em}' +
+      '.od-welcome *{box-sizing:border-box}' +
+      '.od-welcome-box{position:relative;width:100%;max-width:360px;border-radius:18px;background:#fff;padding:32px 24px 22px;text-align:center;box-shadow:0 20px 50px -20px rgba(27,58,92,.6);animation:odWel .25s ease-out}' +
+      '@keyframes odWel{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}' +
+      '.od-welcome-x{position:absolute;right:12px;top:12px;width:36px;height:36px;border:0;background:none;cursor:pointer}' +
+      '.od-welcome-x:before,.od-welcome-x:after{content:"";position:absolute;left:17px;top:9px;width:1.6px;height:18px;background:#6E8299;transform:rotate(45deg)}' +
+      '.od-welcome-x:after{transform:rotate(-45deg)}' +
+      '.od-welcome-en{font-family:Georgia,"Times New Roman",serif;font-style:italic;font-size:12px;color:#4B86B4;margin-bottom:6px}' +
+      '.od-welcome-h{font-size:19px;font-weight:700;line-height:1.4;color:#1E2A3A;word-break:keep-all}' +
+      '.od-welcome-tk{display:flex;margin:20px 0 0;border:1px solid #E3EAF2;border-radius:14px;overflow:hidden;text-align:left}' +
+      '.od-welcome-tk .l{position:relative;flex:none;width:96px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(160deg,#1B3A5C,#4B86B4);color:#fff}' +
+      '.od-welcome-tk .l strong{font-size:21px;font-weight:700}' +
+      '.od-welcome-tk .l small{font-size:11px;opacity:.85}' +
+      '.od-welcome-tk .l:after{content:"";position:absolute;right:-7px;top:50%;margin-top:-7px;width:14px;height:14px;border-radius:50%;background:#fff}' +
+      '.od-welcome-tk .r{flex:1;padding:14px 14px 14px 18px}' +
+      '.od-welcome-tk .r b{display:block;font-size:14px;color:#1E2A3A}' +
+      '.od-welcome-tk .r small{display:block;margin-top:3px;font-size:12px;color:#8A98AA}' +
+      '.od-welcome-d{margin-top:14px;font-size:13px;line-height:1.6;color:#6E8299;word-break:keep-all}' +
+      '.od-welcome-p{display:flex;align-items:center;justify-content:center;width:100%;height:50px;margin-top:20px;border-radius:10px;background:#1B3A5C;color:#fff !important;font-size:15px;font-weight:600;text-decoration:none !important}' +
+      '.od-welcome-s{display:block;margin:12px auto 0;border:0;background:none;font-size:13px;color:#8A98AA;text-decoration:underline;cursor:pointer}';
+    document.head.appendChild(st);
+
+    var ov = document.createElement('div');
+    ov.className = 'od-welcome';
+    ov.setAttribute('data-od-kc', '1');   /* Body의 상세페이지 쿠폰 버튼 코드가 이 창 안을 건드리지 않게 */
+    ov.innerHTML =
+      '<div class="od-welcome-box">' +
+        '<button type="button" class="od-welcome-x" aria-label="닫기"></button>' +
+        '<div class="od-welcome-en">Welcome</div>' +
+        '<div class="od-welcome-h">카카오 가입 기념 쿠폰이<br>발급되었어요</div>' +
+        '<div class="od-welcome-tk"><div class="l"><strong>' + info.amount + '</strong><small>원 할인</small></div>' +
+          '<div class="r"><b>카카오 회원가입 기념 쿠폰</b>' + (info.cond ? '<small>' + info.cond + '</small>' : '') + '<small>결제창에서 바로 사용 가능</small></div></div>' +
+        '<div class="od-welcome-d">마이페이지 › 쿠폰에서 언제든 확인할 수 있어요.</div>' +
+        '<a class="od-welcome-p" href="/shop_mypage/?m2=coupon">쿠폰 확인하기</a>' +
+        '<button type="button" class="od-welcome-s">쇼핑 계속하기</button>' +
+      '</div>';
+    document.body.appendChild(ov);
+    function close() { if (ov.parentNode) ov.parentNode.removeChild(ov); }
+    ov.querySelector('.od-welcome-x').addEventListener('click', close);
+    ov.querySelector('.od-welcome-s').addEventListener('click', close);
+    ov.addEventListener('click', function (e) { if (e.target === ov) close(); });
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', check);
+  else check();
+})();
+</script>
+<style>
+  a{ -webkit-tap-highlight-color:rgba(0,0,0,0) !important; }
+  a[class~="odv-detail" i]:hover, a[class~="odv-detail" i]:active,
+  a[href*="idx=1" i]:hover,       a[href*="idx=1" i]:active{
+    background:#ffffff !important;
+    color:#111111 !important;
+    border-color:#1E2A3A !important;
+    transition:none !important;
+  }
+</style>
+<style>
+  [class~="od-up" i]{opacity:0;transform:translateY(28px);transition:opacity .8s cubic-bezier(.22,.61,.36,1),transform .8s cubic-bezier(.22,.61,.36,1);}
+  [class~="od-up" i][class~="od-in" i]{opacity:1;transform:none;}
+  [class~="od-d1" i]{transition-delay:.05s}
+  [class~="od-d2" i]{transition-delay:.20s}
+  [class~="od-d3" i]{transition-delay:.35s}
+  [class~="od-d4" i]{transition-delay:.50s}
+  [class~="od-d5" i]{transition-delay:.65s}
+</style>
+<script>
+(function(){
+  function els(){ return Array.prototype.slice.call(document.querySelectorAll('[class~="od-up" i]')); }
+
+  function visible(el){
+    var r = el.getBoundingClientRect();
+    var W = window.innerWidth, H = window.innerHeight;
+    if (r.width === 0 || r.height === 0) return false;
+    if (r.right <= 0 || r.left >= W || r.bottom <= 0 || r.top >= H) return false;
+    var cx = (r.left + r.right) / 2;
+    if (cx < 0 || cx > W) return false;
+    /* 자기 자신은 제외하고 '부모'부터 검사 (자기 자신은 등장 전 투명이 정상) */
+    var p = el.parentElement, n = 0;
+    while (p && p !== document.body && n++ < 8){
+      var cs = getComputedStyle(p);
+      if (cs.opacity === "0" || cs.visibility === "hidden" || cs.display === "none") return false;
+      p = p.parentElement;
+    }
+    return true;
+  }
+
+  function tick(){
+    els().forEach(function(el){
+      var shown = /\bod-in\b/i.test(el.className);
+      var vis = visible(el);
+      if (vis && !shown)  el.className += " od-in";
+      if (!vis && shown)  el.className = el.className.replace(/\bod-in\b/gi,"").replace(/\s+/g," ").trim();
+    });
+  }
+
+  function start(){ tick(); setInterval(tick, 150); }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start);
+  else start();
+})();
+</script>
+
+<style>
+  /* DB(폼) 위젯 제출 버튼 → 알약 네이비 버튼 */
+  :is(.form_wrap, .db_form, .widget_db, [class*="db_"], [class*="form"]) :is(button[type="submit"], .btn_submit, .btn-submit, input[type="submit"], .submit){
+    display:inline-flex !important; align-items:center; justify-content:center;
+    min-width:150px !important; height:40px !important; padding:0 26px !important;
+    background:#1E2A3A !important; color:#fff !important;
+    font-size:13px !important; letter-spacing:2px !important; font-weight:500 !important;
+    border:1px solid #1E2A3A !important; border-radius:999px !important;
+    box-shadow:none !important; transition:background .2s, color .2s;
+  }
+  :is(.form_wrap, .db_form, .widget_db, [class*="db_"], [class*="form"]) :is(button[type="submit"], .btn_submit, .btn-submit, input[type="submit"], .submit):hover{
+    background:#fff !important; color:#111 !important;
+  }
+</style>
+
+ <script>
+(function(){
+    function pick(){ return Array.prototype.filter.call(document.querySelectorAll('a'), function(a){ var t=(a.textContent||'').replace(/\s/g,''); return t==='내피부방향찾기' || t==='BRANDSTORY'; }); }
+  function on(a){ a.style.setProperty('background','#ffffff','important'); a.style.setProperty('color','#111111','important'); a.style.setProperty('border-color','#111111','important'); }
+  function off(a){ a.style.setProperty('background','#1E2A3A','important'); a.style.setProperty('color','#ffffff','important'); a.style.setProperty('border-color','#1E2A3A','important'); }
+  function bind(){
+    pick().forEach(function(a){
+      if(a.dataset.odHover) return; a.dataset.odHover='1';
+      a.style.setProperty('-webkit-tap-highlight-color','transparent','important');
+      a.addEventListener('mouseenter',function(){on(a)});
+      a.addEventListener('mouseleave',function(){off(a)});
+      a.addEventListener('touchstart',function(){on(a)},{passive:true});
+      a.addEventListener('touchend',function(){setTimeout(function(){off(a)},150)},{passive:true});
+      a.addEventListener('touchcancel',function(){off(a)},{passive:true});
+    });
+  }
+  bind(); setInterval(bind, 500);
+})();
+</script>
+  
+
+<script>document.addEventListener('touchstart',function(){},{passive:true});</script>
+
+<style>
+  .od-kakao-wrap{position:relative !important}
+  .od-kakao-tip{position:absolute;top:-42px;right:14px;z-index:5;background:#1E2A3A;color:#fff;font-size:11px;letter-spacing:.04em;font-weight:500;line-height:1;padding:6px 10px;border-radius:999px;white-space:nowrap;pointer-events:none;box-shadow:0 4px 12px -6px rgba(30,42,58,.5);animation:odTip .35s ease-out}
+  .od-kakao-tip::after{content:"";position:absolute;left:50%;bottom:-4px;width:8px;height:8px;background:#1E2A3A;transform:translateX(-50%) rotate(45deg)}
+  @keyframes odTip{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  @media (max-width:760px){ .od-kakao-tip{top:-40px;right:10px;font-size:10.5px;padding:5px 9px} }
+</style>
+<script>
+(function(){
+  function isYellow(el){ var bg=getComputedStyle(el).backgroundColor.replace(/\s/g,''); return /rgb\(25[0-5],2[23]\d,0\)|rgb\(254,229,0\)|rgb\(255,235,0\)/.test(bg); }
+  function findKakao(){
+    var c=document.querySelectorAll('a,button,div,span,label');
+    for(var i=0;i<c.length;i++){
+      var el=c[i], t=(el.textContent||'').replace(/\s/g,'');
+      if(!/^카카오(로|톡으로|계정으로)?(시작|로그인|계속)/.test(t)) continue;
+      var btn=el.closest('a,button')||el;
+      var p=btn, n=0; while(p && n++<4){ if(isYellow(p) && p.offsetWidth>120) return p; p=p.parentElement; }
+      if(btn.offsetWidth>120) return btn;
+    }
+    return null;
+  }
+  function place(){
+    if(document.querySelector('.od-kakao-tip')) return true;
+    var btn=findKakao(); if(!btn) return false;
+    btn.classList.add('od-kakao-wrap');
+    var tip=document.createElement('span'); tip.className='od-kakao-tip'; tip.textContent='플친 쿠폰 지급';
+    btn.appendChild(tip); return true;
+  }
+  var n=0, t=setInterval(function(){ if(place()||++n>60) clearInterval(t); },250);
+})();
+</script>
+
+<style>
+/* od- IN 세럼 상세페이지: PC 최대 폭 650px */
+img[alt="온디레브 [IN] 리플 엑토인 세럼 50ml"],
+img[alt="온디레브 Direction Check 바로가기"]{
+  display:block !important;
+  width:100% !important;
+  max-width:750px !important;
+  height:auto !important;
+  margin:0 auto !important;
+}
+</style>
+
+<!-- ============================================================
+     마이페이지 깜빡임 방지 (Head에 있어야 페이지가 그려지기 전에 적용됨)
+     · 마이페이지에서는 Footer 디자인 코드가 다 입혀질 때까지 내용을 잠깐 숨김
+     · 2초 안에 안 끝나면 그냥 보여줌 (안전장치)
+     ============================================================ -->
+<style>
+  html.od-my-wait .shop-content.mypage{ opacity:0 !important; }
+  html.od-my body.shop_mypage .section_wrap.section_first{ background-color:#F5F8FB !important; }
+  html.od-my .shop-content.mypage{ transition:opacity .15s ease; }
+</style>
+<script>
+(function(){
+  if(!/^\/shop_mypage/.test(location.pathname)) return;
+  var h = document.documentElement;
+  h.classList.add("od-my");
+  h.classList.add("od-my-wait");
+  if(/[?&]m2=coupon\b/.test(location.search)) h.classList.add("od-my-coupon");
+  setTimeout(function(){ h.classList.remove("od-my-wait"); }, 2000);
+})();
+</script>
+
+<!-- ===================== 상세페이지 중복 리뷰 블록 숨김 =====================
+     · .iewb-744 : 구매 버튼 아래 "포토 리뷰 (N)" 위젯 (PC·모바일)
+     · .review_summary_wrap : PC 기본 평점 + 포토 리뷰 (회색 상자 포함)
+     · .review_summary_wrap_mobile : 모바일 기본 평점 + 포토 리뷰
+     ============================================================ -->
+<style>
+  #prod_goods_form .iewb-744,
+  #prod_detail .iewb-744,
+  .review_summary_wrap,
+  .review_summary_wrap_mobile{ display:none !important; }
+
+  /* 수량별 할인 안내 숨김 → 할인은 "회원 전용 세트가" 카드에서만 보여줌
+     (상품 정보 표의 '혜택: 수량별 할인' 줄 + 구매 창 맨 위 '2개 이상 구매하면 5% 추가 할인!' 띠)
+     · 실제 결제 할인(아임웹 수량별 할인 설정)은 그대로 적용됨 */
+  .prod-detail-section--benefits:has(._quantity_discount_benefits),
+  ._quantity_discount_benefits,
+  [class*="_quantity_discount_banner"]{ display:none !important; }
+
+  /* 모바일: "회원가 기준 금액입니다" 문구와 리뷰·상세정보·Q&A 탭 사이 간격 (8px → 44px) */
+  @media (max-width:991px){
+    #prod_goods_form ._categorize_mobile{ padding-top:36px !important; }
+  }
+</style>
+
+<!-- ===================== 상품 상세: 원래 화면이 잠깐 보였다 바뀌는 깜빡임 방지 =====================
+     꾸민 화면이 준비될 때까지 오른쪽 구매 영역(모바일은 사진 아래 전체)과 탭 영역을 잠깐 숨겼다가 부드럽게 보여줌.
+     Footer 코드가 준비되면 html 에 od-ready 를 붙임. 혹시 Footer 가 늦어도 2.5초 뒤엔 무조건 보이게 함 -->
+<style id="od-preload">
+  html:not(.od-ready) body.shop_view #prod_detail .goods_form,
+  html:not(.od-ready) body.shop_view #prod_detail .categorize{ opacity:0 !important; }
+  html.od-ready body.shop_view #prod_detail .goods_form,
+  html.od-ready body.shop_view #prod_detail .categorize{ opacity:1; transition:opacity .18s ease; }
+  /* 모바일: 아임웹 기본 하단 바(장바구니·구매하기)는 처음부터 화면 아래로 내려 둠 → 잠깐 보였다 사라지는 깜빡임 방지
+     (구매창이 열릴 때는 Body 코드가 다시 올려줌) */
+  @media (max-width:991px){
+    body.shop_view ._mobile_action_btn_wrap .cart_btn{ transform:translateY(140%) !important; }
+  }
+</style>
+<script>
+  setTimeout(function(){ document.documentElement.classList.add("od-ready"); }, 2500);
+</script>
