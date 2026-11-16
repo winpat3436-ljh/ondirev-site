@@ -4399,3 +4399,80 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
 })();
 </script>
 <!-- ===================== /메타 픽셀 ===================== -->
+
+<!-- ===================== 상세페이지 구매 정보(적립·구매·배송) 3칸 타일 ===================== -->
+<style>
+  .odinf{ margin:14px 0 6px; font-family:"Pretendard Variable",Pretendard,"Apple SD Gothic Neo","Noto Sans KR",sans-serif; letter-spacing:-.01em; }
+  .odinf *{ box-sizing:border-box; }
+  .odinf-g{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+  .odinf-t{ display:flex; flex-direction:column; align-items:center; gap:4px; min-width:0; background:#F5F8FB; border-radius:14px; padding:13px 6px; text-align:center; }
+  .odinf-t svg{ display:block; width:20px; height:20px; }
+  .odinf-t em{ font-style:normal; font-size:12.5px; font-weight:600; color:#5A6878; -webkit-text-fill-color:#5A6878; }
+  .odinf-t b{ font-size:17px; font-weight:800; color:#13263A; -webkit-text-fill-color:#13263A; white-space:nowrap; }
+  .odinf-n{ display:flex; align-items:center; gap:6px; margin-top:8px; background:#EAF2FA; border-radius:10px; padding:10px 12px; font-size:13.5px; color:#13263A; -webkit-text-fill-color:#13263A; }
+  .odinf-n svg{ flex:none; display:block; width:16px; height:16px; }
+  .odinf-n b{ font-weight:800; color:#1667A8; -webkit-text-fill-color:#1667A8; }
+  .odinf-hide{ display:none !important; }
+  @media (min-width:992px){
+    .odinf-t{ padding:15px 8px; }
+    .odinf-t em{ font-size:13px; }
+    .odinf-t b{ font-size:18px; }
+  }
+</style>
+<script>
+(function(){
+  "use strict";
+  if(window.__odinfInit) return; window.__odinfInit = true;
+  var S = '<svg viewBox="0 0 24 24" fill="none" stroke="#1667A8" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">';
+  var COIN  = S+'<circle cx="12" cy="12" r="8.5"/><path d="M10 15.5V8.5h2.6a2.2 2.2 0 0 1 0 4.4H10"/></svg>';
+  var BOX   = S+'<path d="M4 7.5 12 4l8 3.5v9L12 20l-8-3.5z"/><path d="M4 7.5 12 11l8-3.5M12 11v9"/></svg>';
+  var TRUCK = S+'<path d="M3 6.5h11v9H3zM14 9.5h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17.5" cy="17.5" r="1.8"/></svg>';
+
+  /* 글자로 칸 찾기 (아임웹 구조가 바뀌어도 동작하게) */
+  function findEl(root, re){
+    var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null), n;
+    while((n = w.nextNode())){ if(re.test(n.nodeValue) && n.parentElement && !n.parentElement.closest(".odinf,script,style")) return n.parentElement; }
+    return null;
+  }
+
+  function run(){
+    if(!document.body || !document.body.classList.contains("shop_view")) return;
+    var root = document.querySelector(".goods_form") || document.body;
+    /* '최소 구매 수량' 칸에서 시작해, 적립·배송 글자가 함께 들어있는 가장 작은 묶음까지만 올라감 */
+    var b = findEl(root, /최소\s*구매\s*수량/); if(!b) return;
+    var box = b;
+    while(box && box !== root){
+      if(findEl(box, /포인트\s*적립/) && findEl(box, /택배|배송비|무료\s*배송/)) break;
+      box = box.parentElement;
+    }
+    if(!box || box === root || box === document.body) return;
+    /* 안전장치: 버튼·입력칸·가격 영역이 섞인 큰 덩어리면 손대지 않음 */
+    var txt = (box.innerText || box.textContent || "").replace(/\s+/g, " ").trim();
+    if(txt.length > 220 || box.querySelector("select,input,textarea,.pay_detail") || /구매하기|장바구니/.test(txt)) return;
+
+    var pt = /([\d,]+)\s*포인트/.exec(txt), mq = /최소\s*구매\s*수량\s*([\d,]+)/.exec(txt);
+    var fee = /기본\s*([\d,]+)\s*원/.exec(txt), free = /([\d,]+)\s*원\s*이상[^.]*?무료\s*배송/.exec(txt);
+    if(!pt || !mq || !fee) return;
+
+    var html = '<div class="odinf-g">' +
+      '<div class="odinf-t">'+COIN+'<em>적립</em><b>'+pt[1]+'P</b></div>' +
+      '<div class="odinf-t">'+BOX+'<em>최소 구매</em><b>'+mq[1]+'개</b></div>' +
+      '<div class="odinf-t">'+TRUCK+'<em>배송비</em><b>'+fee[1]+'원</b></div></div>' +
+      (free ? '<div class="odinf-n">'+TRUCK+'<span>'+free[1]+'원 이상 구매 시 <b>무료배송</b></span></div>' : '');
+
+    var card = box.previousElementSibling;
+    if(!card || !card.classList.contains("odinf")){
+      card = document.createElement("div"); card.className = "odinf";
+      box.parentNode.insertBefore(card, box);
+    }
+    if(card.__h !== html){ card.innerHTML = html; card.__h = html; }
+    box.classList.add("odinf-hide");
+  }
+
+  var t = null;
+  function kick(){ if(t) return; t = setTimeout(function(){ t = null; run(); }, 120); }
+  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", kick); else kick();
+  new MutationObserver(kick).observe(document.documentElement, { childList:true, subtree:true, characterData:true });
+})();
+</script>
+<!-- ===================== /상세페이지 구매 정보 ===================== -->
