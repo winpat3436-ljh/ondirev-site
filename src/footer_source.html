@@ -4511,3 +4511,72 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
 })();
 </script>
 <!-- ===================== /상세페이지 구매 정보 ===================== -->
+
+<!-- ===================== 상세페이지 찜·공유 버튼 (연한 블루 알약) ===================== -->
+<style>
+  .odlk-b{ position:relative !important; display:inline-flex !important; align-items:center; justify-content:center; gap:0; height:38px !important; min-width:0 !important; padding:0 14px !important; margin:0 8px 0 0 !important; border:0 !important; border-radius:999px !important; background:#F5F8FB !important; box-shadow:none !important; vertical-align:middle; cursor:pointer; text-decoration:none !important; transition:background .15s; font-size:0 !important; color:transparent !important; -webkit-text-fill-color:transparent !important; }
+  .odlk-b > *{ position:absolute !important; inset:0 !important; width:100% !important; height:100% !important; margin:0 !important; opacity:0 !important; z-index:2; pointer-events:none !important; }
+  .odlk-b > a, .odlk-b > button, .odlk-b > [onclick], .odlk-b > [role=button], .odlk-b > label, .odlk-b > input{ pointer-events:auto !important; z-index:3; }
+  .odlk-b::before{ content:""; display:block; width:20px; height:20px; flex:none; margin-right:6px; background:center/20px 20px no-repeat; }
+  .odlk-b::after{ content:attr(data-odt); font-family:"Pretendard Variable",Pretendard,"Apple SD Gothic Neo","Noto Sans KR",sans-serif; font-size:14px; font-weight:700; line-height:1; color:#1667A8; -webkit-text-fill-color:#1667A8; letter-spacing:-.01em; }
+  .odlk-like::before{ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231667A8' stroke-width='1.7' stroke-linejoin='round'%3E%3Cpath d='M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z'/%3E%3C/svg%3E"); }
+  .odlk-share::before{ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231667A8' stroke-width='1.7' stroke-linecap='round'%3E%3Ccircle cx='18' cy='5.5' r='2.3'/%3E%3Ccircle cx='6' cy='12' r='2.3'/%3E%3Ccircle cx='18' cy='18.5' r='2.3'/%3E%3Cpath d='M8 11 16 6.6M8 13l8 4.4'/%3E%3C/svg%3E"); }
+  .odlk-like.odlk-on{ background:#1667A8 !important; }
+  .odlk-like.odlk-on::after{ color:#fff; -webkit-text-fill-color:#fff; }
+  .odlk-like.odlk-on::before{ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23fff' stroke='%23fff' stroke-width='1.7' stroke-linejoin='round'%3E%3Cpath d='M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z'/%3E%3C/svg%3E"); }
+  .odlk-cnt{ display:none !important; }
+</style>
+<script>
+(function(){
+  "use strict";
+  if(window.__odlkInit) return; window.__odlkInit = true;
+  var DBG = /[?&]oddbg=1/.test(location.search);
+  function dbg(m){
+    if(!DBG) return;
+    var d = document.getElementById("odlk-dbg");
+    if(!d){ d = document.createElement("pre"); d.id = "odlk-dbg"; d.style.cssText = "position:fixed;left:6px;right:6px;top:6px;z-index:2147483647;max-height:35vh;overflow:auto;background:#111;color:#ff0;font:11px/1.4 monospace;padding:8px;white-space:pre-wrap;border-radius:8px"; document.body.appendChild(d); }
+    var v = "odlk v1\n" + m; if(d.textContent !== v) d.textContent = v;
+  }
+  function vis(el){ return el && el.offsetParent !== null; }
+  function cls(el){ var s = ""; [el].concat([].slice.call(el.querySelectorAll("*"))).forEach(function(x){ s += " " + (typeof x.className === "string" ? x.className : (x.getAttribute && x.getAttribute("class")) || ""); }); return s; }
+  var LIKE = /like|wish|heart|love|zzim/i, SHARE = /share|sns/i;
+
+  function run(){
+    if(!document.body || !document.body.classList.contains("shop_view")) return;
+    var card = document.querySelector(".odinf"); if(!card || !vis(card)) return dbg("구매 정보 타일 아직 없음");
+    var top = card.getBoundingClientRect().top;
+    /* 타일 바로 위(220px 안)에 보이는 작은 버튼들 */
+    var cand = [].filter.call(document.querySelectorAll('a,button,[onclick],[role=button],[class*=like],[class*=wish],[class*=share],[class*=Like],[class*=Share]'), function(el){
+      if(!vis(el) || el.closest(".odinf,.odpx,.odpx-ev,#odinf-dbg,#odlk-dbg,header nav,.mobile_slide_menu_container")) return false;
+      var r = el.getBoundingClientRect();
+      return r.bottom <= top + 2 && r.bottom >= top - 220 && r.width > 8 && r.width < 220 && r.height < 90 && (el.innerText || "").replace(/\s+/g, "").length <= 8;
+    });
+    cand = cand.filter(function(el){ return !cand.some(function(o){ return o !== el && o.contains(el); }); });
+    var like = cand.filter(function(el){ return LIKE.test(cls(el)) || el.classList.contains("odlk-like"); })[0];
+    var share = cand.filter(function(el){ return el !== like && (SHARE.test(cls(el)) || el.classList.contains("odlk-share")); })[0];
+    var info = "후보 " + cand.length + "개: " + cand.map(function(e){ return e.tagName.toLowerCase() + "." + String(e.className).slice(0, 40) + " '" + (e.innerText || "").trim() + "'"; }).join(" | ");
+    if(!like) return dbg("찜 버튼 못 찾음\n" + info);
+
+    /* 찜 숫자: 버튼 안 숫자, 없으면 바로 옆 숫자칸 */
+    var n = ((like.innerText || like.textContent || "").match(/\d[\d,]*/) || [])[0], cnt = null;
+    if(!n){
+      var sib = like.nextElementSibling;
+      if(sib && /^\s*\d[\d,]*\s*$/.test(sib.textContent || "")){ cnt = sib; n = sib.textContent.trim(); }
+    }
+    if(cnt) cnt.classList.add("odlk-cnt");
+    like.classList.add("odlk-b", "odlk-like");
+    if(n != null && like.getAttribute("data-odt") !== n) like.setAttribute("data-odt", n);
+    if(!n && like.getAttribute("data-odt") !== "찜") like.setAttribute("data-odt", "찜");
+    var on = /(^|[\s_-])(on|active|actived|liked|is-liked|selected|checked)(\s|$)|heart-?fill|heart-?full|fa-heart(?!-o)|filled/i.test(cls(like)) || /♥/.test(like.textContent || "");
+    like.classList.toggle("odlk-on", on);
+    if(share){ share.classList.add("odlk-b", "odlk-share"); if(share.getAttribute("data-odt") !== "공유") share.setAttribute("data-odt", "공유"); }
+    dbg("적용 완료 · 숫자 " + n + " · 찜상태 " + on + " · 공유 " + !!share + "\n" + info);
+  }
+  var t = null;
+  function kick(){ if(t) return; t = setTimeout(function(){ t = null; run(); }, 150); }
+  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", kick); else kick();
+  new MutationObserver(kick).observe(document.documentElement, { childList:true, subtree:true, attributes:true, attributeFilter:["class"], characterData:true });
+  window.addEventListener("resize", kick);
+})();
+</script>
+<!-- ===================== /찜·공유 버튼 ===================== -->
