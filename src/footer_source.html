@@ -4318,3 +4318,62 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
 })();
 </script>
 <!-- ===================== /메인 홈 맨 아래 남은 글자 정리 ===================== -->
+
+<!-- ===================== 메타 픽셀 (데이터 세트 ond · 2033066714076793) =====================
+     · 모든 페이지: PageView / 상품 상세: ViewContent / '장바구니' 버튼: AddToCart
+     · 주문서(shop_payment): InitiateCheckout / 주문 완료 화면: Purchase (주문번호당 1번만)
+     ============================================================ -->
+<script>
+(function(){
+  "use strict";
+  var PIXEL = "2033066714076793";
+  if(window.__odPixel) return; window.__odPixel = true;
+  if(/^\/admin/.test(location.pathname)) return;
+  /* 메타 기본 코드 */
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version="2.0";n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,"script","https://connect.facebook.net/en_US/fbevents.js");
+  fbq("init", PIXEL);
+  fbq("track", "PageView");
+
+  var path = location.pathname, qs = new URLSearchParams(location.search);
+  var PRICE = 26800;
+  function num(s){ var m = String(s || "").replace(/[^\d]/g, ""); return m ? parseInt(m, 10) : 0; }
+  function prodIdx(){ return qs.get("idx") || "1"; }
+
+  /* 상품 상세 */
+  var isProduct = /^\/(shop_view|products|IN)\b/.test(path) && qs.get("idx");
+  if(isProduct){
+    fbq("track", "ViewContent", { content_ids:[prodIdx()], content_type:"product", value:PRICE, currency:"KRW" });
+  }
+  /* 장바구니 / 구매하기 버튼 */
+  document.addEventListener("click", function(e){
+    if(!isProduct) return;
+    var b = e.target.closest && e.target.closest("a,button");
+    if(!b) return;
+    var t = (b.textContent || "").replace(/\s+/g, "");
+    if(t === "장바구니"){
+      fbq("track", "AddToCart", { content_ids:[prodIdx()], content_type:"product", value:PRICE, currency:"KRW" });
+    }
+  }, true);
+
+  /* 주문서 */
+  if(/^\/shop_payment\/?$/.test(path)){
+    fbq("track", "InitiateCheckout", { content_ids:["1"], content_type:"product", currency:"KRW" });
+  }
+  /* 주문 완료 */
+  if(/^\/shop_payment_complete|^\/shop_order_complete|order_complete/.test(path)){
+    var key = "odpx_" + (qs.get("order_no") || qs.get("order_code") || "x");
+    var done = false; try{ done = localStorage.getItem(key) === "1"; }catch(err){}
+    if(!done){
+      var fire = function(){
+        var txt = document.body ? document.body.innerText : "";
+        var m = txt.match(/(최종\s*)?결제\s*금액[^\d]{0,20}([\d,]+)\s*원/);
+        var v = m ? num(m[2]) : 0;
+        fbq("track", "Purchase", { content_type:"product", value: v || PRICE, currency:"KRW" });
+        try{ localStorage.setItem(key, "1"); }catch(err){}
+      };
+      if(document.readyState === "complete") setTimeout(fire, 300); else window.addEventListener("load", function(){ setTimeout(fire, 300); });
+    }
+  }
+})();
+</script>
+<!-- ===================== /메타 픽셀 ===================== -->
