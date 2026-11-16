@@ -4449,39 +4449,59 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
     return out.replace(/\s+/g, " ").trim();
   }
 
+  /* 화면에 보이는 글자 칸만 찾기 */
+  function findVis(root, re){
+    var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null), n, out = [];
+    while((n = w.nextNode())){
+      var p = n.parentElement;
+      if(p && re.test(n.nodeValue) && !p.closest(".odinf,script,style,#odinf-dbg") && p.offsetParent !== null) out.push(p);
+    }
+    return out;
+  }
+  function childOf(c, el){ while(el && el.parentElement !== c) el = el.parentElement; return el; }
+
   function run(){
     if(!document.body || !document.body.classList.contains("shop_view")) return dbg("shop_view 아님: " + (document.body && document.body.className));
-    var root = document.querySelector(".goods_form") || document.body;
-    var b = findEl(document.body, /최소\s*구매\s*수량/); if(!b) return dbg("'최소 구매 수량' 글자 못 찾음");
-    var box = b;
-    while(box && box !== document.body){
-      if(findEl(box, /포인트\s*적립|적립\s*예정/) && findEl(box, /택배|배송비|무료\s*배송/)) break;
-      box = box.parentElement;
+    if(document.querySelector(".odinf")) return;   /* 이미 바꿈 */
+    var qs = findVis(document.body, /최소\s*구매\s*수량/);
+    if(!qs.length) return dbg("보이는 '최소 구매 수량' 없음");
+    for(var i = 0; i < qs.length; i++){
+      /* 이 칸에서 위로 올라가며 적립·배송 글자가 함께 보이는 가장 작은 묶음 찾기 */
+      var c = qs[i], pa = null, sh = null;
+      while(c && c !== document.body){
+        pa = findVis(c, /포인트\s*적립|적립\s*예정/)[0]; sh = findVis(c, /택배|배송비|무료\s*배송/)[0];
+        if(pa && sh) break;
+        c = c.parentElement;
+      }
+      if(!c || c === document.body) { dbg("적립·배송 묶음 못 찾음"); continue; }
+      /* 묶음 안에서 세 줄(적립·구매·배송)에 해당하는 칸만 골라냄 */
+      var rows = [];
+      [pa, qs[i], sh].forEach(function(el){ var r = childOf(c, el); if(r && rows.indexOf(r) < 0) rows.push(r); });
+      /* 제목칸(적립/구매/배송)이 값과 따로 떨어진 구조면 제목칸도 같이 */
+      rows.slice().forEach(function(r){ var l = r.previousElementSibling; if(l && rows.indexOf(l) < 0 && /^(적립|구매|배송|배송비)$/.test(vis(l))) rows.push(l); });
+      rows.sort(function(x, y){ return x.compareDocumentPosition(y) & 4 ? -1 : 1; });
+      var txt = rows.map(vis).join(" ");
+      var info = "묶음 <" + c.tagName.toLowerCase() + " class='" + c.className + "'> 줄 " + rows.length + "개 · 글자 " + txt.length + "\n" + txt.slice(0, 300);
+      var bad = rows.some(function(r){
+        return vis(r).length > 200 || r.querySelector("select,textarea,input:not([type=hidden]),.pay_detail,.odpx,.odpx-ev") ||
+          [].some.call(r.querySelectorAll("a,button"), function(x){ return /구매하기|장바구니|바로구매/.test(x.textContent || ""); });
+      });
+      if(bad){ dbg("안전장치로 중단\n" + info); continue; }
+
+      var pt = /([\d,]+)\s*(포인트|P)\s*적립/.exec(txt), mq = /최소\s*구매\s*수량\s*([\d,]+)/.exec(txt);
+      var fee = /기본\s*([\d,]+)\s*원/.exec(txt) || /배송비\s*([\d,]+)\s*원/.exec(txt), free = /([\d,]+)\s*원\s*이상[^.]*?무료\s*배송/.exec(txt);
+      if(!pt || !mq || !fee){ dbg("숫자 읽기 실패 pt=" + !!pt + " mq=" + !!mq + " fee=" + !!fee + "\n" + info); continue; }
+
+      var card = document.createElement("div"); card.className = "odinf";
+      card.innerHTML = '<div class="odinf-g">' +
+        '<div class="odinf-t">'+COIN+'<em>적립</em><b>'+pt[1]+'P</b></div>' +
+        '<div class="odinf-t">'+BOX+'<em>최소 구매</em><b>'+mq[1]+'개</b></div>' +
+        '<div class="odinf-t">'+TRUCK+'<em>배송비</em><b>'+fee[1]+'원</b></div></div>' +
+        (free ? '<div class="odinf-n">'+TRUCK+'<span>'+free[1]+'원 이상 구매 시 <b>무료배송</b></span></div>' : '');
+      c.insertBefore(card, rows[0]);
+      rows.forEach(function(r){ r.classList.add("odinf-hide"); });
+      return dbg("적용 완료\n" + info);
     }
-    if(!box || box === document.body) return dbg("적립·배송이 함께 든 묶음 못 찾음");
-    var txt = vis(box);
-    var info = "묶음: <" + box.tagName.toLowerCase() + " class='" + box.className + "'> 글자수 " + txt.length + "\n글자: " + txt.slice(0, 300);
-    var btns = [].filter.call(box.querySelectorAll("a,button"), function(x){ return /구매하기|장바구니|바로구매/.test(x.textContent || ""); }).length;
-    if(txt.length > 400 || btns || box.querySelector("select,textarea,input:not([type=hidden])") || box.contains(root.querySelector(".pay_detail"))) return dbg("안전장치로 중단\n" + info);
-
-    var pt = /([\d,]+)\s*(포인트|P)\s*적립/.exec(txt), mq = /최소\s*구매\s*수량\s*([\d,]+)/.exec(txt);
-    var fee = /기본\s*([\d,]+)\s*원/.exec(txt) || /배송비\s*([\d,]+)\s*원/.exec(txt), free = /([\d,]+)\s*원\s*이상[^.]*?무료\s*배송/.exec(txt);
-    if(!pt || !mq || !fee) return dbg("숫자 읽기 실패 pt=" + !!pt + " mq=" + !!mq + " fee=" + !!fee + "\n" + info);
-
-    var html = '<div class="odinf-g">' +
-      '<div class="odinf-t">'+COIN+'<em>적립</em><b>'+pt[1]+'P</b></div>' +
-      '<div class="odinf-t">'+BOX+'<em>최소 구매</em><b>'+mq[1]+'개</b></div>' +
-      '<div class="odinf-t">'+TRUCK+'<em>배송비</em><b>'+fee[1]+'원</b></div></div>' +
-      (free ? '<div class="odinf-n">'+TRUCK+'<span>'+free[1]+'원 이상 구매 시 <b>무료배송</b></span></div>' : '');
-
-    var card = box.previousElementSibling;
-    if(!card || !card.classList.contains("odinf")){
-      card = document.createElement("div"); card.className = "odinf";
-      box.parentNode.insertBefore(card, box);
-    }
-    if(card.__h !== html){ card.innerHTML = html; card.__h = html; }
-    box.classList.add("odinf-hide");
-    dbg("적용 완료\n" + info);
   }
 
   var t = null;
