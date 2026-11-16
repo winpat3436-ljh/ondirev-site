@@ -10,3 +10,7 @@
 ## 배포 방식 (2026-11-16 변경)
 - 아임웹 Body 칸은 `https://winpat3436-ljh.github.io/ondirev-site/dist/footer.css`, Footer 칸은 `.../dist/footer.js`를 불러옵니다 (GitHub Pages).
 - `main`에 올리면 1~2분 뒤 Pages가 갱신되고, 방문자 브라우저는 최대 10분(max-age=600) 안에 새 파일을 받습니다. 아임웹 수정·캐시 비우기 필요 없음.
+
+## 빠른 반영 (로더 구조)
+- 아임웹이 부르는 `dist/footer.js` 는 작은 로더. 1분 단위로 바뀌는 주소(`main.js?v=…`, `main.css?v=…`)로 실제 코드를 불러옴 → 수정 후 1~2분 안에 반영.
+- 빌드: `./build.sh` (src/footer_source.html → dist/main.js, dist/main.css, dist/footer.css)
