@@ -4658,7 +4658,7 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
       if(hdr && hdr.contains(el)) return;
       if(el.closest("header,footer,#doz_footer,#doz_footer_wrap")) return;
       var isDup = el.classList && el.classList.contains("odv-root") || el.id === "odv-app" ||
-        /어느\s*방향이\s*필요|내\s*방향\s*찾기|directioncheck/.test((el.innerText || "") + " " + (el.getAttribute && (el.getAttribute("src") || "")));
+        /방향\s*찾기|어느\s*방향이\s*필요|열\s*가지\s*질문|방향이\s*맞는\s*하루|directioncheck/.test((el.innerText || "") + " " + (el.getAttribute && (el.getAttribute("src") || "")));
       if(!isDup) return;
       var box = (el.closest && el.closest("._widget_data")) || el;
       if(box.contains(mine) || (hdr && hdr.contains(box))) return;
