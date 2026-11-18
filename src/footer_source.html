@@ -3378,6 +3378,14 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
   .odpx-ev .zr .n{ color:#13263A; -webkit-text-fill-color:#13263A; }
   .odpx-ev .fn{ margin-top:12px; font-size:12px; line-height:1.6; color:#4F5D6B; -webkit-text-fill-color:#4F5D6B; }
 
+  /* PC 대표 사진 크기 고정: 아임웹이 처음엔 사진 칸 높이를 750px로 잡았다가 몇 초 뒤 원래 비율(817px)로 다시 계산해서
+     사진이 줄었다 돌아오는 것처럼 보임 → 처음부터 사진 원래 비율로 높이를 잡음 (사진이 아직 안 왔을 때는 3:4 근사값) */
+  @media (min-width:992px){
+    html body.shop_view #prod_image_list .holder,
+    html body.shop_view #prod_image_list .owl-stage-outer,
+    html body.shop_view #prod_image_list .owl-item{ height:auto !important; }
+    html body.shop_view #prod_image_list .owl-item img{ width:100% !important; height:auto !important; max-height:none !important; aspect-ratio:auto 750 / 1004; object-fit:contain; }
+  }
   /* PC(992px 이상): 그래프는 왼쪽 사진 아래, 오른쪽엔 숨김 · 상품명 중복 한 줄 숨김 */
   .odpx-ev-pc{ display:none !important; }
   @media (min-width:992px){
