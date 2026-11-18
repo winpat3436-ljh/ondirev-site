@@ -889,7 +889,7 @@ function revBlock(){
   const head = `<div class="rhd">
       <span class="reb">${same ? "같은 IN 방향" : "지금 함께 쓸 IN"}</span>
       <h4>${same ? "같은 방향, 같은 고민<br>먼저 써본 사람들" : "같은 고민,<br>IN을 먼저 써본 사람들"}</h4>
-      ${anyHit ? `<p>진하게 표시된 고민은 내 답변과 겹치는 부분이에요</p>` : ""}
+      <p>체험단(제품 무상 제공) 리뷰가 포함되어 있어요</p>
     </div>`;
   if(!list.length){
     return `<div class="revs">${head}
@@ -899,15 +899,14 @@ function revBlock(){
   const card = (v) => `<div class="rv2">
       <button type="button" class="rth" data-zoom="${esc(v.p[0])}"><img src="${esc(v.p[0])}" alt="구매자 사진" loading="lazy"></button>
       <div class="rbd">
-        ${starRow(v.r||5)}${v.tag?`<span class="rdis">${esc(v.tag)}</span>`:""}
-        <div class="rtags">${(v.tags||[]).map(t => `<span class="${tagHit(t)?"hit":""}">${esc(t)}</span>`).join("")}</div>
+        ${starRow(v.r||5)}
+        <div class="rtags">${(v.tags||[]).map((t,i) => `<span class="${i===0?"hit":""}">${esc(t)}</span>`).join("")}</div>
         <p class="rtx">${esc(v.t)}</p>
       </div>
     </div>`;
   return `<div class="revs">${head}
     ${list.slice(0,3).map(card).join("")}
     <a class="rall" data-what="reviews" href="${RV_URL}" target="_blank" rel="noopener">리뷰 ${meta.count || list.length}개 전체 보기 ›</a>
-    <p class="rnote">체험단 리뷰가 포함되어 있습니다</p>
   </div>`;
 }
 
