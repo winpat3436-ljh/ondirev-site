@@ -4647,7 +4647,25 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
       else { (document.querySelector("#doz_body") || document.body).appendChild(box); }
     }
     scripts.forEach(function(s){ var n = document.createElement("script"); n.text = s.textContent; document.body.appendChild(n); });
+    hideDup();
   }
+  /* 예전에 아임웹에 직접 넣어둔 방향 찾기(중복)는 숨김. 새 테스트·헤더·푸터는 건드리지 않음 */
+  function hideDup(){
+    var mine = document.querySelector(".odv-root[data-odv-new]"); if(!mine) return;
+    var hdr = document.querySelector("#doz_header_wrap, #doz_header, ._doz_header");
+    [].forEach.call(document.querySelectorAll(".odv-root:not([data-odv-new]), #odv-app, ._widget_data, iframe"), function(el){
+      if(mine.contains(el) || el.contains(mine)) return;
+      if(hdr && hdr.contains(el)) return;
+      if(el.closest("header,footer,#doz_footer,#doz_footer_wrap")) return;
+      var isDup = el.classList && el.classList.contains("odv-root") || el.id === "odv-app" ||
+        /어느\s*방향이\s*필요|내\s*방향\s*찾기|directioncheck/.test((el.innerText || "") + " " + (el.getAttribute && (el.getAttribute("src") || "")));
+      if(!isDup) return;
+      var box = (el.closest && el.closest("._widget_data")) || el;
+      if(box.contains(mine) || (hdr && hdr.contains(box))) return;
+      if(box.style.display !== "none") box.style.display = "none";
+    });
+  }
+  var hdT = null; new MutationObserver(function(){ if(hdT) return; hdT = setTimeout(function(){ hdT = null; hideDup(); }, 300); }).observe(document.documentElement, { childList:true, subtree:true });
   function go(){ fetch(SRC).then(function(r){ return r.ok ? r.text() : ""; }).then(function(t){ if(t) mount(t); }).catch(function(){}); }
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", go); else go();
 })();
