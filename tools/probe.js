@@ -1,4 +1,4 @@
-// (v3) 상품 상세 첫 화면에서 왼쪽 대표 사진 크기 변화를 시간별로 기록 (진단용)
+// (v4) 상품 상세 첫 화면에서 왼쪽 대표 사진 크기 변화를 시간별로 기록 (진단용)
 const {chromium}=require('playwright');const fs=require('fs');
 const URLS=["https://ondirev.com/shop_view/?idx=1"];
 (async()=>{const b=await chromium.launch({ignoreDefaultArgs:['--hide-scrollbars']});const out={};
