@@ -91,7 +91,7 @@ body.odv-intro-on #od-kakao{bottom:118px !important}
 .odv-root .qfoot{margin-top:14px;text-align:center;font-size:12.5px;color:var(--soft)}
 .odv-root .hero{display:flex;flex-direction:column;align-items:center;padding-top:6px}
 .odv-root .hero .lab{margin-top:6px;font-size:13px;color:var(--soft);font-weight:500}
-.odv-root .dirbig{margin-top:6px;display:flex;align-items:center;gap:10px}
+.odv-root .dirbig{margin-top:6px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px 10px}
 .odv-root .dirbig .w{font-size:60px;font-weight:800;letter-spacing:.02em;color:var(--navy);line-height:1}
 .odv-root .dirbig .c{background:var(--sky);color:var(--navy);font-size:14px;font-weight:700;padding:6px 12px;border-radius:999px}
 .odv-root .hero .role{margin-top:10px;font-size:18px;font-weight:700;letter-spacing:-.04em;text-align:center}
@@ -725,7 +725,10 @@ let pos = 0, ans = {}, dec = decide({}), dir = dec.p, fuDir = null, angle = null
 const recompute = () => { dec = decide(ans); dir = dec.p; };
 const coreDone = () => AX.filter(a => ans[a.k] !== undefined).length;
 const vals = () => AX.map(a => ans[a.k] ?? 0);
-const subTag = k => SUB[k] ? SUB[k][0] : (k==="IN" && !dec.zero ? ((ans.oil ?? 0)===0 ? "Lipid" : "Water") : "");
+/* 부가 단어: IN = 피지 답(Water/Lipid), OUT = OUT 후속 답 ①Pore ②Texture (③④는 없음), DOWN·ON = 하위 유형. 화면에는 "영어 · 한국어"로 표시 */
+const SUBKO = {Water:"수분 부족형", Lipid:"유수분 부족형", Pore:"모공 막힘형", Texture:"각질 정체형", Calm:"진정형", Balance:"피지 조절형", Shield:"장벽 보호형", UV:"자외선 보호형"};
+const subTag = k => SUB[k] ? SUB[k][0] : (k==="IN" && !dec.zero ? ((ans.oil ?? 0)===0 ? "Lipid" : "Water") : (k==="OUT" && fuDir==="OUT" ? (["Pore","Texture"][ans.fu] || "") : ""));
+const subFull = k => { const t = subTag(k); return t ? (SUBKO[t] ? `${t} · ${SUBKO[t]}` : t) : ""; };
 const shortest = d => ((d % 360) + 540) % 360 - 180;
 const fx = n => n.toFixed(1);
 function printPts(R, v, cx=150, cy=150){
@@ -1024,7 +1027,7 @@ function result(){
   <section class="hero">
     ${compass(230,{on:name, lit:true, from: settle + 44})}
     <div class="lab">내 피부에 지금 필요한 방향</div>
-    <div class="dirbig"><span class="w">${name}</span>${subTag(dir)?`<span class="c">${subTag(dir)}</span>`:""}</div>
+    <div class="dirbig"><span class="w">${name}</span>${subTag(dir)?`<span class="c">${subTag(dir)}${SUBKO[subTag(dir)]?`<i style="font-style:normal;font-weight:600;opacity:.75"> · ${SUBKO[subTag(dir)]}</i>`:""}</span>`:""}</div>
     <div class="role">${ROLE[dir]}</div>
     <p class="q">${r.q}</p>
   </section>
@@ -1076,9 +1079,9 @@ function result(){
 
   <div class="card"><h3>다음 방향</h3>
     <div class="nx">
-      <div class="now"><small>지금</small><b>${name}</b><span>${subTag(dir)||DIR[name].s}</span></div>
+      <div class="now"><small>지금</small><b>${name}</b><span>${subFull(dir)||DIR[name].s}</span></div>
       <svg width="22" height="14" viewBox="0 0 24 12" aria-hidden="true"><path d="M1 6h20M17 2l4 4-4 4" fill="none" stroke="#1B3A5C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <div class="nxt"><small>4~8주 뒤</small><b>${show(nx)}</b><span>${SUB[nx]?`${SUB[nx][0]} · ${SUB[nx][1]}`:DIR[nx].s}</span></div>
+      <div class="nxt"><small>4~8주 뒤</small><b>${show(nx)}</b><span>${SUB[nx]?`${SUB[nx][0]} · ${SUBKO[SUB[nx][0]]}`:DIR[nx].s}</span></div>
     </div>
     <p class="p m">${lbl(dir)}${josa(dir,"이","가")} 안정되면 ${lbl(nx)}${josa(nx,"으로","로")} 넘어가세요. 그때 다시 해보면 바늘이 옮겨갔는지 확인할 수 있어요.</p>
   </div>
@@ -1125,10 +1128,10 @@ async function drawCard(v, nx){
   x.beginPath(); for(let i=0;i<7;i++){ const [px,py]=pt(i,R*Math.max(.05,v[i]/3)); i?x.lineTo(px,py):x.moveTo(px,py);} x.closePath(); x.fillStyle=pg; x.fill(); x.strokeStyle="#FFFFFF"; x.lineWidth=4; x.lineJoin="round"; x.stroke();
   const mx=Math.max(...v);
   AXL.forEach((t,i)=>{ const [px,py]=pt(i,R+40); x.fillStyle= v[i]===mx&&mx>0 ? "#FFFFFF" : "#A8C8E8"; x.font=`${v[i]===mx&&mx>0?700:500} 32px ${K}`; x.fillText(t, px, py+11); });
-  const name=show(dir), tag=subTag(dir);
+  const name=show(dir), tag=subFull(dir);
   x.fillStyle="#FFFFFF"; x.font=`800 160px ${L}`; x.letterSpacing="6px"; x.fillText(name, W/2+3, 1290); x.letterSpacing="0px";
-  if(tag){ x.font=`500 34px ${L}`; x.letterSpacing="6px"; const tw=x.measureText(tag).width+56; x.strokeStyle="rgba(255,255,255,.55)"; x.lineWidth=2; const bx=W/2-tw/2, by=1336; x.beginPath(); x.roundRect ? x.roundRect(bx,by,tw,62,31) : x.rect(bx,by,tw,62); x.stroke(); x.fillStyle="#FFFFFF"; x.fillText(tag, W/2+3, by+43); x.letterSpacing="0px"; }
-  x.fillStyle="#DCE6F1"; x.font=`400 36px ${K}`; x.fillText(subOf(dir), W/2, tag?1470:1390);
+  if(tag){ x.font=`500 34px ${L}`; x.letterSpacing="2px"; const tw=x.measureText(tag).width+56; x.strokeStyle="rgba(255,255,255,.55)"; x.lineWidth=2; const bx=W/2-tw/2, by=1336; x.beginPath(); x.roundRect ? x.roundRect(bx,by,tw,62,31) : x.rect(bx,by,tw,62); x.stroke(); x.fillStyle="#FFFFFF"; x.fillText(tag, W/2+3, by+43); x.letterSpacing="0px"; }
+  x.fillStyle="#DCE6F1"; x.font=`400 36px ${K}`; x.fillText(SUB[dir]?SUB[dir][1]:DIR[name].s, W/2, tag?1470:1390);
   x.fillStyle="#A8C8E8"; x.font=`300 34px ${L}`; x.letterSpacing="8px"; x.fillText(v.join(" · "), W/2+4, 1580); x.letterSpacing="0px";
   x.strokeStyle="rgba(255,255,255,.18)"; x.lineWidth=2; x.beginPath(); x.moveTo(140,1650); x.lineTo(W-140,1650); x.stroke();
   x.fillStyle="#DCE6F1"; x.font=`400 32px ${K}`; x.fillText(`다음 방향  ${lbl(nx)}`, W/2, 1720);
