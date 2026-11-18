@@ -1,6 +1,19 @@
 <!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Ondirev 방향 찾기</title><meta name="description" content="10가지 질문으로 내 피부에 지금 필요한 방향을 찾아요.">
-<style>html,body{margin:0;background:#F7F9FC}</style></head><body>
+<style>html,body{margin:0;background:#F7F9FC}
+/* 결과 화면: 중요한 부분만 굵게 (본문은 그대로) */
+.odv-root #odv-app.rs .card h3{font-weight:800}
+.odv-root #odv-app.rs .card .p b,.odv-root #odv-app.rs .card .p strong{font-weight:800;color:var(--navy)}
+.odv-root #odv-app.rs .glance strong{font-weight:800}
+.odv-root #odv-app.rs .glance b,.odv-root #odv-app.rs .basis b{font-weight:700;color:var(--navy)}
+.odv-root #odv-app.rs .ans{font-weight:700}
+.odv-root #odv-app.rs .avoid li{font-weight:600}
+.odv-root #odv-app.rs .tl b{font-weight:800;font-size:13px}
+.odv-root #odv-app.rs .rt h4{font-weight:800;font-size:13.5px}
+.odv-root #odv-app.rs .prodcard h3{font-weight:900}
+.odv-root #odv-app.rs .slot b{font-weight:800}
+.odv-root #odv-app.rs .hero .role{font-weight:800}
+</style></head><body>
 <!-- Ondirev 방향 찾기 (Compass + Skin Print)
      아임웹: '방향 찾기' 페이지 → 섹션 하나(풀폭, 상하 여백 0) → 코드 위젯 → 이 파일 전체를 붙여넣기.
      스타일은 .odv-root 안에만 적용되고, 스크립트는 함수 하나로 감싸 사이트의 다른 코드와 이름이 겹치지 않는다. -->
@@ -756,6 +769,7 @@ function moveNeedle(){
   angle = next;
 }
 function go(n){
+  app.classList.remove("rs");
   pos = n; render();
   jump(ROOT.getBoundingClientRect().top + window.scrollY - HEAD_OFF, "instant");
   /* 질문 화면: 선택지가 화면 아래로 잘리면, 선택지 끝이 화면 안에 들어오도록 바로 내려준다. */
@@ -980,6 +994,7 @@ function productSection(){
 }
 
 function result(){
+  app.classList.add("rs");
   const r = R[dir], name = show(dir), nx = nextOf(r), mod = M[dir];
   const am = [...r.am], pm = [...r.pm], plan = [...r.plan], avoid = [...r.avoid];
   const ag = AG[ans.age ?? 1], env = ans.env ?? 8;
