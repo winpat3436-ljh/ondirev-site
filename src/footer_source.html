@@ -4622,3 +4622,33 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
   html body [style*="a684643193397"]{ background-image:url("https://cdn.imweb.me/thumbnail/20261103/a684643193397.jpg") !important; }
   html body img[src*="a684643193397"]{ content:normal !important; }
 </style>
+
+<!-- ===================== 방향 찾기 테스트: ondirev.com/directioncheck 에 자동 장착 =====================
+     원본: dist 옆 directioncheck/widget.html (GitHub Pages). 되돌리려면 이 블록 삭제. -->
+<script>
+(function(){
+  "use strict";
+  if(!/^\/directioncheck\/?$/i.test(location.pathname)) return;
+  if(window.__odvMount) return; window.__odvMount = true;
+  var SRC = "https://winpat3436-ljh.github.io/ondirev-site/directioncheck/widget.html?v=" + Math.floor(Date.now()/60000);
+  function mount(html){
+    if(document.querySelector(".odv-root[data-odv-new]")) return;
+    var old = document.querySelectorAll(".odv-root");
+    var box = document.createElement("div"); box.innerHTML = html;
+    var scripts = [].slice.call(box.querySelectorAll("script")); scripts.forEach(function(s){ s.parentNode.removeChild(s); });
+    var root = box.querySelector(".odv-root"); if(root) root.setAttribute("data-odv-new","1");
+    var host;
+    if(old.length){ host = old[0]; host.parentNode.insertBefore(box, host); [].forEach.call(old, function(o){ o.remove(); }); }
+    else{
+      host = document.querySelector("#doz_body") || document.querySelector("main") || document.body;
+      /* 아임웹 본문 위젯들은 숨기고 테스트만 보이게 (헤더·푸터는 유지) */
+      [].forEach.call(host.querySelectorAll("._widget_data"), function(w){ w.style.display = "none"; });
+      host.insertBefore(box, host.firstChild);
+    }
+    scripts.forEach(function(s){ var n = document.createElement("script"); n.text = s.textContent; document.body.appendChild(n); });
+  }
+  function go(){ fetch(SRC).then(function(r){ return r.ok ? r.text() : ""; }).then(function(t){ if(t) mount(t); }).catch(function(){}); }
+  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", go); else go();
+})();
+</script>
+<!-- ===================== /방향 찾기 ===================== -->
