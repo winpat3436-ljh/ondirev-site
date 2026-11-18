@@ -4640,10 +4640,11 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
     var host;
     if(old.length){ host = old[0]; host.parentNode.insertBefore(box, host); [].forEach.call(old, function(o){ o.remove(); }); }
     else{
-      host = document.querySelector("#doz_body") || document.querySelector("main") || document.body;
-      /* 아임웹 본문 위젯들은 숨기고 테스트만 보이게 (헤더·푸터는 유지) */
-      [].forEach.call(host.querySelectorAll("._widget_data"), function(w){ w.style.display = "none"; });
-      host.insertBefore(box, host.firstChild);
+      /* 아무것도 숨기지 않음. 헤더(메뉴) 바로 아래 본문 첫 위치에만 끼움 */
+      var hdr = document.querySelector("#doz_header_wrap, #doz_header, ._doz_header, header");
+      var first = [].filter.call(document.querySelectorAll("._widget_data"), function(w){ return !(hdr && hdr.contains(w)) && !w.closest("header,footer,#doz_header,#doz_footer,#doz_header_wrap,#doz_footer_wrap"); })[0];
+      if(first && first.parentNode){ first.parentNode.insertBefore(box, first); }
+      else { (document.querySelector("#doz_body") || document.body).appendChild(box); }
     }
     scripts.forEach(function(s){ var n = document.createElement("script"); n.text = s.textContent; document.body.appendChild(n); });
   }
