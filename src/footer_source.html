@@ -4689,13 +4689,13 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
 </script>
 <!-- ===================== /방향 찾기 ===================== -->
 
-<!-- ===================== 상품 상세 대표 사진 효능 문구 (P-2): IN 세럼(idx=1) 첫 번째 사진 오른쪽 위 =====================
+<!-- ===================== 상품 상세 대표 사진 효능 문구 (P-2): IN 세럼(idx=1) 사진 오른쪽 위, 모든 사진에 고정 =====================
+     사진 칸 위에 떠 있어서 사진을 넘기거나 아임웹에서 사진을 더 올려도 그대로 보임.
      되돌리려면 이 블록 삭제. 문구를 바꾸려면 아래 OD_PB 의 글자만 수정. -->
 <style>
   .odpb{ position:absolute; right:14px; top:16px; z-index:6; display:flex; align-items:center; gap:10px; background:rgba(255,255,255,.82); -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px);
-    border-radius:99px; padding:6px 12px 6px 8px; pointer-events:none; transition:opacity .25s ease;
+    border-radius:99px; padding:6px 12px 6px 8px; pointer-events:none;
     font-family:"Pretendard Variable",Pretendard,"Apple SD Gothic Neo","Noto Sans KR",sans-serif; }
-  .odpb.odpb-off{ opacity:0; }
   .odpb .i{ display:flex; align-items:center; gap:4px; }
   .odpb svg{ width:18px; height:18px; flex:none; display:block; }
   .odpb b{ font-size:12px; font-weight:800; line-height:1; color:#13263A; -webkit-text-fill-color:#13263A; letter-spacing:-.02em; white-space:nowrap; }
@@ -4711,12 +4711,6 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
   var DROP = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3c3.5 4.3 6 7.6 6 10.6A6 6 0 0 1 6 13.6C6 10.6 8.5 7.3 12 3z" fill="#4B9BD8" fill-opacity=".18" stroke="#1667A8" stroke-width="1.6"/></svg>';
   var KEEP = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3c3.5 4.3 6 7.6 6 10.6A6 6 0 0 1 6 13.6C6 10.6 8.5 7.3 12 3z" stroke="#1667A8" stroke-width="1.6"/><path d="M8.5 15.2h7" stroke="#1667A8" stroke-width="1.6" stroke-linecap="round"/><path d="M12 9.5v4.2m-2-2 2 2 2-2" stroke="#1667A8" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   function esc(s){ return String(s).replace(/[&<>"]/g,function(c){ return {"&":"&"+"amp;","<":"&"+"lt;",">":"&"+"gt;",'"':"&"+"quot;"}[c]; }); }
-  /* 첫 번째 사진일 때만 보이기 (넘기면 숨김) */
-  function sync(box, holder){
-    var items = [].filter.call(holder.querySelectorAll(".owl-item"), function(x){ return !x.classList.contains("cloned"); });
-    var on = !items.length || items[0].classList.contains("active");
-    box.classList.toggle("odpb-off", !on);
-  }
   function run(){
     if(!document.body || !document.body.classList.contains("shop_view")) return;
     var holder = document.querySelector("#prod_image_list .holder"); if(!holder) return;
@@ -4726,15 +4720,12 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
       box = document.createElement("div"); box.className = "odpb"; box.setAttribute("aria-label", T.join(", "));
       box.innerHTML = '<span class="i">'+DROP+'<b>'+esc(T[0])+'</b></span><span class="d"></span><span class="i">'+KEEP+'<b>'+esc(T[1])+'</b></span>';
       holder.appendChild(box);
-      new MutationObserver(function(){ sync(box, holder); }).observe(holder, { attributes:true, attributeFilter:["class"], subtree:true });
     }
-    sync(box, holder);
   }
   var tm = 0;
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", run); else run();
-  var mo = new MutationObserver(function(){ clearTimeout(tm); tm = setTimeout(run, 120); });
-  mo.observe(document.documentElement, { childList:true, subtree:true });
-  setTimeout(function(){ mo.disconnect(); run(); }, 15000);
+  /* 아임웹이 사진 칸을 다시 그려도 다시 붙임 */
+  new MutationObserver(function(){ clearTimeout(tm); tm = setTimeout(run, 150); }).observe(document.documentElement, { childList:true, subtree:true });
 })();
 </script>
 <!-- ===================== /상품 상세 대표 사진 효능 문구 ===================== -->
