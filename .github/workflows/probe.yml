@@ -7,7 +7,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: npm i playwright@1.47.2 && npx playwright install --with-deps chromium
-      - run: mkdir -p probe && curl -sL -o probe/main1.png 'https://cdn.imweb.me/upload/S202607312a3f801bb2036/0314ec66a3aec.png' && ls -la probe
+      - run: sleep 100 && mkdir -p probe && node tools/probe.js
       - run: |
           git config user.name probe-bot; git config user.email probe@users.noreply.github.com
           git add probe && git commit -m "probe result [skip ci]" && git push
