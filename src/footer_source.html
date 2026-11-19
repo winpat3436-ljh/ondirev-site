@@ -4729,3 +4729,106 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
 })();
 </script>
 <!-- ===================== /상품 상세 대표 사진 효능 문구 ===================== -->
+
+<!-- ===================== 상품 상세 수량·가격 영역 간결화 (A안: 세그먼트 탭) =====================
+     Body 코드가 만든 세트 카드(.od-qty)는 숨겨 두고 그 자리에 1개/2개/3개 탭을 놓음. 탭을 누르면 숨긴 카드를 대신 눌러서
+     수량·금액 계산·구매 연결은 원래 코드 그대로 씀. 모바일: 수량 칸·빨간 회원가 줄·안내 문구 숨김, 비회원은 노란 가입 띠 하나.
+     4개 이상은 구매하기를 누른 뒤 열리는 주문 창의 수량 칸에서 바꿀 수 있음. 되돌리려면 이 블록 삭제. -->
+<style>
+  .odqa{ margin:18px 0 6px; font-family:"Pretendard Variable",Pretendard,"Apple SD Gothic Neo","Noto Sans KR",sans-serif; color:#1E2A3A; letter-spacing:-.02em; word-break:keep-all; }
+  .odqa *{ box-sizing:border-box; }
+  .odqa-h{ display:flex; align-items:baseline; justify-content:space-between; margin:0 2px 9px; }
+  .odqa-h b{ font-size:14px; font-weight:700; color:#1E2A3A; -webkit-text-fill-color:#1E2A3A; }
+  .odqa-h small{ font-size:12px; font-weight:600; color:#4B86B4; -webkit-text-fill-color:#4B86B4; }
+  .odqa-s{ display:flex; gap:6px; background:#F2F5F9; border-radius:14px; padding:5px; }
+  .odqa-t{ flex:1; position:relative; min-width:0; text-align:center; padding:10px 2px 9px; border:0; border-radius:10px; background:transparent; cursor:pointer; font:inherit; color:inherit; -webkit-tap-highlight-color:transparent; }
+  .odqa-t b{ display:block; font-size:16px; font-weight:800; line-height:1.25; color:#1E2A3A; -webkit-text-fill-color:#1E2A3A; }
+  .odqa-t small{ display:block; font-size:11.5px; font-weight:600; line-height:1.4; color:#6B7A8C; -webkit-text-fill-color:#6B7A8C; white-space:nowrap; }
+  .odqa-t em{ position:absolute; top:-8px; right:4px; font-style:normal; font-size:10.5px; font-weight:800; line-height:1; padding:3px 6px; border-radius:99px; background:#1b3a5c; color:#fff; -webkit-text-fill-color:#fff; }
+  .odqa-t.on{ background:#fff; box-shadow:0 2px 6px rgba(19,38,58,.10), inset 0 0 0 1.5px #1b3a5c; }
+  .odqa-src{ display:none !important; }
+  /* 모바일 구매 영역 정리 */
+  .od-mbuy.odqa-on .od-mqty, .od-mbuy.odqa-on .od-mline, .od-mbuy.odqa-on .od-mnote{ display:none !important; }
+  .od-mbuy.odqa-on .od-mtotal{ margin-top:12px; padding:14px 2px 0; align-items:baseline; }
+  .od-mbuy.odqa-on .od-mtotal small{ font-size:14px; font-weight:500; color:#6B7A8C; -webkit-text-fill-color:#6B7A8C; }
+  .od-mbuy.odqa-on .od-mtotal strong{ font-size:26px; font-weight:900; color:#13263A; -webkit-text-fill-color:#13263A; letter-spacing:-.02em; }
+  .od-mbuy.odqa-on .od-mbtns{ margin-top:14px; }
+  .odqa-k{ display:flex; align-items:center; gap:6px; margin:10px 0 0; padding:11px 12px; border-radius:12px; background:#FEE500; color:#191919 !important; -webkit-text-fill-color:#191919 !important;
+    text-decoration:none !important; font-family:"Pretendard Variable",Pretendard,"Apple SD Gothic Neo","Noto Sans KR",sans-serif; font-size:13px; font-weight:600; letter-spacing:-.02em; white-space:nowrap; }
+  .odqa-k svg{ width:15px; height:15px; flex:none; }
+  .odqa-k b{ font-weight:900; }
+  .odqa-k i{ font-style:normal; font-size:12px; font-weight:800; padding:2px 7px; border-radius:99px; background:#191919; color:#FEE500 !important; -webkit-text-fill-color:#FEE500 !important; }
+  .odqa-k span{ margin-left:auto; font-weight:800; }
+  @media (max-width:359px){ .odqa-t b{ font-size:15px; } .odqa-t small{ font-size:10.5px; } .odqa-k{ font-size:12px; gap:4px; padding:10px; } .odqa-k i{ font-size:11px; padding:2px 5px; } }
+</style>
+<script>
+(function(){
+  var CFG = { "1": { base:32000, member:26800, free:50000, tiers:[{n:1,rate:0},{n:2,rate:5},{n:3,rate:10}] } };   /* Body 코드와 같은 값 */
+  var m = /[?&]idx=(\d+)/.exec(location.search); var C = m && CFG[m[1]]; if(!C) return;
+  function guest(){ try{ return typeof window.__odIsGuest === "function" ? !!window.__odIsGuest() : false; }catch(e){ return false; } }
+  function won(v){ return v.toLocaleString("ko-KR") + "원"; }
+  function rateOf(n){ var r = 0; C.tiers.forEach(function(t){ if(n >= t.n) r = t.rate; }); return r; }
+  function unit(base, n){ return Math.round(base * (100 - rateOf(n)) / 100 / 10) * 10; }
+  var KK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#191919" d="M12 4C7 4 3 7.1 3 11c0 2.5 1.7 4.7 4.2 5.9l-.9 3.3c-.1.3.3.6.6.4l3.9-2.6c.4 0 .8.1 1.2.1 5 0 9-3.1 9-7S17 4 12 4z"/></svg>';
+
+  function tabsHTML(){
+    var g = guest(), base = g ? C.base : C.member, h = "";
+    C.tiers.forEach(function(t){
+      var u = unit(base, t.n), off = Math.floor((1 - u / C.base) * 100 + 1e-6);
+      h += '<button type="button" class="odqa-t" data-n="'+t.n+'"><b>'+t.n+'개</b><small>'+(t.n > 1 ? "개당 " : "")+won(u)+'</small>'+(t.n > 1 && off > 0 ? '<em>-'+off+'%</em>' : '')+'</button>';
+    });
+    return h;
+  }
+  function freeFrom(){ var g = guest(), base = g ? C.base : C.member; for(var i = 0; i < C.tiers.length; i++){ var t = C.tiers[i]; if(unit(base, t.n) * t.n >= C.free) return t.n; } return 0; }
+
+  function sync(box, src){
+    var on = src.querySelector(".od-qty-card.is-on"), n = on ? +on.getAttribute("data-n") : 0;
+    [].forEach.call(box.querySelectorAll(".odqa-t"), function(b){ b.classList.toggle("on", +b.getAttribute("data-n") === n); });
+  }
+  /* 모바일: 비회원 가입 띠 (선택한 수량 기준 회원가와 차액) */
+  function nudge(mb){
+    var k = mb.querySelector(".odqa-k");
+    if(!guest()){ if(k) k.remove(); return; }
+    var sm = mb.querySelector(".od-mtotal small"), n = sm && /(\d+)\s*개/.exec(sm.textContent); n = n ? +n[1] : 1;
+    var pay = unit(C.base, n) * n, mem = unit(C.member, n) * n, diff = pay - mem;
+    if(diff <= 0){ if(k) k.remove(); return; }
+    var key = n + "|" + mem;
+    if(!k){ k = document.createElement("a"); k.className = "odqa-k"; var t = mb.querySelector(".od-mtotal"); if(!t) return; t.insertAdjacentElement("afterend", k); }
+    k.href = typeof window.__odLoginHref === "function" ? window.__odLoginHref() : "/login";
+    if(k.getAttribute("data-k") === key) return;
+    k.setAttribute("data-k", key);
+    k.innerHTML = KK + '카카오 1초 가입하면 <b>' + won(mem) + '</b><i>−' + won(diff) + '</i><span>가입 ›</span>';
+  }
+
+  function build(src){
+    if(src.__odqa) return; src.__odqa = 1;
+    var box = document.createElement("div"); box.className = "odqa";
+    var ff = freeFrom();
+    box.innerHTML = '<div class="odqa-h"><b>수량 선택</b>' + (ff > 1 ? '<small>' + ff + '개부터 무료배송</small>' : '') + '</div><div class="odqa-s">' + tabsHTML() + '</div>';
+    src.parentNode.insertBefore(box, src);
+    src.classList.add("odqa-src");
+    box.addEventListener("click", function(e){
+      var b = e.target.closest(".odqa-t"); if(!b) return;
+      var c = src.querySelector('.od-qty-card[data-n="' + b.getAttribute("data-n") + '"]'); if(c) c.click();
+      setTimeout(function(){ sync(box, src); }, 30);
+    });
+    new MutationObserver(function(){ sync(box, src); }).observe(src, { attributes:true, attributeFilter:["class"], subtree:true });
+    sync(box, src);
+    var mb = src.closest(".od-mbuy");
+    if(mb){
+      mb.classList.add("odqa-on");
+      var tot = mb.querySelector(".od-mtotal");
+      if(tot) new MutationObserver(function(){ nudge(mb); }).observe(tot, { childList:true, characterData:true, subtree:true });
+      nudge(mb);
+    }
+  }
+  function run(){
+    if(!document.body || !document.body.classList.contains("shop_view")) return;
+    [].forEach.call(document.querySelectorAll(".od-qty:not(.is-sheet)"), build);
+  }
+  var tm = 0;
+  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", run); else run();
+  new MutationObserver(function(){ clearTimeout(tm); tm = setTimeout(run, 120); }).observe(document.documentElement, { childList:true, subtree:true });
+})();
+</script>
+<!-- ===================== /상품 상세 수량·가격 영역 간결화 ===================== -->
