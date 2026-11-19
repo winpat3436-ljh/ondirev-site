@@ -1,4 +1,4 @@
-// (v6) 상품 상세 대표 사진 확인 캡처
+// (v7) 상품 상세 대표 사진 확인 캡처
 const {chromium}=require('playwright');
 (async()=>{const b=await chromium.launch();
 for(const vp of [{n:'pc',w:1440,h:900},{n:'m',w:390,h:844}]){
