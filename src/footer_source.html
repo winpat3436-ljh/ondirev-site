@@ -3261,6 +3261,12 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
     step();
   }
 
+  /* V2 30초 요약용: 전체 리뷰의 피부·고민 태그를 넘겨줌 (리뷰 목록과 같은 데이터, 한 번만 불러옴) */
+  window.__odRvTags = function(cb){
+    var dev = window.innerWidth < 992 ? "mobile" : "pc"; load(dev);
+    var n = 0, iv = setInterval(function(){ var D = DATA[dev]; if(D && D.st !== "loading"){ clearInterval(iv); cb(D.st === "done" ? D.list : null); } else if(++n > 160) clearInterval(iv); }, 250);
+  };
+
   function active(){ return !!(S.skin || S.cons.length); }
   function match(r){
     if(S.skin && r.skin !== S.skin) return false;
@@ -5004,6 +5010,22 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
     /* 화면 폭 전체 사용: 아임웹 좌우 여백만큼 바깥으로 넓힘 */
     function bleed(){ [w, s].forEach(function(el){ if(!el || el.offsetParent === null) return; el.style.marginLeft = "0px"; el.style.width = "auto"; var r = el.getBoundingClientRect(), cw = document.documentElement.clientWidth; if(r.left > .5 || Math.abs(r.width - cw) > 1){ el.style.marginLeft = (-r.left) + "px"; el.style.width = cw + "px"; } }); }
     bleed(); window.addEventListener("resize", bleed); window.addEventListener("load", bleed); setTimeout(bleed, 1500);
+    /* 30초 요약의 "리뷰에 많이 나온 피부 고민": 실제 리뷰 태그를 세어서 상위 4개를 보여줌 (10분 저장) */
+    (function(){
+      var box = s && s.querySelector(".odbr"); if(!box) return;
+      function esc2(t){ return String(t).replace(/[<>&"]/g, ""); }
+      function paint(v){ if(!v || !v.top || !v.top.length || !v.tot) return;
+        box.innerHTML = v.top.map(function(x){ return "<div><span>" + esc2(x[0]) + '</span><s><u style="width:' + Math.max(4, Math.round(x[1] / v.tot * 100)) + '%"></u></s><em>' + x[1] + "명</em></div>"; }).join(""); }
+      try{ var c = JSON.parse(sessionStorage.getItem("od_v2_tags") || "null"); if(c && Date.now() - c.t < 600000){ paint(c.v); return; } }catch(e){}
+      function run(){ if(!window.__odRvTags) return;
+        window.__odRvTags(function(list){ if(!list || !list.length) return;
+          var m = {}; list.forEach(function(r){ [r.skin].concat(r.cons || []).filter(Boolean).forEach(function(t){ m[t] = (m[t] || 0) + 1; }); });
+          var top = Object.keys(m).sort(function(a, b){ return m[b] - m[a]; }).slice(0, 4).map(function(k){ return [k, m[k]]; });
+          var v = { top: top, tot: list.length }; try{ sessionStorage.setItem("od_v2_tags", JSON.stringify({ t: Date.now(), v: v })); }catch(e){}
+          paint(v); }); }
+      var go = function(){ setTimeout(run, 2500); };
+      if(document.readyState === "complete") go(); else window.addEventListener("load", go);
+    })();
     /* 리뷰 수: 실제 탭의 숫자로 */
     var rv = document.querySelector('a[href="#prod_detail_review"]'), m = rv && /(\d+)/.exec(rv.textContent), ln = s && s.querySelector("[data-odv2-rv]");
     if(ln && m) ln.innerHTML = ln.innerHTML.replace(/리뷰\s*\d+개/, "리뷰 " + m[1] + "개");
@@ -5258,6 +5280,30 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
       function pick(f){ chips.forEach(function(b){ b.classList.toggle("pz-on", b.getAttribute("data-f") === f); }); cards.forEach(function(x){ x.hidden = !(f === "ALL" || x.getAttribute("data-d") === f); }); }
       chips.forEach(function(b){ b.addEventListener("click", function(){ pick(b.getAttribute("data-f")); }); });
       pick(m[1] === "IN" ? "IN" : "ALL");
+      /* 가격·별점·리뷰 수: 아임웹의 실제 상품 정보에서 읽어 옴 (못 읽으면 적어 둔 값 그대로) */
+      (function(){
+        var cardEl = w.querySelector('.pz-pc[data-d="IN"]'); if(!cardEl) return;
+        function won(n){ return Math.round(n).toLocaleString("en-US") + "원"; }
+        try{
+          var its = document.querySelectorAll(".shop-item[data-product-properties]"), i, p = null;
+          for(i = 0; i < its.length; i++){ var q = JSON.parse(its[i].getAttribute("data-product-properties") || "{}"); if(String(q.idx) === "1"){ p = q; break; } }
+          var pr = cardEl.querySelector(".pz-pr");
+          if(p && pr && p.original_price > p.price && p.price > 0){
+            var sEl = pr.querySelector("s"), pc = pr.querySelector(".pz-pct"), bEl = pr.querySelector("b");
+            if(sEl) sEl.textContent = won(p.original_price); if(pc) pc.textContent = Math.floor((1 - p.price / p.original_price) * 100) + "%"; if(bEl) bEl.textContent = won(p.price);
+          }
+        }catch(e){}
+        var rt = cardEl.querySelector(".pz-rt"); if(!rt) return;
+        function paint(v){ if(v && v.cnt > 0 && v.avg > 0) rt.innerHTML = "<i>★</i>" + v.avg.toFixed(1) + " · 리뷰 " + v.cnt; }
+        try{ var c = JSON.parse(sessionStorage.getItem("od_rt_1") || "null"); if(c && Date.now() - c.t < 600000){ paint(c.v); return; } }catch(e){}
+        fetch("/shop/prod_review_summary_html.cm", { method:"POST", credentials:"same-origin", body:"prod_idx=1", headers:{ "Content-Type":"application/x-www-form-urlencoded; charset=UTF-8", "X-Requested-With":"XMLHttpRequest" } })
+          .then(function(r){ return r.text(); }).then(function(h){
+            var a = /rating_point[^>]*>\s*([\d.]+)/.exec(h), n = /총\s*([\d,]+)\s*개/.exec(h);
+            var v = { avg: a ? parseFloat(a[1]) : 0, cnt: n ? parseInt(n[1].replace(/,/g, ""), 10) : 0 };
+            try{ sessionStorage.setItem("od_rt_1", JSON.stringify({ t: Date.now(), v: v })); }catch(e){}
+            paint(v);
+          })["catch"](function(){});
+      })();
     }
     var st = document.createElement("div"); st.innerHTML = html.slice(0, html.indexOf("@@DIR@@")); while(st.firstChild) document.head.appendChild(st.firstChild);
     document.documentElement.classList.add(kind === "dir" ? "odv2-dir" : "odv2-prod");
