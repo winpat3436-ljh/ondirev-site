@@ -5121,6 +5121,7 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
       q.addEventListener("keydown", function(ev){ if(ev.key === "Enter"){ ev.preventDefault(); goSearch(q.value); } });
       [].forEach.call(root.querySelectorAll("#sxSg button"), function(b){ b.addEventListener("click", function(){ goSearch(b.textContent); }); });
       var rs = root.querySelector("#sxRs");
+      if(rs){ var qk = document.createElement("div"); qk.className = "kz-sxq"; rs.parentNode.insertBefore(qk, rs); rs.hidden = true; rs = qk; }
       if(rs) rs.innerHTML = [["/shop_view/?idx=1", "온디레브 [IN] 리플 엑토인 세럼 50ml", "상품"], ["/directioncheck", "내 피부 방향 찾기 · 3분 테스트", "Direction Check"], ["/brand", "브랜드 스토리", "Brand"], ["/faq", "배송 · 교환 · 반품 안내", "FAQ"]].map(function(x){ return '<a class="kz-sx-quick" href="' + x[0] + '"><small>' + x[2] + "</small><b>" + x[1] + "</b></a>"; }).join("");
       return root;
     });
@@ -5166,7 +5167,8 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
 <style>
   .odv2 .kz-cx-it .kz-chg{ font-size:12.5px; color:#4B86B4; -webkit-text-fill-color:#4B86B4; text-decoration:underline; text-underline-offset:3px; }
   .odv2 .kz-cx-it .kz-rw{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
-  .odv2 .kz-sx-quick{ display:flex; flex-direction:column; gap:2px; padding:14px 2px; border-bottom:1px solid #EEF1F4; }
+  .odv2 .kz-sxq{ margin-top:22px; border-top:1px solid #1E2A3A; }
+  .odv2 .kz-sxq .kz-sx-quick{ display:flex; flex-direction:column; gap:3px; padding:14px 2px; border-bottom:1px solid #EEF1F4; text-align:left; }
   .odv2 .kz-sx-quick small{ font-size:11.5px; font-weight:700; letter-spacing:.08em; color:#4B86B4; -webkit-text-fill-color:#4B86B4; }
   .odv2 .kz-sx-quick b{ font-size:15px; font-weight:600; color:#1E2A3A; -webkit-text-fill-color:#1E2A3A; }
 </style>
