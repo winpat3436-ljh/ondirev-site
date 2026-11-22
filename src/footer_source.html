@@ -629,8 +629,10 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
   function scanList(){
     var w=document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT), n, hits=[];
     while((n=w.nextNode())){
-      if(n.nodeValue.indexOf("[평가:")<0) continue;   /* 값싼 검사를 먼저: 해당 글자가 없는 글줄은 바로 건너뜀 */
-      var p=n.parentElement; if(!p || /^(SCRIPT|STYLE|TEXTAREA)$/.test(p.tagName) || p.isContentEditable || p.closest(".odrv, .odrv-view")) continue;
+      /* 값싼 검사를 먼저: 코드·스타일 글줄과 해당 글자가 없는 글줄은 바로 건너뜀 */
+      var p=n.parentNode; if(!p || p.nodeName==="SCRIPT" || p.nodeName==="STYLE" || p.nodeName==="TEXTAREA") continue;
+      if(n.nodeValue.indexOf("[평가:")<0) continue;
+      p=n.parentElement; if(!p || p.isContentEditable || p.closest(".odrv, .odrv-view")) continue;
       if(TAG_RE.test(n.nodeValue)) hits.push(n);
     }
     hits.forEach(function(n){
