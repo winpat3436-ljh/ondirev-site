@@ -5187,7 +5187,7 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
   var kind = /^direction/.test(m[1]) ? "dir" : "prod", BASE = "https://winpat3436-ljh.github.io/ondirev-site/dist/v2/", html = null, done = false;
   function vis(e){ return e && e.offsetParent !== null; }
   function part(a, b){ var i = html.indexOf("@@" + a + "@@"), j = html.indexOf("@@" + b + "@@"); return i < 0 || j < 0 ? "" : html.slice(i + a.length + 4, j); }
-  function wrap(inner){ var w = document.createElement("div"); w.className = "odv2 odv2-pg"; w.innerHTML = inner; return w; }
+  function wrap(inner){ var w = document.createElement("div"); w.className = "odv2 odv2-pg" + (kind === "dir" ? " pz-dirw" : ""); w.innerHTML = inner; return w; }
   function mount(){
     if(done || !html) return;
     var all = [];
