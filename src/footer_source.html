@@ -1,4 +1,17 @@
 <script>
+/* 성능 진단용(평소에는 꺼져 있음): 주소에 ?od_prof=1 을 붙였을 때만 타이머·감시 코드가 쓰는 시간을 window.__odp 에 모음 */
+(function(){
+  try{ var q = /[?&]od_prof=([01])/.exec(location.search); if(q) localStorage.setItem("od_prof", q[1]); if(localStorage.getItem("od_prof") !== "1") return; }catch(e){ return; }
+  var P = window.__odp = {};
+  function rec(k, t){ var o = P[k] || (P[k] = [0, 0, 0]); o[0] += t; o[1]++; if(t > o[2]) o[2] = t; }
+  function wrap(type, fn){ if(typeof fn !== "function") return fn; var k = type + ":" + String(fn).replace(/\s+/g, " ").slice(0, 110); return function(){ var t0 = performance.now(); try{ return fn.apply(this, arguments); } finally { rec(k, performance.now() - t0); } }; }
+  ["setTimeout", "setInterval", "requestAnimationFrame"].forEach(function(n){ var o = window[n]; window[n] = function(fn){ var a = [].slice.call(arguments); a[0] = wrap(n, fn); return o.apply(window, a); }; });
+  var MO = window.MutationObserver; var W = function(cb){ return new MO(wrap("MO", cb)); }; W.prototype = MO.prototype; window.MutationObserver = W;
+  var IO = window.IntersectionObserver; if(IO){ var W2 = function(cb, o){ return new IO(wrap("IO", cb), o); }; W2.prototype = IO.prototype; window.IntersectionObserver = W2; }
+  var ae = EventTarget.prototype.addEventListener; EventTarget.prototype.addEventListener = function(t, fn, o){ if(/^(scroll|resize|touchmove|touchstart|click|load|DOMContentLoaded)$/.test(t) && typeof fn === "function"){ fn = wrap("ev:" + t, fn); } return ae.call(this, t, fn, o); };
+})();
+</script>
+<script>
 /* 성능: 새 디자인 영역(.odv2) 안에서 일어나는 숫자 카운트·모션·진행 표시 변화는 기존 감시 코드들이 다시 훑지 않게 걸러 줌
    (그 영역은 기존 코드가 손대지 않는 곳이라 결과는 같고, 불필요한 재검사만 줄어듦) */
 (function(){
