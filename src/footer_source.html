@@ -1,3 +1,4 @@
+<script>window.__OD_V2_ALL = false; window.__odV2 = function(){ try{ return !!window.__OD_V2_ALL || localStorage.getItem("od_v2") === "1"; }catch(e){ return !!window.__OD_V2_ALL; } };</script>
 <style>
   #od-kakao{
     position:fixed !important; right:20px !important; bottom:20px !important; z-index:2147483000 !important;
@@ -3138,6 +3139,12 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
   .odrf-load{ text-align:center; font-size:12.5px; color:#8494A7; padding:18px 0; }
   /* 필터가 켜지면: 원래 목록·페이지 번호 숨기고 걸러진 목록만 */
   html body .odrf-on > ul.list_review_wrap:not(.odrf-list), html body .odrf-on > nav.paging-block{ display:none !important; }
+  html body .odv2-pgon > ul.list_review_wrap:not(.odrf-list), html body .odv2-pgon > nav.paging-block > ul.pagination{ display:none !important; }
+  .odv2-pager{ display:flex; justify-content:center; align-items:center; gap:6px; margin:22px 0 14px; font-family:"Pretendard Variable",Pretendard,"Apple SD Gothic Neo","Noto Sans KR",sans-serif; }
+  .odv2-pager button{ min-width:38px; height:38px; padding:0 6px; border:1px solid #E3E9F0; border-radius:10px; background:#fff; color:#3C4B5C; -webkit-text-fill-color:#3C4B5C; font-size:14px; font-weight:600; line-height:1; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+  .odv2-pager button.on{ background:#1B3A5C; border-color:#1B3A5C; color:#fff; -webkit-text-fill-color:#fff; }
+  .odv2-pager button[disabled]{ opacity:.35; cursor:default; }
+  @media (max-width:360px){ .odv2-pager{ gap:4px; } .odv2-pager button{ min-width:34px; height:36px; } }
   @media (min-width:768px){
     html body .odrf{ padding:15px 20px !important; margin:16px 0 6px !important; }
     html body .odrf-h b{ font-size:15px !important; }
@@ -3167,6 +3174,7 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
   var TAG_RE = /\[평가:\s*([^\]]+)\]/;
 
   var S = { skin:"", cons:[], open:false };
+  var PG = {};
   var DATA = {};   /* device(pc|mobile) -> { st:"loading"|"done"|"fail", list:[...] } */
 
   function isProd(){ return document.body && document.body.classList.contains("shop_view"); }
@@ -3259,7 +3267,27 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
 
     if(!active()){
       wrap.classList.remove("odrf-on");
-      if(empty) empty.remove(); if(list) list.remove();
+      if(empty) empty.remove();
+      /* V2: 한 페이지에 3건, 페이지 번호는 5개씩 + 화살표 */
+      if(window.__odV2 && window.__odV2() && D && D.st === "done" && D.list.length){
+        var PER = 3, tot = Math.ceil(D.list.length / PER); if(!PG[dev] || PG[dev] > tot) PG[dev] = 1;
+        var cur = PG[dev], g0 = Math.floor((cur - 1) / 5) * 5 + 1, g1 = Math.min(tot, g0 + 4), ph = "", q;
+        wrap.classList.add("odv2-pgon");
+        if(!list){ list = document.createElement("ul"); list.className = "list_review_wrap odrf-list odv2-pglist"; res.after(list); }
+        var pk = "pg|" + dev + "|" + cur + "|" + D.list.length;
+        if(list.__k !== pk){ list.innerHTML = D.list.slice((cur - 1) * PER, cur * PER).map(function(x){ return x.html; }).join(""); list.__k = pk; }
+        var pgr = wrap.querySelector(".odv2-pager");
+        if(!pgr){ pgr = document.createElement("div"); pgr.className = "odv2-pager"; var nv = wrap.querySelector(":scope > nav.paging-block"); if(nv) nv.insertBefore(pgr, nv.firstChild); else list.after(pgr); }
+        ph += '<button type="button" data-odpg="' + (g0 - 1) + '"' + (g0 > 1 ? "" : " disabled") + ' aria-label="이전 페이지 묶음">‹</button>';
+        for(q = g0; q <= g1; q++) ph += '<button type="button" data-odpg="' + q + '"' + (q === cur ? ' class="on" aria-current="page"' : "") + ">" + q + "</button>";
+        ph += '<button type="button" data-odpg="' + (g1 + 1) + '"' + (g1 < tot ? "" : " disabled") + ' aria-label="다음 페이지 묶음">›</button>';
+        if(pgr.__h !== ph){ pgr.innerHTML = ph; pgr.__h = ph; }
+        var rh2 = '<span>전체 리뷰 <b class="n">' + D.list.length + '개</b></span>';
+        if(res.__h !== rh2){ res.innerHTML = rh2; res.__h = rh2; } res.style.display = "";
+        return;
+      }
+      wrap.classList.remove("odv2-pgon");
+      if(list) list.remove();
       var rh = (D && D.st === "done") ? '<span>전체 리뷰 <b class="n">' + D.list.length + '개</b></span>' : "";
       if(res.__h !== rh){ res.innerHTML = rh; res.__h = rh; }
       res.style.display = rh ? "" : "none";
@@ -3268,6 +3296,7 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
 
     wrap.classList.add("odrf-on");
     res.style.display = "";
+    wrap.classList.remove("odv2-pgon"); if(list && list.classList.contains("odv2-pglist")){ list.classList.remove("odv2-pglist"); list.__k = ""; }
     if(!D || D.st === "loading"){
       if(wrap.offsetParent) load(dev);
       var lh = '<span><b>' + esc(label()) + '</b> 리뷰</span><u data-odrf="reset">초기화</u>';
@@ -3299,6 +3328,9 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
   function wraps(){ return [].slice.call(document.querySelectorAll("._review_wrap")).filter(function(w){ return w.querySelector(":scope > ul.list_review_wrap"); }); }
   function renderAll(){
     if(!isProd()) return;
+    if(window.__odV2 && window.__odV2()){
+      [].forEach.call(document.querySelectorAll("li.list_review_inner .use_summary > div:first-child"), function(n){ var t = (n.textContent || "").trim(); if(t.length > 1 && /\*/.test(t) && t !== t.charAt(0) + "**") n.textContent = t.charAt(0) + "**"; });
+    }
     wraps().forEach(function(w){
       try{ render(w); }catch(e){}
       /* 리뷰 영역이 보이면 미리 불러와서 '전체 리뷰 N개'를 맞춰 둠 */
@@ -3306,6 +3338,14 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
     });
   }
 
+  document.addEventListener("click", function(e){
+    var b = e.target.closest && e.target.closest(".odv2-pager button[data-odpg]"); if(!b || b.disabled) return;
+    e.preventDefault(); e.stopPropagation();
+    var w = b.closest("._review_wrap"); if(!w) return;
+    PG[devOf(w)] = +b.getAttribute("data-odpg"); renderAll();
+    var top = (w.querySelector(".odrf") || w).getBoundingClientRect().top + window.pageYOffset - 130;
+    if(top < window.pageYOffset) window.scrollTo({ top: top, behavior:"smooth" });
+  }, true);
   document.addEventListener("click", function(e){
     var t = e.target.closest && e.target.closest("[data-odrf], [data-odrf-s], [data-odrf-c]");
     if(!t || !t.closest(".odrf, .odrf-res, .odrf-empty")) return;
@@ -4842,8 +4882,9 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
   try{
     var q = /[?&]od_v2=([01])/.exec(location.search);
     if(q){ if(q[1] === "1") localStorage.setItem("od_v2", "1"); else localStorage.removeItem("od_v2"); }
-    if(!V2_ALL && localStorage.getItem("od_v2") !== "1") return;
-  }catch(e){ if(!V2_ALL) return; }
+  }catch(e){}
+  V2_ALL = !!window.__OD_V2_ALL;
+  if(!window.__odV2()) return;
   if(!/\/shop_view\/?/.test(location.pathname) || !/[?&]idx=1(&|$)/.test(location.search)) return;
   var BASE = "https://winpat3436-ljh.github.io/ondirev-site/dist/v2/", done = false, html = null;
 
