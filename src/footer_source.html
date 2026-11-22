@@ -4896,7 +4896,7 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
     while(st.firstChild) document.head.appendChild(st.firstChild);
     var w = document.createElement("div"); w.className = "odv2 odv2-d"; w.innerHTML = '<div class="pdp">' + part("DETAIL", "SHIP") + part("SHIP", "END") + "</div>";
     tb.parentNode.insertBefore(w, tb.nextSibling);
-    var cat = document.querySelector("#prod_detail .categorize.review-box"), s = null;
+    var cm = document.querySelector("#prod_detail ._categorize_mobile"), cp = document.querySelector("#prod_detail .categorize.review-box"), cat = vis(cm) ? cm : (vis(cp) ? cp : (cm || cp)), s = null;
     if(cat){ s = document.createElement("div"); s.className = "odv2 odv2-s"; s.innerHTML = '<div class="pdp">' + part("SUM", "DETAIL") + "</div>"; cat.parentNode.insertBefore(s, cat); }
     document.documentElement.classList.add("odv2-on");
     /* 화면 폭 전체 사용: 아임웹 좌우 여백만큼 바깥으로 넓힘 */
