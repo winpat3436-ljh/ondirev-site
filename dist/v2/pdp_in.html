@@ -784,6 +784,171 @@ html.odv2-on [id="prod_detail_body"]{display:none !important}
   0% { transform: scale(0.6); opacity: 0.7; }
   100% { transform: scale(2.6); opacity: 0; }
 }
+.odv2 *{box-sizing: border-box;}
+.odv2 a{color: inherit; text-decoration: none;}
+.odv2 a:focus-visible{outline: 2px solid var(--accent); outline-offset: 2px;}
+.odv2 .ozrv{opacity: 0; transform: translateY(24px); transition: opacity 0.8s cubic-bezier(0.2, 0.7, 0.2, 1), transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);}
+.odv2 .ozrv.ozrv-on{opacity: 1; transform: none;}
+.odv2 .pdp a{text-decoration: none; color: inherit;}
+.odv2 .pdp svg{width: 16px; height: 16px; fill: none; stroke: currentcolor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto;}
+.odv2 .odev{margin: 18px 0px 4px;}
+.odv2 .odev-m{display: none;}
+.odv2 .odev-pc{margin-top: 40px;}
+.odv2 .odev .od-eyb{font-size: 12px; font-weight: 700; color: rgb(47, 110, 158); letter-spacing: 0.06em;}
+.odv2 .odev .od-hd{margin: 3px 0px 14px; font-size: 19px; font-weight: 800; color: rgb(19, 38, 58); letter-spacing: -0.01em;}
+.odv2 .odev .od-g,.odv2 .odev .od-zr{background: rgb(245, 248, 251); border-radius: 14px; padding: 13px 14px; margin-bottom: 8px;}
+.odv2 .odev .od-gt{display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px;}
+.odv2 .odev .od-k{display: flex; align-items: center; gap: 6px; font-size: 15.5px; font-weight: 800; color: rgb(19, 38, 58);}
+.odv2 .pdp .odev .od-k svg{width: 20px; height: 20px; stroke: none; fill: none;}
+.odv2 .pdp .odev .od-k svg path[stroke]{stroke-linejoin: round; stroke-linecap: round;}
+.odv2 .odev .od-n{font-size: 19px; font-weight: 900; color: rgb(19, 38, 58); letter-spacing: -0.01em;}
+.odv2 .odev .od-r{display: flex; align-items: center; gap: 8px; margin-top: 6px;}
+.odv2 .odev .od-r em{flex: 0 0 auto; width: 56px; font-style: normal; font-size: 13px; font-weight: 600; color: rgb(60, 75, 92);}
+.odv2 .odev .od-c{--pw: 17px; display: flex; gap: 1px; min-width: 0px; overflow: hidden;}
+.odv2 .odev .od-d{flex: 0 0 auto; display: block; width: var(--pw); height: 19px; overflow: hidden;}
+.odv2 .pdp .odev .od-d svg{width: 17px; height: 19px; stroke: none; fill: currentcolor; display: block;}
+.odv2 .odev .od-s{margin-top: 7px; font-size: 13.5px; color: rgb(60, 75, 92); line-height: 1.45;}
+.odv2 .odev .od-zr{display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 0px;}
+.odv2 .odev .od-zr .od-s{margin-top: 2px;}
+.odv2 .odev .od-fn{margin-top: 12px; font-size: 12px; color: rgb(79, 93, 107); line-height: 1.6;}
+@media (max-width: 991px){
+.odv2 .odev-pc{display: none;}
+.odv2 .odev-m{display: block;}
+}
+.odv2 .odev .od-r em{white-space: nowrap;}
+@media (max-width: 380px){
+.odv2 .odev .od-c{--pw: 15px;}
+.odv2 .pdp .odev .od-d svg{width: 15px; height: 17px;}
+.odv2 .odev .od-d{height: 17px;}
+}
+@media (max-width: 360px){
+.odv2 .odev .od-r em{width: 50px; font-size: 12px;}
+}
+.odv2 .odfp{display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; padding: 12px 14px; border-radius: 12px; background: rgb(234, 242, 250); text-decoration: none;}
+.odv2 .odfp .l{display: flex; flex-direction: column; gap: 2px;}
+.odv2 .odfp .l b{font-size: 13px; font-weight: 700; color: rgb(22, 103, 168);}
+.odv2 .odfp .l small{font-size: 11.5px; color: rgb(79, 93, 107);}
+.odv2 .odfp .r{display: flex; align-items: center; gap: 10px;}
+.odv2 .odfp strong{font-size: 21px; font-weight: 800; color: rgb(27, 58, 92); letter-spacing: -0.02em;}
+.odv2 .odfp em{font-style: normal; font-size: 12px; font-weight: 700; color: rgb(255, 255, 255); background: rgb(27, 58, 92); border-radius: 999px; padding: 6px 11px; white-space: nowrap;}
+@media (max-width: 991px){
+}
+@media (max-width: 360px){
+.odv2 .odfp strong{font-size: 19px;}
+.odv2 .odfp em{display: none;}
+}
+.odv2 .odfp{background: rgb(255, 248, 214); border: 1px solid rgb(244, 225, 154);}
+.odv2 .odfp .l b{color: rgb(122, 92, 0);}
+.odv2 .odfp .l small{color: rgb(92, 74, 18);}
+.odv2 .odfp strong{color: rgb(30, 42, 58);}
+.odv2 .odfp em{background: rgb(254, 229, 0); color: rgb(25, 25, 25);}
+.odv2 .odev{background: linear-gradient(160deg, rgb(19, 38, 58) 0%, rgb(27, 58, 92) 62%, rgb(36, 80, 122) 100%); border-radius: 20px; padding: 24px 18px 18px; color: rgb(255, 255, 255); position: relative; overflow: hidden;}
+.odv2 .odev::before{content: ""; position: absolute; right: -60px; top: -60px; width: 200px; height: 200px; border-radius: 50%; background: radial-gradient(circle, rgba(120, 180, 235, 0.28), rgba(120, 180, 235, 0) 70%); pointer-events: none;}
+.odv2 .odev .od-top{display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; position: relative;}
+.odv2 .odev .od-eyb{font-size: 11.5px; font-weight: 800; color: rgb(158, 201, 238); letter-spacing: 0.16em;}
+.odv2 .odev .od-badge{font-size: 11px; font-weight: 600; color: rgb(220, 235, 247); border: 1px solid rgba(220, 235, 247, 0.35); border-radius: 99px; padding: 4px 10px;}
+.odv2 .odev .od-hd{margin: 10px 0px 4px; font-size: 22px; font-weight: 800; color: rgb(255, 255, 255); letter-spacing: -0.02em; position: relative;}
+.odv2 .odev .od-sub2{font-size: 12.5px; color: rgb(185, 205, 224); margin-bottom: 16px; position: relative;}
+.odv2 .odev .od-g,.odv2 .odev .od-zr{background: rgb(255, 255, 255); border-radius: 16px; padding: 16px; margin-bottom: 10px; color: rgb(19, 38, 58); box-shadow: rgba(5, 20, 40, 0.18) 0px 6px 18px; position: relative;}
+.odv2 .odev .od-gt{align-items: flex-start; margin-bottom: 10px;}
+.odv2 .odev .od-nv{display: flex; flex-direction: column; align-items: flex-end; gap: 2px;}
+.odv2 .odev .od-n{font-size: 30px; font-weight: 900; letter-spacing: -0.03em; line-height: 1; color: rgb(19, 38, 58);}
+.odv2 .odev .od-n small{font-size: 17px; font-weight: 800; margin-left: 1px;}
+.odv2 .odev .od-n.c1{color: rgb(22, 103, 168);}
+.odv2 .odev .od-n.c2{color: rgb(46, 134, 207);}
+.odv2 .odev .od-v{font-size: 11.5px; font-weight: 600; color: rgb(110, 130, 153); font-variant-numeric: tabular-nums;}
+.odv2 .odev .od-zr{margin-bottom: 0px;}
+.odv2 .odev .od-fn{color: rgb(169, 190, 211); font-size: 11.5px;}
+@media (max-width: 380px){
+.odv2 .odev{padding: 20px 14px 14px;}
+.odv2 .odev .od-n{font-size: 26px;}
+.odv2 .odev .od-hd{font-size: 20px;}
+}
+.odv2 .odev.odx2{padding: 22px 18px 16px;}
+.odv2 .odx2 .od-hd{margin: 12px 0px 18px; font-size: 21px;}
+.odv2 .od-st3{display: grid; grid-template-columns: repeat(3, minmax(0px, 1fr)); background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 16px; position: relative;}
+.odv2 .od-st3 .it{display: flex; flex-direction: column; gap: 6px; padding: 16px 14px;}
+.odv2 .od-st3 .it + .it{border-left: 1px solid rgba(255, 255, 255, 0.12);}
+.odv2 .od-st3 .lb{font-size: 12.5px; font-weight: 600; color: rgb(185, 205, 224);}
+.odv2 .od-st3 .nb{font-size: 28px; font-weight: 900; letter-spacing: -0.03em; line-height: 1.05; color: rgb(255, 255, 255); white-space: nowrap;}
+.odv2 .od-st3 .nb small{font-size: 15px; font-weight: 800; margin-left: 1px;}
+.odv2 .od-st3 .nb.c1{color: rgb(140, 203, 255);}
+.odv2 .od-st3 .nb.c2{color: rgb(140, 203, 255);}
+.odv2 .odx2 .od-fn{margin-top: 12px; font-size: 11px; color: rgb(143, 167, 191); line-height: 1.6; position: relative;}
+@media (max-width: 380px){
+.odv2 .od-st3 .it{padding: 14px 10px;}
+.odv2 .od-st3 .nb{font-size: 22px;}
+.odv2 .od-st3 .nb small{font-size: 12px;}
+.odv2 .od-st3 .lb{font-size: 11.5px;}
+}
+@media (min-width: 381px) and (max-width: 420px){
+.odv2 .od-st3 .it{padding: 15px 11px;}
+.odv2 .od-st3 .nb{font-size: 24px;}
+.odv2 .od-st3 .nb small{font-size: 13px;}
+}
+.odv2 .odev.odx2{background: rgb(245, 248, 251); border: 1px solid rgb(227, 233, 240); border-radius: 4px; padding: 26px 22px 20px; color: rgb(19, 38, 58);}
+.odv2 .odev.odx2::before{display: none;}
+.odv2 .odx2 .od-top{padding-bottom: 12px; border-bottom: 1px solid rgb(217, 226, 235);}
+.odv2 .odx2 .od-eyb{font-size: 10.5px; font-weight: 600; letter-spacing: 0.22em; color: rgb(110, 130, 153);}
+.odv2 .odx2 .od-badge{border: 0px; padding: 0px; font-size: 11px; font-weight: 500; letter-spacing: 0.02em; color: rgb(110, 130, 153);}
+.odv2 .odx2 .od-it{margin-top: 18px; font-size: 17px; font-style: italic; font-weight: 300; color: rgb(75, 134, 180); letter-spacing: -0.01em;}
+.odv2 .odx2 .od-hd{margin: 4px 0px 20px; font-size: 21px; font-weight: 700; color: rgb(19, 38, 58);}
+.odv2 .od-st3{background: none; border-width: 1px 0px; border-style: solid none; border-color: rgb(19, 38, 58) currentcolor rgb(217, 226, 235); border-image: none; border-radius: 0px;}
+.odv2 .od-st3 .it{padding: 18px 12px 18px 0px; gap: 8px;}
+.odv2 .od-st3 .it + .it{border-left: 1px solid rgb(217, 226, 235); padding-left: 14px;}
+.odv2 .od-st3 .lb{order: -1; font-size: 11.5px; font-weight: 600; color: rgb(90, 104, 120); letter-spacing: 0.02em;}
+.odv2 .od-st3 .nb,.odv2 .od-st3 .nb.c1,.odv2 .od-st3 .nb.c2{font-size: 30px; font-weight: 700; color: rgb(27, 58, 92); letter-spacing: -0.035em;}
+.odv2 .od-st3 .nb small{font-size: 15px; font-weight: 600; color: rgb(75, 134, 180);}
+.odv2 .odx2 .od-fn{margin-top: 14px; font-size: 11px; color: rgb(110, 130, 153);}
+@media (max-width: 420px){
+.odv2 .odev.odx2{padding: 22px 16px 18px;}
+.odv2 .od-st3 .it{padding: 16px 8px 16px 0px;}
+.odv2 .od-st3 .it + .it{padding-left: 10px;}
+.odv2 .od-st3 .nb,.odv2 .od-st3 .nb.c1,.odv2 .od-st3 .nb.c2{font-size: 23px;}
+.odv2 .od-st3 .nb small{font-size: 12px;}
+.odv2 .od-st3 .lb{font-size: 11px;}
+.odv2 .odx2 .od-hd{font-size: 19px;}
+}
+@media (max-width: 360px){
+.odv2 .od-st3 .nb,.odv2 .od-st3 .nb.c1,.odv2 .od-st3 .nb.c2{font-size: 21px;}
+}
+.odv2 .od-st3 .ch{display: flex; align-items: flex-end; gap: 10px; height: 62px; margin-top: 20px; padding: 0px 6px; border-bottom: 1px solid rgb(159, 179, 199);}
+.odv2 .od-st3 .ch span{flex: 1 1 0%; max-width: 34px; position: relative; background: rgb(211, 225, 238); border-radius: 2px 2px 0px 0px;}
+.odv2 .od-st3 .ch span.on{background: rgb(27, 58, 92);}
+.odv2 .od-st3 .ch span::before{content: attr(data-v); position: absolute; left: 50%; bottom: 100%; transform: translateX(-50%); margin-bottom: 3px; font-size: 10.5px; font-weight: 600; color: rgb(110, 130, 153); white-space: nowrap; font-variant-numeric: tabular-nums;}
+.odv2 .od-st3 .ch span.on::before{color: rgb(27, 58, 92); font-weight: 700;}
+.odv2 .od-st3 .cl{display: flex; gap: 10px; padding: 5px 6px 0px;}
+.odv2 .od-st3 .cl em{flex: 1 1 0%; max-width: 34px; font-style: normal; font-size: 10.5px; color: rgb(110, 130, 153); text-align: center; white-space: nowrap;}
+.odv2 .od-st3 .cl.one em{max-width: none; text-align: left; white-space: normal; line-height: 1.4;}
+.odv2 .od-st3 .cl.one{padding-left: 0px;}
+.odv2 .od-st3 .rg{width: 48px; height: 48px; margin-top: 22px; border-radius: 50%; border: 1.5px solid rgb(159, 179, 199); display: flex; align-items: center; justify-content: center; box-sizing: border-box;}
+.odv2 .pdp .od-st3 .rg svg{width: 22px; height: 22px; stroke: rgb(27, 58, 92); stroke-width: 1.8;}
+.odv2 .od-st3 .it{justify-content: flex-start;}
+@media (max-width: 420px){
+.odv2 .od-st3 .ch{gap: 6px; padding: 0px 2px; height: 54px;}
+.odv2 .od-st3 .cl{gap: 6px; padding: 5px 2px 0px;}
+.odv2 .od-st3 .ch span::before,.odv2 .od-st3 .cl em{font-size: 9.5px;}
+.odv2 .od-st3 .rg{width: 42px; height: 42px; margin-top: 18px;}
+}
+.odv2 .dz-pw.r{grid-template-columns: minmax(0px, 1fr) minmax(0px, 1fr);}
+@media (max-width: 760px){
+.odv2 .dz-pw.r{grid-template-columns: 1fr; gap: 24px;}
+}
+@media (max-width: 991px){
+}
+@media (max-width: 991px){
+}
+.odv2 .od-st3 .ch span{transition: height 1.6s cubic-bezier(0.16, 0.84, 0.3, 1) 0.1s;}
+.odv2 .od-st3 .ch span.on{transition-delay: 0.55s;}
+.odv2 .od-st3 .ch span::before{transition: opacity 0.4s 0.5s;}
+.odv2 .od-st3 .ch span.on::before{transition-delay: 1.6s;}
+.odv2 .odx2:not(.go) .od-st3 .ch span{transition: none; height: 0px !important;}
+.odv2 .odx2:not(.go) .od-st3 .ch span::before{opacity: 0; transition: none;}
+.odv2 .od-st3 .rg{transition: transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s, opacity 0.5s 0.3s;}
+.odv2 .pdp .od-st3 .rg svg path{stroke-dasharray: 20; stroke-dashoffset: 0; transition: stroke-dashoffset 0.6s 0.9s;}
+.odv2 .odx2:not(.go) .od-st3 .rg{transform: scale(0.5); opacity: 0; transition: none;}
+.odv2 .pdp .odx2:not(.go) .od-st3 .rg svg path{stroke-dashoffset: 20; transition: none;}
+.odv2 .od-st3 .nb{font-variant-numeric: tabular-nums;}
 </style>
 @@SUM@@<section class="odsum" id="pdp-sum"><div class="in2">
  <div class="hd2"><span class="eb2">30초 요약</span><h2 class="ozrv">이런 피부라면, IN부터 시작하세요</h2></div>
@@ -806,4 +971,4 @@ html.odv2-on [id="prod_detail_body"]{display:none !important}
  <details><summary>반품/교환 안내</summary><p class="ozrv"><b>교환 및 반품 신청 방법</b><br>- 교환 및 반품은 마이페이지, 고객센터(070-8019-3426) 또는 <a class="kk" href="https://pf.kakao.com/_lkcJX" target="_blank" rel="noopener">카카오 채널 문의</a>를 통해 신청하실 수 있습니다.<br><br><b>교환 및 반품 가능 기간</b><br>- 계약내용에 관한 서면을 받은 날부터 7일. 다만, 그 서면을 받은 때보다 재화등의 공급이 늦게 이루어진 경우에는 재화등을 공급받거나 재화등의 공급이 시작된 날부터 7일<br>- 공급받은 상품의 내용이 표시·광고의 내용과 다르거나 계약내용과 다르게 이행된 경우에는 그 재화등을 공급받은 날부터 3개월 이내, 그 사실을 안 날 또는 알 수 있었던 날부터 30일 이내<br><br><b>교환 및 반품 비용</b><br>- 단순 변심: 반품·교환 모두 왕복 배송비 6,000원 (고객 부담)<br>- 상품 하자·오배송: 판매자 부담<br><br><b>교환 및 반품 불가 사유</b><br>- 고객의 책임 있는 사유로 상품이 멸실 또는 훼손된 경우 (단, 내용 확인을 위해 포장을 훼손한 경우는 제외)<br>- 제품을 개봉하여 사용하였거나 일부를 소비하여 상품의 가치가 현저히 감소한 경우<br>- 시간의 경과로 재판매가 곤란할 정도로 상품의 가치가 현저히 감소한 경우<br>※ 화장품 특성상 개봉 후에는 재판매가 불가하므로, 단순 변심에 의한 교환 및 반품은 미개봉 상태에 한해 가능합니다. 단, 상품 하자 또는 오배송의 경우 개봉 여부와 관계없이 교환 및 반품이 가능합니다.</p></details>
  <details><summary>환불 안내</summary><p class="ozrv">- 반품 상품이 회수되어 확인된 날부터 3영업일 이내에 결제하신 수단으로 환불됩니다.<br>- 카드 결제의 경우 카드사 사정에 따라 취소 반영까지 3~5영업일이 소요될 수 있습니다.</p></details>
  <details><summary>고객센터</summary><p class="ozrv">- 고객센터: 070-8019-3426<br>- 카카오 채널: <a class="kk" href="https://pf.kakao.com/_lkcJX" target="_blank" rel="noopener">온디레브 카카오 채널 문의</a><br>- 이메일: winpat11@naver.com<br>- 반품 주소: 서울 광진구 자양번영로11길 35-9 B101<br>- 기타 분쟁은 공정거래위원회 고시 「소비자분쟁해결기준」에 따릅니다.</p></details>
-</div></section>@@END@@
+</div></section>@@FP@@<a class="odfp" href="/login"><span class="l"><b>첫 구매가</b><small>카카오 1초 가입 쿠폰 5,000원 적용</small></span><span class="r"><strong>21,800원</strong><em>쿠폰 받기</em></span></a>@@EVPC@@<div class="odev odx2 odev-pc"><div class="od-top"><span class="od-eyb">CLINICAL RESULT</span><span class="od-badge">한국피부과학연구원 · 인체적용시험</span></div><div class="od-it">Measured, right after.</div><div class="od-hd">한 번 발랐을 때, 피부 속 수분</div><div class="od-st3"><div class="it"><span class="lb ozrv">속보습</span><b class="nb"><span data-count="25.15" data-pre="+">+25.15</span><small>%</small></b><div class="ch"><span style="height:80%" data-v="38.86"></span><span class="on" style="height:100%" data-v="48.64"></span></div><div class="cl"><em>사용 전</em><em>직후</em></div></div><div class="it"><span class="lb ozrv">수분 손실량</span><b class="nb"><span data-count="12.54" data-pre="−">−12.54</span><small>%</small></b><div class="ch"><span style="height:100%" data-v="11.93"></span><span class="on" style="height:87.4%" data-v="10.43"></span></div><div class="cl"><em>사용 전</em><em>직후</em></div></div><div class="it"><span class="lb ozrv">피부 자극</span><b class="nb">0.00</b><div class="rg"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 12.5l3.6 3.6 7.4-7.6"></path></svg></div><div class="cl one"><em>성인 32명 · 전문의 판정</em></div></div></div><div class="od-fn">건성 피부 성인 남녀 22명, 사용 전 대비 1회 사용 직후 측정(p&lt;.001) · 피부 일차 자극 시험 성인 32명, 피부과 전문의 판정 · 개인차가 있을 수 있습니다.</div></div>@@EVM@@<div class="odev odx2 odev-m"><div class="od-top"><span class="od-eyb">CLINICAL RESULT</span><span class="od-badge">한국피부과학연구원 · 인체적용시험</span></div><div class="od-it">Measured, right after.</div><div class="od-hd">한 번 발랐을 때, 피부 속 수분</div><div class="od-st3"><div class="it"><span class="lb ozrv">속보습</span><b class="nb"><span data-count="25.15" data-pre="+">+25.15</span><small>%</small></b><div class="ch"><span style="height:80%" data-v="38.86"></span><span class="on" style="height:100%" data-v="48.64"></span></div><div class="cl"><em>사용 전</em><em>직후</em></div></div><div class="it"><span class="lb ozrv">수분 손실량</span><b class="nb"><span data-count="12.54" data-pre="−">−12.54</span><small>%</small></b><div class="ch"><span style="height:100%" data-v="11.93"></span><span class="on" style="height:87.4%" data-v="10.43"></span></div><div class="cl"><em>사용 전</em><em>직후</em></div></div><div class="it"><span class="lb ozrv">피부 자극</span><b class="nb">0.00</b><div class="rg"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 12.5l3.6 3.6 7.4-7.6"></path></svg></div><div class="cl one"><em>성인 32명 · 전문의 판정</em></div></div></div><div class="od-fn">건성 피부 성인 남녀 22명, 사용 전 대비 1회 사용 직후 측정(p&lt;.001) · 피부 일차 자극 시험 성인 32명, 피부과 전문의 판정 · 개인차가 있을 수 있습니다.</div></div>@@END@@
