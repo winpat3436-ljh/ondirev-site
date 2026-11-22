@@ -830,7 +830,7 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
             return want==="rv" ? /리뷰|구매평/.test(t) : want==="qa" ? /Q&A|Q＆A|문의/.test(t) : /상세/.test(t); })[0];
         }
         if(!pick) pick=items.filter(function(c){ return /(^|\s)(active|on|selected|current)(\s|$)/i.test(c.className); })[0] || items[0];
-        items.forEach(function(c){ c.classList.toggle("is-on", c===pick); });
+        items.forEach(function(c){ var on=c===pick; if(c.classList.contains("is-on")!==on) c.classList.toggle("is-on", on); });
         bar.setAttribute("data-odtab-set","1");
       }
       if(!bar.getAttribute("data-odtab")){
@@ -864,7 +864,7 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
       for(var i=0;i<4 && row && row!==document.body;i++,row=row.parentElement){
         if(row.querySelector(".odst, [data-odst]") || row.querySelectorAll("*").length>=5){ break; }
       }
-      if(row && row!==document.body) row.setAttribute("data-od-ddrow","1");
+      if(row && row!==document.body && !row.hasAttribute("data-od-ddrow")) row.setAttribute("data-od-ddrow","1");
       if(n.parentElement.childNodes.length===1) n.parentElement.style.setProperty("display","none","important"); else n.nodeValue="";
     });
   }
@@ -902,7 +902,7 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
   }
   function setActive(key){
     [].forEach.call(document.querySelectorAll(".odtab"),function(b){
-      [].forEach.call(b.querySelectorAll(".odtab-i"),function(it){ it.classList.toggle("is-on", tabKey(it)===key); });
+      [].forEach.call(b.querySelectorAll(".odtab-i"),function(it){ var on=tabKey(it)===key; if(it.classList.contains("is-on")!==on) it.classList.toggle("is-on", on); });
     });
   }
   /* 스크롤 시 아임웹이 탭 줄을 화면 위에 고정할 때 왼쪽으로 쏠리면 원래 위치·폭으로 맞춤 */
@@ -4664,7 +4664,7 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
   function place(wrap){
     var hd = wrap.parentElement, rt = hd && hd.querySelector(".odpx-rt");
     if(!rt || !vis(rt)){ if(!wrap.classList.contains("odlk-free")) wrap.classList.add("odlk-free"); return; }
-    wrap.classList.remove("odlk-free");
+    if(wrap.classList.contains("odlk-free")) wrap.classList.remove("odlk-free");
     var y = Math.round(rt.getBoundingClientRect().top - hd.getBoundingClientRect().top + rt.offsetHeight / 2) + "px";
     if(wrap.style.top !== y) wrap.style.top = y;
   }
