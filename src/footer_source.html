@@ -6,14 +6,19 @@
   function skip(r){
     var t = r.target; if(t && t.nodeType === 3) t = t.parentNode;
     if(!t || !t.closest) return false;
+    /* 값이 그대로인 속성 다시 쓰기(같은 class·style을 또 넣는 경우)는 변화가 아니므로 무시 → 감시 코드끼리 서로 깨우는 반복을 끊음 */
+    if(r.type === "attributes" && r.oldValue === t.getAttribute(r.attributeName)) return true;
     if(r.type !== "childList") return !!t.closest(".odv2");
     return !!t.closest(".odv2 [data-count], .odv2 #dxProg, .odv2 .odrs-avg");
   }
   function W(cb){
-    return new MO(function(recs, obs){
+    var mo = new MO(function(recs, obs){
       var keep = [], i; for(i = 0; i < recs.length; i++) if(!skip(recs[i])) keep.push(recs[i]);
       if(keep.length) cb.call(this, keep, obs);
     });
+    var ob = mo.observe.bind(mo);
+    mo.observe = function(t, o){ if(o && (o.attributes || o.attributeFilter) && !("attributeOldValue" in o)){ var c = {}, k; for(k in o) c[k] = o[k]; c.attributeOldValue = true; o = c; } return ob(t, o); };
+    return mo;
   }
   W.prototype = MO.prototype; W.__odf = 1;
   try{ window.MutationObserver = W; }catch(e){}
