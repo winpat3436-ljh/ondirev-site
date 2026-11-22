@@ -5091,3 +5091,83 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
 })();
 </script>
 <!-- ===================== /V2 서비스 ===================== -->
+
+<!-- ===================== V2 장바구니 서랍 + 검색 창 =====================
+     · 장바구니: 아임웹 실제 장바구니 내용을 읽어서 보여줌(읽기 전용). 수량 변경·주문은 장바구니 페이지에서
+     · 검색: 입력하면 아임웹 검색 결과(/search)로 이동 -->
+<script>
+(function(){
+  if(!window.__odV2 || !window.__odV2()) return;
+  var BASE = "https://winpat3436-ljh.github.io/ondirev-site/dist/v2/", html = null, root = null, loading = null;
+  function won(n){ return Math.round(n).toLocaleString("en-US") + "원"; }
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return { "&":"&" + "amp;", "<":"&" + "lt;", ">":"&" + "gt;", '"':"&" + "quot;" }[c]; }); }
+  function part(a, b){ var i = html.indexOf("@@" + a + "@@"), j = html.indexOf("@@" + b + "@@"); return i < 0 || j < 0 ? "" : html.slice(i + a.length + 4, j); }
+  function ensure(){
+    if(root) return Promise.resolve(root);
+    if(!loading) loading = fetch(BASE + "cart.html?v=" + Math.floor(Date.now() / 60000)).then(function(r){ return r.ok ? r.text() : Promise.reject(); }).then(function(t){
+      html = t;
+      var st = document.createElement("div"); st.innerHTML = html.slice(0, html.indexOf("@@CX@@")); while(st.firstChild) document.head.appendChild(st.firstChild);
+      root = document.createElement("div"); root.className = "odv2 odv2-ov"; root.innerHTML = part("CX", "SX") + part("SX", "END");
+      document.body.appendChild(root);
+      var cx = root.querySelector("#cx"), sx = root.querySelector("#sx"); cx.id = "kzcx"; sx.id = "kzsx"; cx.classList.remove("kz-on"); cx.setAttribute("aria-hidden", "true");
+      var e = root.querySelector("#cxEmpty a"); if(e) e.setAttribute("href", "/products");
+      var o = root.querySelector(".kz-cx-order"); if(o){ o.setAttribute("href", "/shop_cart"); o.removeAttribute("target"); o.textContent = "장바구니에서 주문하기"; }
+      var nt = root.querySelector(".kz-cx-ft .kz-nt"); if(nt) nt.textContent = "수량 변경·삭제와 쿠폰 적용은 장바구니에서 할 수 있어요.";
+      var tip = root.querySelector("#cxTip"); if(tip) tip.hidden = true;
+      root.addEventListener("click", function(ev){ if(ev.target.closest("[data-cxclose]")) closeCart(); if(ev.target.closest("[data-sxclose]")) closeSearch(); });
+      document.addEventListener("keydown", function(ev){ if(ev.key === "Escape"){ closeCart(); closeSearch(); } });
+      var q = root.querySelector("#sxQ");
+      function goSearch(k){ k = (k || "").trim(); if(!k) return; if(/방향|테스트/.test(k)){ location.href = "/directioncheck"; return; } if(/배송|교환|반품|환불/.test(k)){ location.href = "/faq"; return; } location.href = "/search?keyword=" + encodeURIComponent(k); }
+      q.addEventListener("keydown", function(ev){ if(ev.key === "Enter"){ ev.preventDefault(); goSearch(q.value); } });
+      [].forEach.call(root.querySelectorAll("#sxSg button"), function(b){ b.addEventListener("click", function(){ goSearch(b.textContent); }); });
+      var rs = root.querySelector("#sxRs");
+      if(rs) rs.innerHTML = [["/shop_view/?idx=1", "온디레브 [IN] 리플 엑토인 세럼 50ml", "상품"], ["/directioncheck", "내 피부 방향 찾기 · 3분 테스트", "Direction Check"], ["/brand", "브랜드 스토리", "Brand"], ["/faq", "배송 · 교환 · 반품 안내", "FAQ"]].map(function(x){ return '<a class="kz-sx-quick" href="' + x[0] + '"><small>' + x[2] + "</small><b>" + x[1] + "</b></a>"; }).join("");
+      return root;
+    });
+    return loading;
+  }
+  function lock(on){ document.documentElement.style.overflow = on ? "hidden" : ""; }
+  function closeCart(){ if(!root) return; var cx = root.querySelector("#kzcx"); if(cx.classList.contains("kz-on")){ cx.classList.remove("kz-on"); cx.setAttribute("aria-hidden", "true"); lock(false); } }
+  function closeSearch(){ if(!root) return; var sx = root.querySelector("#kzsx"); if(!sx.hidden){ sx.hidden = true; sx.classList.remove("kz-on"); sx.setAttribute("aria-hidden", "true"); lock(false); } }
+  function render(d){
+    var n = (d.meta && d.meta.total_normal_cart_item_count) || 0, items = (d.cart && d.cart.items) || [], sm = d.cart_price_summary || {};
+    root.querySelector("#cxN").textContent = n;
+    root.querySelector("#cxEmpty").hidden = n > 0; root.querySelector("#cxFull").hidden = !n; root.querySelector("#cxFt").hidden = !n;
+    if(!n) return;
+    var full = root.querySelector("#cxFull"); [].forEach.call(full.querySelectorAll(".kz-cx-it"), function(x){ x.remove(); });
+    var tipEl = root.querySelector("#cxTip"), h = "";
+    items.forEach(function(it){ var p = it.product || {}, pr = it.price || {}, u = p.url || "/shop_cart";
+      h += '<div class="kz-cx-it"><a class="kz-th" href="' + esc(u) + '"><img alt="" src="' + esc(p.image_url || "") + '"></a><div class="kz-in"><a class="kz-nm" href="' + esc(u) + '">' + esc(p.name || "") + '</a><span class="kz-op">수량 ' + (it.count || 1) + "개" + (pr.original_total_price > pr.total_price ? " · 정가 " + won(pr.original_total_price) : "") + '</span><div class="kz-rw"><a class="kz-chg" href="/shop_cart">수량 변경</a><b>' + won(pr.total_price || 0) + "</b></div></div></div>"; });
+    tipEl.insertAdjacentHTML("beforebegin", h);
+    var goods = (sm.product_price || 0) - (sm.total_discount_price || 0), fee = sm.deliv_price || 0, free = 0;
+    try{ d.cart.delivery_groups[0].deliv_price_info[0].rows.forEach(function(r){ if(r.price === 0 && r.from) free = r.from; }); }catch(e){}
+    var st = root.querySelector("#cxShipT"), sb = root.querySelector("#cxShipB"), ship = root.querySelector(".kz-cx-ship");
+    if(ship){ if(!free){ ship.hidden = true; } else { ship.hidden = false; st.innerHTML = fee === 0 || goods >= free ? "<b>무료배송</b>이 적용됐어요" : "<b>" + won(free - goods) + "</b> 더 담으면 무료배송"; sb.style.width = Math.min(100, goods / free * 100).toFixed(1) + "%"; } }
+    root.querySelector("#cxSub").textContent = won(goods); root.querySelector("#cxFee").textContent = fee ? won(fee) : "무료"; root.querySelector("#cxTot").textContent = won(sm.total_order_price || goods + fee);
+  }
+  function openCart(){
+    ensure().then(function(){
+      var cx = root.querySelector("#kzcx"); closeSearch(); cx.classList.add("kz-on"); cx.setAttribute("aria-hidden", "false"); lock(true);
+      return fetch("/shop/cart/get_cart_content.cm?cart_type=normal&current_full_url=" + encodeURIComponent(location.origin + "/shop_cart"), { credentials:"same-origin", headers:{ "X-Requested-With":"XMLHttpRequest" } }).then(function(r){ return r.json(); }).then(function(j){ if(!j || !j.data) throw 0; render(j.data); });
+    })["catch"](function(){ location.href = "/shop_cart"; });
+  }
+  function openSearch(){
+    ensure().then(function(){ var sx = root.querySelector("#kzsx"); closeCart(); sx.hidden = false; sx.classList.add("kz-on"); sx.setAttribute("aria-hidden", "false"); lock(true); var q = root.querySelector("#sxQ"); setTimeout(function(){ try{ q.focus(); }catch(e){} }, 60); })["catch"](function(){});
+  }
+  document.addEventListener("click", function(e){
+    if(!e.target.closest || e.target.closest(".odv2")) return;
+    var a = e.target.closest("a, button"); if(!a) return;
+    var href = a.getAttribute("href") || "", oc = a.getAttribute("onclick") || "";
+    if(/SITE_SEARCH\.openSearch/.test(oc)){ e.preventDefault(); e.stopImmediatePropagation(); openSearch(); return; }
+    if(/(^|\/)shop_cart\/?$/.test(href.split("?")[0]) && !/^\/shop_cart/.test(location.pathname) && a.closest("header, #doz_header_wrap, .od-buybar") && !a.closest(".od-buybar")){ e.preventDefault(); e.stopImmediatePropagation(); openCart(); }
+  }, true);
+})();
+</script>
+<style>
+  .odv2 .kz-cx-it .kz-chg{ font-size:12.5px; color:#4B86B4; -webkit-text-fill-color:#4B86B4; text-decoration:underline; text-underline-offset:3px; }
+  .odv2 .kz-cx-it .kz-rw{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .odv2 .kz-sx-quick{ display:flex; flex-direction:column; gap:2px; padding:14px 2px; border-bottom:1px solid #EEF1F4; }
+  .odv2 .kz-sx-quick small{ font-size:11.5px; font-weight:700; letter-spacing:.08em; color:#4B86B4; -webkit-text-fill-color:#4B86B4; }
+  .odv2 .kz-sx-quick b{ font-size:15px; font-weight:600; color:#1E2A3A; -webkit-text-fill-color:#1E2A3A; }
+</style>
+<!-- ===================== /V2 장바구니·검색 ===================== -->
