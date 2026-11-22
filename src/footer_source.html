@@ -5255,3 +5255,92 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
 })();
 </script>
 <!-- ===================== /V2 링크 ===================== -->
+
+<!-- ===================== V2 마이페이지: 내 방향 기록 =====================
+     · 방향 찾기 결과는 이 브라우저에 저장됨(기기별). 마이페이지 메뉴 '내 방향 기록'에서 확인 -->
+<script>
+(function(){
+  if(!window.__odV2 || !window.__odV2()) return;
+  if(!/^\/shop_mypage\/?$/.test(location.pathname)) return;
+  var BASE = "https://winpat3436-ljh.github.io/ondirev-site/dist/v2/", PANE = null, cssOk = false, HREF = "/shop_mypage/?m2=order#mydir";
+  function pfx(el){ [].forEach.call(el.querySelectorAll("[class]"), function(x){ if(x instanceof SVGElement) return; x.className = x.className.split(/\s+/).filter(Boolean).map(function(c){ return /^mz-/.test(c) ? c : "mz-" + c; }).join(" "); }); }
+  var DAY=86400000, CYCLE=28;
+  function H(){ try{ return JSON.parse(localStorage.getItem('odv_hist')||'[]'); }catch(e){ return []; } }
+  function off(){ return 0; }
+  function remind(){ try{ return localStorage.getItem('odv_remind')!=='0'; }catch(e){ return true; } }
+  function today(){ var t=new Date(Date.now()+off()*DAY); t.setHours(0,0,0,0); return t; }
+  function pd(s){ var p=s.split('-'); return new Date(+p[0],p[1]-1,+p[2]); }
+  function fmt(s){ return s.replace(/-/g,'.'); }
+  function md(d){ return (d.getMonth()+1)+'월 '+d.getDate()+'일'; }
+  function esc(t){ return String(t).replace(/[&<>"]/g,function(c){return {'&':'&'+'amp;','<':'&'+'lt;','>':'&'+'gt;','"':'&'+'quot;'}[c];}); }
+  function info(){ var h=H(); if(!h.length) return null; var last=pd(h[0].d), nxt=new Date(+last+CYCLE*DAY), left=Math.round((nxt-today())/DAY); return {h:h,last:last,nxt:nxt,left:left}; }
+  var AX=['반응','수분','피지','모공','잔여','탄력','색소'];
+  function radar(v){ var R=46,c=60,pt=function(i,r){var a=(-90+i*360/7)*Math.PI/180;return (c+Math.cos(a)*r).toFixed(1)+','+(c+Math.sin(a)*r).toFixed(1);};
+    var ring=function(n){var o=[];for(var i=0;i<7;i++)o.push(pt(i,R*n/3));return o.join(' ');}; var mx=Math.max.apply(null,v), shp=[];for(var i=0;i<7;i++)shp.push(pt(i,R*Math.max(.06,v[i]/3)));
+    var lab='';for(var j=0;j<7;j++){var a=(-90+j*360/7)*Math.PI/180;lab+='<text x="'+(c+Math.cos(a)*(R+10)).toFixed(1)+'" y="'+(c+Math.sin(a)*(R+10)+3).toFixed(1)+'" text-anchor="middle" font-size="8" fill="'+(v[j]===mx&&mx>0?'#1B3A5C':'#8A98AA')+'" font-weight="'+(v[j]===mx&&mx>0?700:400)+'">'+AX[j]+'</text>';}
+    return '<svg viewBox="-12 -4 144 128" width="130" height="116" aria-hidden="true"><polygon points="'+ring(3)+'" fill="#fff" stroke="#E1E8F0"/><polygon points="'+ring(2)+'" fill="none" stroke="#E1E8F0"/><polygon points="'+ring(1)+'" fill="none" stroke="#E1E8F0"/><polygon points="'+shp.join(' ')+'" fill="rgba(27,58,92,.28)" stroke="#1B3A5C" stroke-width="1.5" stroke-linejoin="round"/>'+lab+'</svg>'; }
+  function lst(a,ord){ if(!a||!a.length) return ''; return '<'+(ord?'ol':'ul')+'>'+a.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</'+(ord?'ol':'ul')+'>'; }
+  function brief(t,n){ t=String(t||''); var m=t.match(/[^.!?]+[.!?]/g)||[t]; return m.slice(0,n||2).join(' ').trim(); }
+  function legend(v){ var mx=Math.max.apply(null,v); return '<div class="lg2">'+AX.map(function(a,i){return '<span'+(v[i]===mx&&mx>0?' class="tp"':'')+'>'+a+' '+v[i]+'</span>';}).join('')+'</div>'; }
+  function detail(r,nd){
+    var top='<div class="dtop">'+(r.v?radar(r.v):'')+'<dl><div><dt>방향</dt><dd><b>'+esc(r.k)+'</b> · '+esc(r.s)+'</dd></div>'+(r.role?'<div><dt>역할</dt><dd>'+esc(r.role)+'</dd></div>':'')+(r.lv?'<div><dt>판단 근거</dt><dd>'+esc(r.lv)+'</dd></div>':'')+(r.nx?'<div><dt>다음 방향</dt><dd>'+esc(r.nx)+' (4~8주 뒤)</dd></div>':'')+'<div><dt>재체크</dt><dd>'+md(nd)+'</dd></div></dl></div>'+(r.v?legend(r.v):'');
+    if(!r.am) return top+'<div class="dsec"><h5>4주 첫 단계</h5><p>'+esc(r.p||'-')+'</p><p class="old">이 기록은 요약만 저장돼 있어요.</p></div>';
+    var sec=function(t,b){ return b?'<div class="dsec"><h5>'+t+'</h5>'+b+'</div>':''; };
+    return top
+      +sec('왜 '+esc(r.k)+'일까요?', (r.why?'<p>'+esc(brief(r.why,2))+'</p>':'')+(r.q?'<p class="qq">“'+esc(r.q)+'”</p>':''))
+      +sec('내 상황에 맞춘 해석', r.fuA?'<p class="ans"><span>내 답</span>'+esc(r.fuA)+'</p><p>'+esc(brief(r.fuT,2))+'</p>':'')
+      +sec('하루 루틴','<div class="rt2"><div><h6>아침</h6>'+lst(r.am,1)+'</div><div><h6>저녁</h6>'+lst(r.pm,1)+'</div></div>')
+      +sec('피할 것', r.av&&r.av.length?lst(r.av):'')
+      +sec('4주 계획','<ol class="wk">'+r.plan.map(function(t,i){return '<li><b>'+(i+1)+'주차</b>'+esc(t)+'</li>';}).join('')+'</ol>')
+      +sec('나이와 생활', r.life?r.life.map(function(t){return '<p>'+esc(brief(t,1))+'</p>';}).join(''):'')
+      +sec('분석 근거', r.basis&&r.basis.length?'<dl class="bs2">'+r.basis.map(function(x){return '<div><dt>'+esc(x[0])+'</dt><dd>'+esc(brief(x[1],1))+'</dd></div>';}).join('')+'</dl>':'')
+      +'<a class="dgo" href="/directioncheck">지금 다시 체크해서 비교하기</a>';
+  }
+  function render(){
+    var el=PANE; if(!el) return; var I=info(), s='';
+    if(!I){ s='<div class="cd emp"><div class="t" style="justify-content:center">아직 기록이 없어요</div><p>1분 디렉션 체크를 하면 여기에 내 방향이 쌓여요.</p><div class="bt" style="grid-template-columns:1fr"><a href="/directioncheck">디렉션 체크 시작</a></div></div>'; }
+    else{
+      var c=I.h[0], pass=Math.min(100,Math.max(4,Math.round((CYCLE-Math.max(I.left,0))/CYCLE*100)));
+      s+='<div class="cd now"><small>지금 내 방향 · '+fmt(c.d)+' 체크</small><div class="dn"><b>'+esc(c.k)+'</b><span>'+esc(c.s)+'</span></div>'
+        +(I.left>0?'<div class="dd2"><div class="r"><span>다음 체크까지</span><b>D-'+I.left+' · '+md(I.nxt)+'</b></div><div class="bar"><i style="width:'+pass+'%"></i></div><p>'+(remind()?'🔔 사이트 알림 받는 중 · 4주가 지나면 접속할 때 알려 드려요':'🔕 재체크 알림 꺼짐')+'</p></div>'
+          :'<div class="due">🔔 재체크할 때예요. 4주 동안 방향이 바뀌었는지 확인해 보세요.</div>')+'</div>';
+      s+='<div class="cd"><div class="t">지난 기록<span>'+I.h.length+'회</span></div><div style="margin-top:6px">'
+        +I.h.map(function(r,i){ var nd=new Date(+pd(r.d)+CYCLE*DAY);
+          return '<div class="hr"><button type="button" class="row'+(i?'':' on')+'" aria-expanded="false"><div class="bd">'+esc(r.k)+'</div><div><b>'+esc(r.k)+'</b><em>'+esc(r.s)+'</em><small>'+fmt(r.d)+'</small></div><div class="tg">'+(i?'':'최근 결과 ')+'<i class="cv">⌄</i></div></button>'
+          +'<div class="hd2" hidden>'+detail(r,nd)+'</div></div>'; }).join('')+'</div></div>';
+      s+='<div class="cd"><div class="t">이번 4주, 첫 단계</div><p class="pl">'+esc(c.p||'결과 화면의 4주 플랜을 따라 해 보세요.')+'</p><div class="bt"><a href="/shop_view/?idx=1">IN 세럼 보기</a><a class="l" href="/directioncheck">지금 다시 체크</a></div></div>';
+    }
+    el.innerHTML='<div class="my"><div class="k1">마이페이지</div><h1>내 방향 기록</h1>'+s+'</div>';
+    pfx(el);
+    [].forEach.call(el.querySelectorAll('.mz-hr>.mz-row'),function(bt){ bt.onclick=function(){ var d=bt.nextElementSibling, on=d.hidden; d.hidden=!on; bt.setAttribute('aria-expanded',on?'true':'false'); bt.parentElement.classList.toggle('mz-op',on); }; });
+  }
+
+  function nav(){
+    var pc = document.querySelector(".shop-content.mypage .col-md-2 ul"), mo = document.querySelector(".shop-content.mypage .cart-menu-slide");
+    if(pc && !pc.querySelector(".od-mydir")){ var li = document.createElement("li"); li.className = "od-mydir"; li.innerHTML = '<a href="' + HREF + '" class="text-gray-dark">내 방향 <span class="hidden-xs">기록</span></a>'; var f = pc.querySelector("li"); if(f) f.after(li); else pc.appendChild(li); }
+    if(mo && !mo.querySelector(".od-mydir")){ var l2 = document.createElement("li"); l2.className = "od-mydir"; l2.innerHTML = '<a href="' + HREF + '" class="body_font_color_50">내 방향</a>'; var f2 = mo.querySelector("li"); if(f2) f2.after(l2); else mo.appendChild(l2); }
+    return !!(pc || mo);
+  }
+  function show(){
+    var on = location.hash === "#mydir", col = document.querySelector(".shop-content.mypage .col-md-10");
+    document.documentElement.classList.toggle("odv2-mydir", on && !!col);
+    [].forEach.call(document.querySelectorAll(".shop-content.mypage .col-md-2 li, .shop-content.mypage .cart-menu-slide li"), function(li){
+      var mine = li.classList.contains("od-mydir");
+      if(on){ if(li.classList.contains("on")){ li.classList.remove("on"); li.setAttribute("data-od-was", "on"); } if(li.classList.contains("active")){ li.classList.remove("active"); li.setAttribute("data-od-was", "active"); } if(mine){ li.classList.add("on"); li.classList.add("active"); } }
+      else { if(mine){ li.classList.remove("on"); li.classList.remove("active"); } var w = li.getAttribute("data-od-was"); if(w){ li.classList.add(w); li.removeAttribute("data-od-was"); } }
+    });
+    if(!on || !col) return;
+    if(!PANE){ var w = document.createElement("div"); w.className = "odv2 mz-w"; PANE = document.createElement("div"); w.appendChild(PANE); col.appendChild(w); }
+    function go(){ render(); window.scrollTo(0, Math.max(0, PANE.getBoundingClientRect().top + window.pageYOffset - 140)); }
+    if(cssOk){ go(); return; }
+    fetch(BASE + "my.html?v=" + Math.floor(Date.now() / 60000)).then(function(r){ return r.ok ? r.text() : ""; }).then(function(t){
+      var st = document.createElement("div"); st.innerHTML = t.slice(0, t.indexOf("@@END@@")); while(st.firstChild) document.head.appendChild(st.firstChild); cssOk = true; go();
+    })["catch"](function(){ cssOk = true; go(); });
+  }
+  function boot(){ var n = 0, iv = setInterval(function(){ if(nav() || ++n > 40){ clearInterval(iv); show(); } }, 200); }
+  window.addEventListener("hashchange", show);
+  document.addEventListener("click", function(e){ var a = e.target.closest && e.target.closest(".od-mydir a"); if(!a) return; e.preventDefault(); if(location.hash !== "#mydir") location.hash = "mydir"; else show(); }, true);
+  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot); else boot();
+})();
+</script>
+<!-- ===================== /V2 내 방향 기록 ===================== -->

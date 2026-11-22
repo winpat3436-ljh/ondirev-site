@@ -1100,6 +1100,19 @@ function result(){
   if(n) requestAnimationFrame(()=>requestAnimationFrame(()=>{ n.style.transition="transform 1.5s cubic-bezier(.25,1.7,.45,1)"; n.style.transform=`rotate(${settle}deg)`; }));
   angle = settle;
   wireBack();
+  try{
+    const H = JSON.parse(localStorage.getItem("odv_hist")||"[]"), _t = new Date(), td = _t.getFullYear()+"-"+String(_t.getMonth()+1).padStart(2,"0")+"-"+String(_t.getDate()).padStart(2,"0");
+    const e = {d: td, k: name, l: lbl(dir), s: subFull(dir)||DIR[name].s, p: plan[0]||""};
+    const g = (k,f) => { try{ const x=f(); if(x!==undefined&&x!==null) e[k]=x; }catch(er){ console.warn("odv_hist field",k,er); } };
+    const strip = t => String(t||"").replace(/<[^>]+>/g,"");
+    g("v",()=>v.slice()); g("lv",()=>levelTxt); g("nx",()=>show(nx)); g("am",()=>am.slice()); g("pm",()=>pm.slice()); g("plan",()=>plan.slice()); g("av",()=>avoid.slice());
+    g("role",()=>strip(ROLE[dir])); g("q",()=>strip(r.q)); g("why",()=>strip(WHYP[1]||w));
+    g("fuA",()=>fp!==undefined?strip(fu.o[fp]):""); g("fuT",()=>fp!==undefined?strip(pn(fu.txt[fp])):"");
+    g("life",()=>[strip(C[0].o[ans.age ?? 1])+" · "+strip(pn(r.age[ans.age ?? 1])), strip(String(C[1].o[env]).split(/[.,]/)[0])+" · "+strip(r.env[env])]);
+    g("basis",()=>(r.basis||[]).map(x=>[strip(x[0]),strip(x[1])]));
+    if(H[0] && H[0].d===td) H[0] = e; else H.unshift(e);
+    localStorage.setItem("odv_hist", JSON.stringify(H.slice(0,12)));
+  }catch(e){}
   document.getElementById("again").onclick = () => { track("check_click", {what: "restart", direction: name}); go(0); };
   track("check_result", {direction: name, subtype: lbl(dir), second: dec.second || "", age: ans.age, env: ans.env});
   app.querySelectorAll("a[data-what]").forEach(a => a.addEventListener("click", () => track("check_click", {what: a.dataset.what, direction: name})));
