@@ -1,5 +1,15 @@
 <script>window.__OD_V2_ALL = true; (function(){ try{ var q = /[?&]od_v2=([01])/.exec(location.search); if(q) localStorage.setItem("od_v2", q[1]); }catch(e){} })(); window.__odV2 = function(){ try{ var v = localStorage.getItem("od_v2"); if(v === "0") return false; return !!window.__OD_V2_ALL || v === "1"; }catch(e){ return !!window.__OD_V2_ALL; } };</script>
-<style>html:not(.od-ready):not(.odv2-home):not(.odv2-off) body._body_menu_m2026073170a0802cfc8b8 .section_wrap.visual_section{ opacity:0 !important; }</style>
+<style>
+/* 새 디자인이 붙기 전에 예전 화면이 잠깐 보이는 것 방지 (최대 2.5초 뒤에는 무조건 다시 보임) */
+html:not(.od-ready):not(.odv2-home):not(.odv2-off) body._body_menu_m2026073170a0802cfc8b8 .section_wrap.visual_section,
+html:not(.od-ready):not(.odv2-off) body._body_menu_m2026073170a0802cfc8b8 section.odh,
+html:not(.od-ready):not(.odv2-off) .odd,
+html:not(.od-ready):not(.odv2-off) .odc,
+html:not(.od-ready):not(.odv2-off) .odv-tabs,
+html:not(.od-ready):not(.odv2-off) body._body_menu_m20260922d9e9006c9e12c .widget.board,
+html:not(.od-ready):not(.odv2-off) body._body_menu_m20261020ba062c0222784:not(.shop_view) .section_wrap,
+html:not(.od-ready):not(.odv2-off) body._body_menu_m2026091638f0a89638c2b:not(.shop_view) .section_wrap{ opacity:0 !important; }
+</style>
 <script>(function(){ if(!window.__odV2()) document.documentElement.classList.add("odv2-off"); setTimeout(function(){ document.documentElement.classList.add("odv2-off"); }, 3000); })();</script>
 <style>
   #od-kakao{
