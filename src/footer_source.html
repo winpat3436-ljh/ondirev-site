@@ -5043,3 +5043,51 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
 })();
 </script>
 <!-- ===================== /V2 홈 ===================== -->
+
+<!-- ===================== V2 서비스(공지사항 · 1:1 문의 · FAQ): 새 머리말·탭 + FAQ 펼침 목록 =====================
+     · FAQ 글은 아임웹 게시판에 올라온 그대로 읽어서 보여줌 (관리자에서 고치면 자동 반영) -->
+<script>
+(function(){
+  if(!window.__odV2 || !window.__odV2()) return;
+  var m = /^\/(service|notice|faq|one-on-one)\/?$/.exec(location.pathname); if(!m) return;
+  var cur = m[1] === "service" ? "notice" : m[1], BASE = "https://winpat3436-ljh.github.io/ondirev-site/dist/v2/", css = null, done = false;
+  var SEARCH = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4.5 4.5"></path></svg>';
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return { "&":"&" + "amp;", "<":"&" + "lt;", ">":"&" + "gt;", '"':"&" + "quot;" }[c]; }); }
+  function tx(e){ return e ? (e.textContent || "").replace(/\s+/g, " ").trim() : ""; }
+  function mount(){
+    if(done || !css) return;
+    var main = document.querySelector("main .inside") || document.querySelector("main"); if(!main) return;
+    var board = document.querySelector("main .widget.board"), rows = board ? board.querySelectorAll(".acd_row") : [];
+    if(cur === "faq" && !board) return;
+    done = true;
+    var st = document.createElement("div"); st.innerHTML = css.slice(0, css.indexOf("@@END@@")); while(st.firstChild) document.head.appendChild(st.firstChild);
+    var tabs = [["notice", "공지사항", "/notice"], ["one-on-one", "1:1 문의", "/one-on-one"], ["faq", "FAQ", "/faq"]].map(function(t){ return '<a href="' + t[2] + '"' + (t[0] === cur ? ' class="sz-on" aria-current="page"' : "") + ">" + t[1] + "</a>"; }).join("");
+    var h = '<div class="sz-sv"><div class="sz-sv-in"><header class="sz-sv-hd"><div class="sz-sv-meta"><span>SERVICE</span><span>ONDIREV</span></div><nav class="sz-sv-tabs">' + tabs + "</nav></header>";
+    if(cur === "faq" && rows.length){
+      h += '<section class="sz-sv-pane"><div class="sz-sv-top"><h1>FAQ <small>' + rows.length + '</small></h1><label class="sz-sv-search"><input type="search" placeholder="Search" aria-label="검색" data-szq>' + SEARCH + '</label></div><div class="sz-sv-list">';
+      [].forEach.call(rows, function(r){
+        var body = r.querySelector(".board_contents"), c = body ? body.cloneNode(true) : null;
+        if(c) [].forEach.call(c.querySelectorAll(".file_area, script, style"), function(x){ if(!tx(x) || x.tagName !== "DIV") x.remove(); });
+        var meta = [tx(r.querySelector(".board_summary .write")), tx(r.querySelector(".board_summary .date")), tx(r.querySelectorAll(".board_summary .date")[1])].filter(Boolean).join(" · ");
+        h += '<details class="sz-sv-it"><summary><em>' + esc(tx(r.querySelector(".number"))) + "</em><b>" + esc(tx(r.querySelector(".title"))) + '</b><span class="sz-mt">' + esc(meta) + '</span><i></i></summary><div class="sz-bd">' + (c ? c.innerHTML : "") + "</div></details>";
+      });
+      h += '</div><div class="sz-sv-empty" data-sznone hidden><p>검색 결과가 없습니다.</p></div></section>';
+      document.documentElement.classList.add("odv2-faq");
+    }
+    h += "</div></div>";
+    var w = document.createElement("div"); w.className = "odv2 odv2-svc-w"; w.innerHTML = h;
+    main.insertBefore(w, main.firstChild);
+    document.documentElement.classList.add("odv2-svc");
+    var q = w.querySelector("[data-szq]"), none = w.querySelector("[data-sznone]");
+    if(q) q.addEventListener("input", function(){ var k = q.value.trim().toLowerCase(), n = 0; [].forEach.call(w.querySelectorAll(".sz-sv-it"), function(d){ var ok = !k || d.textContent.toLowerCase().indexOf(k) > -1; d.hidden = !ok; if(ok) n++; }); if(none) none.hidden = n > 0; });
+    function bleed(){ w.style.marginLeft = "0px"; w.style.width = "auto"; var r = w.getBoundingClientRect(), cw = document.documentElement.clientWidth; if(r.left > .5 || Math.abs(r.width - cw) > 1){ w.style.marginLeft = (-r.left) + "px"; w.style.width = cw + "px"; } }
+    bleed(); window.addEventListener("resize", bleed); setTimeout(bleed, 1200);
+  }
+  function boot(){ mount(); if(done) return; var n = 0, iv = setInterval(function(){ mount(); if(done || ++n > 40) clearInterval(iv); }, 250); }
+  fetch(BASE + "svc.html?v=" + Math.floor(Date.now() / 60000)).then(function(r){ return r.ok ? r.text() : null; }).then(function(t){
+    if(!t) return; css = t;
+    if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot); else boot();
+  })["catch"](function(){});
+})();
+</script>
+<!-- ===================== /V2 서비스 ===================== -->
