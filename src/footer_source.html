@@ -29,6 +29,7 @@
 (function(){
   try{ var q = /[?&]od_prof=([01])/.exec(location.search); if(q) localStorage.setItem("od_prof", q[1]); if(localStorage.getItem("od_prof") !== "1") return; }catch(e){ return; }
   var P = window.__odp = {};
+  try{ var MG = window.__odm = {}, mo0 = new MutationObserver(function(rs){ MG.__batches = (MG.__batches || 0) + 1; rs.forEach(function(r){ var t = r.target; if(t.nodeType === 3) t = t.parentNode; if(!t) return; var k = r.type + (r.attributeName ? "[" + r.attributeName + "]" : "") + " " + (t.tagName || "").toLowerCase() + (t.id ? "#" + t.id : "") + "." + String(t.className && t.className.baseVal !== undefined ? t.className.baseVal : t.className || "").trim().split(/\s+/).slice(0, 3).join("."); MG[k] = (MG[k] || 0) + 1; }); }); mo0.observe(document.documentElement, { childList:true, subtree:true, attributes:true, characterData:true }); setTimeout(function(){ mo0.disconnect(); }, 10000); }catch(e){}
   function rec(k, t){ var o = P[k] || (P[k] = [0, 0, 0]); o[0] += t; o[1]++; if(t > o[2]) o[2] = t; }
   function wrap(type, fn){ if(typeof fn !== "function") return fn; var at = ""; try{ var m = /main\.js[^:]*:(\d+):(\d+)/.exec(((new Error).stack || "").split("\n").slice(3).join("\n")); if(m) at = "@" + m[1] + ":" + m[2] + " "; }catch(e){} var k = at + type + ":" + String(fn).replace(/\s+/g, " ").slice(0, 70); return function(){ var t0 = performance.now(); try{ return fn.apply(this, arguments); } finally { rec(k, performance.now() - t0); } }; }
   ["setTimeout", "setInterval", "requestAnimationFrame"].forEach(function(n){ var o = window[n]; window[n] = function(fn){ var a = [].slice.call(arguments); a[0] = wrap(n, fn); return o.apply(window, a); }; });
@@ -323,7 +324,10 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
     requestAnimationFrame(sync);
   }
   /* 아임웹이 늦게 그리거나 다시 그려도 15초 동안 계속 확인해서 붙여 둠 */
-  var tries=0, t=setInterval(function(){ run(); if(heroes.length && !syncing){ syncing=true; requestAnimationFrame(sync); } if(++tries>=75) clearInterval(t); },200);
+  /* 처음 3초는 0.2초마다, 그 뒤 12초는 1초마다 확인 (늦게 그려지는 상품명 대비는 그대로, 반복 횟수만 줄임) */
+  var tries=0;
+  function poll(){ run(); if(heroes.length && !syncing){ syncing=true; requestAnimationFrame(sync); } if(++tries>=27) return; setTimeout(poll, tries<15 ? 200 : 1000); }
+  setTimeout(poll, 200);
 })();
 </script>
 
@@ -1201,7 +1205,8 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
     if(t) return; t=setTimeout(function(){ t=null; tick(); },200);
   }).observe(document.documentElement,{childList:true, subtree:true, attributes:true, attributeFilter:["style","class"]});
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", tick); else tick();
-  var k=0, iv=setInterval(function(){ tick(); if(++k>40) clearInterval(iv); },500);
+  /* 처음 4초는 0.5초마다, 그 뒤 16초는 2초마다 (화면 변화가 있으면 위 감시 코드가 따로 다시 돌림) */
+  var k=0; (function again(){ tick(); if(++k>16) return; setTimeout(again, k<8 ? 500 : 2000); })();
 })();
 </script>
 
