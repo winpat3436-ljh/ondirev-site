@@ -4973,8 +4973,29 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
     var tb = target(); if(!tb) return;
     done = true;
     styles();
-    var w = document.createElement("div"); w.className = "odv2 odv2-d"; w.innerHTML = '<div class="pdp">' + part("DETAIL", "SHIP") + part("SHIP", "FP") + "</div>";
+    /* 상세 본문은 화면 가까이 왔을 때 넣음 (처음 열 때 부담 줄이기) */
+    var w = document.createElement("div"); w.className = "odv2 odv2-d"; w.style.minHeight = "900px";
     tb.parentNode.insertBefore(w, tb.nextSibling);
+    var filled = false;
+    function fill(){
+      if(filled) return; filled = true;
+      w.innerHTML = '<div class="pdp">' + part("DETAIL", "SHIP") + part("SHIP", "FP") + "</div>"; w.style.minHeight = "";
+      motion(w); bleed();
+      /* 화면 밖 챕터의 반복 모션은 멈춰 둠 */
+      if("IntersectionObserver" in window){ var vo = new IntersectionObserver(function(es){ es.forEach(function(e){ e.target.classList.toggle("odv2-vis", e.isIntersecting); }); }, { rootMargin:"200px 0px" }); [].forEach.call(w.querySelectorAll(".dz, .dz-hero"), function(x){ vo.observe(x); }); }
+      else [].forEach.call(w.querySelectorAll(".dz, .dz-hero"), function(x){ x.classList.add("odv2-vis"); });
+    }
+    if("IntersectionObserver" in window){ var fo = new IntersectionObserver(function(es){ if(!es[0].isIntersecting) return; fo.disconnect();
+        /* 페이지가 아직 열리는 중이면 다 열린 뒤 여유 있을 때 넣음. 스크롤을 시작하면 바로 넣음 */
+        if(window.pageYOffset > 40){ fill(); return; }
+        var once = function(){ window.removeEventListener("scroll", once); fill(); };
+        window.addEventListener("scroll", once, { passive:true });
+        var later = function(){ setTimeout(function(){ if(window.requestIdleCallback) requestIdleCallback(fill, { timeout:2500 }); else fill(); }, 900); };
+        if(document.readyState === "complete") later(); else window.addEventListener("load", later);
+      }, { rootMargin:"2500px 0px" }); fo.observe(w); }
+    else fill();
+    window.addEventListener("hashchange", fill);
+    document.addEventListener("click", function(e){ if(e.target.closest && e.target.closest('a[href*="prod_detail_detail"], ._detail')) fill(); }, true);
     var cm = document.querySelector("#prod_detail ._categorize_mobile"), cp = document.querySelector("#prod_detail .categorize.review-box"), cat = vis(cm) ? cm : (vis(cp) ? cp : (cm || cp)), s = null;
     if(cat){ s = document.createElement("div"); s.className = "odv2 odv2-s"; s.innerHTML = '<div class="pdp">' + part("SUM", "DETAIL") + "</div>"; cat.parentNode.insertBefore(s, cat); }
     document.documentElement.classList.add("odv2-on");
@@ -4990,7 +5011,6 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
       e.preventDefault(); e.stopPropagation();
       window.scrollTo({ top: el.getBoundingClientRect().top + window.pageYOffset - topOff() - 8, behavior:"smooth" });
     }, true);
-    motion(w);
   }
   /* 구매 영역: 인체적용시험 박스 새 디자인 + 비회원 첫 구매 배너 */
   var styled = false;
