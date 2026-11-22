@@ -1,3 +1,24 @@
+<script>
+/* 성능: 새 디자인 영역(.odv2) 안에서 일어나는 숫자 카운트·모션·진행 표시 변화는 기존 감시 코드들이 다시 훑지 않게 걸러 줌
+   (그 영역은 기존 코드가 손대지 않는 곳이라 결과는 같고, 불필요한 재검사만 줄어듦) */
+(function(){
+  var MO = window.MutationObserver; if(!MO || MO.__odf) return;
+  function skip(r){
+    var t = r.target; if(t && t.nodeType === 3) t = t.parentNode;
+    if(!t || !t.closest) return false;
+    if(r.type !== "childList") return !!t.closest(".odv2");
+    return !!t.closest(".odv2 [data-count], .odv2 #dxProg, .odv2 .odrs-avg");
+  }
+  function W(cb){
+    return new MO(function(recs, obs){
+      var keep = [], i; for(i = 0; i < recs.length; i++) if(!skip(recs[i])) keep.push(recs[i]);
+      if(keep.length) cb.call(this, keep, obs);
+    });
+  }
+  W.prototype = MO.prototype; W.__odf = 1;
+  try{ window.MutationObserver = W; }catch(e){}
+})();
+</script>
 <script>window.__OD_V2_ALL = true; (function(){ try{ var q = /[?&]od_v2=([01])/.exec(location.search); if(q) localStorage.setItem("od_v2", q[1]); }catch(e){} })(); window.__odV2 = function(){ try{ var v = localStorage.getItem("od_v2"); if(v === "0") return false; return !!window.__OD_V2_ALL || v === "1"; }catch(e){ return !!window.__OD_V2_ALL; } };</script>
 <style>
 /* 새 디자인이 붙기 전에 예전 화면이 잠깐 보이는 것 방지. 스크립트가 못 불러와져도 3초 뒤에는 CSS만으로 다시 보임 */
@@ -4939,10 +4960,10 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
     if(!d || !pg) return;
     var chs = [].slice.call(d.querySelectorAll(".dz[data-ch]")), toc = d.querySelector(".dz-toc"), tk = 0;
     function up(){ tk = 0; if(!vis(d)) return; var r = d.getBoundingClientRect(), vh = window.innerHeight;
-      w.style.setProperty("--odtop", topOff() + "px");
-      var on = toc && toc.getBoundingClientRect().bottom < 140 && r.bottom > vh * .6; pg.classList.toggle("on", !!on);
-      var p = Math.min(1, Math.max(0, (-r.top) / (r.height - vh))); bar.style.width = (p * 100).toFixed(1) + "%";
-      var cur = chs[0]; chs.forEach(function(c){ if(c.getBoundingClientRect().top < vh * .45) cur = c; }); if(cur) t.textContent = cur.getAttribute("data-ch"); }
+      var now = Date.now(); if(!up.__t || now - up.__t > 400){ up.__t = now; var to = topOff() + "px"; if(up.__o !== to){ up.__o = to; w.style.setProperty("--odtop", to); } }
+      var on = !!(toc && toc.getBoundingClientRect().bottom < 140 && r.bottom > vh * .6); if(pg.__on !== on){ pg.__on = on; pg.classList.toggle("on", on); }
+      var p = Math.min(1, Math.max(0, (-r.top) / (r.height - vh))), pw = (p * 100).toFixed(0) + "%"; if(bar.__w !== pw){ bar.__w = pw; bar.style.width = pw; }
+      var cur = chs[0]; chs.forEach(function(c){ if(c.getBoundingClientRect().top < vh * .45) cur = c; }); var lab = cur ? cur.getAttribute("data-ch") : ""; if(lab && t.__t !== lab){ t.__t = lab; t.textContent = lab; } }
     function req(){ if(!tk) tk = requestAnimationFrame(up); }
     window.addEventListener("scroll", req, { passive:true }); window.addEventListener("resize", req); up();
   }
