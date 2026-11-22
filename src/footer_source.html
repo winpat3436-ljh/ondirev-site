@@ -71,6 +71,7 @@
       if(!/32,?000/.test(n.nodeValue)) continue;
       var el=n.parentElement;
       if(!el||/^(SCRIPT|STYLE|NOSCRIPT|TEXTAREA)$/.test(el.tagName)) continue;   /* 코드 안의 글자는 가격이 아님 */
+      if(el.closest('.odv2')) continue;   /* 새 디자인 영역에는 덧붙이지 않음 */
       if(el.nextElementSibling&&el.nextElementSibling.hasAttribute('data-mh')) continue;
       var tag=document.createElement('div');
       tag.setAttribute('data-mh','1');
