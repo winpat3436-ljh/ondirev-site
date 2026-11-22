@@ -5302,7 +5302,7 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
     else{
       var c=I.h[0], pass=Math.min(100,Math.max(4,Math.round((CYCLE-Math.max(I.left,0))/CYCLE*100)));
       s+='<div class="cd now"><small>지금 내 방향 · '+fmt(c.d)+' 체크</small><div class="dn"><b>'+esc(c.k)+'</b><span>'+esc(c.s)+'</span></div>'
-        +(I.left>0?'<div class="dd2"><div class="r"><span>다음 체크까지</span><b>D-'+I.left+' · '+md(I.nxt)+'</b></div><div class="bar"><i style="width:'+pass+'%"></i></div><p>'+(remind()?'🔔 사이트 알림 받는 중 · 4주가 지나면 접속할 때 알려 드려요':'🔕 재체크 알림 꺼짐')+'</p></div>'
+        +(I.left>0?'<div class="dd2"><div class="r"><span>다음 체크까지</span><b>D-'+I.left+' · '+md(I.nxt)+'</b></div><div class="bar"><i style="width:'+pass+'%"></i></div><p>'+'피부는 약 4주 주기로 달라져요. 그때 다시 체크해서 비교해 보세요.'+'</p></div>'
           :'<div class="due">🔔 재체크할 때예요. 4주 동안 방향이 바뀌었는지 확인해 보세요.</div>')+'</div>';
       s+='<div class="cd"><div class="t">지난 기록<span>'+I.h.length+'회</span></div><div style="margin-top:6px">'
         +I.h.map(function(r,i){ var nd=new Date(+pd(r.d)+CYCLE*DAY);
