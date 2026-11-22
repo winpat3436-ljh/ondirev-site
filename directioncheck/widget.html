@@ -34,7 +34,8 @@
 .odv-root .pop.d3{animation-delay:.15s}
 @keyframes odv-pop{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .odv-root .compass{position:relative;margin:0 auto}
-.odv-root .compass>svg{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);overflow:visible;filter:drop-shadow(0 10px 22px rgba(27,58,92,.10))}
+.odv-root .compass>svg{position:absolute;left:15%;top:15%;overflow:visible;shape-rendering:geometricPrecision}
+.odv-root .compass>svg>circle:first-of-type{filter:drop-shadow(0 10px 22px rgba(27,58,92,.10))}
 .odv-root .compass .needle{transform-box:view-box;transform-origin:150px 150px;transition:transform .95s cubic-bezier(.3,1.45,.5,1)}
 .odv-root .compass .needle.wob{animation:odv-wob 3.4s ease-in-out infinite;transition:none}
 @keyframes odv-wob{0%,100%{transform:rotate(-36deg)}50%{transform:rotate(30deg)}}
@@ -44,9 +45,7 @@
 .odv-root .lean{margin-top:2px;text-align:center;font-size:14.5px;line-height:1.45;min-height:40px}
 .odv-root .lean b{color:var(--navy);font-weight:700}
 .odv-root .lean small{display:block;font-size:12.5px;color:var(--soft)}
-@media (prefers-reduced-motion:reduce){.odv-root .compass .needle{transition:none}
-.odv-root .compass .needle.wob{animation:none}
-.odv-root .pop{animation:none}}
+@media (prefers-reduced-motion:reduce){.odv-root .pop{animation:none}}
 .odv-root .intro{min-height:calc(100dvh - 42px);display:flex;flex-direction:column;align-items:center;padding-top:20px}
 .odv-root .intro h1{margin:20px 0 0;font-size:28px;font-weight:700;letter-spacing:-.05em;line-height:1.38;text-align:center}
 .odv-root .intro h1 span{color:var(--navy)}
