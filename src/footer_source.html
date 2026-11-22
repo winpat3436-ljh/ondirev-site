@@ -202,7 +202,7 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
   function runDetail(){
     var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT),n,list=[];
     while((n=w.nextNode())){
-      var el=n.parentElement; if(!el || /^(SCRIPT|STYLE|TITLE)$/.test(el.tagName) || el.closest("nav,.mobile_slide_menu_container,.od-ptags,.od-buybar,.od-mbuy,.ondirev-root,.odpx,.odpx-ev")) continue;
+      var el=n.parentElement; if(!el || /^(SCRIPT|STYLE|TITLE)$/.test(el.tagName) || el.closest("nav,.mobile_slide_menu_container,.od-ptags,.od-buybar,.od-mbuy,.ondirev-root,.odpx,.odpx-ev,.odv2")) continue;
       var t=n.nodeValue.trim(); if(!t || t.length>40) continue;
       var rule=null; TAGS.forEach(function(r){ if(r.match.test(t)) rule=r; }); if(!rule || !shown(el)) continue;
       list.push({el:el, rule:rule, top:el.getBoundingClientRect().top+window.scrollY});
@@ -239,7 +239,7 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
     if(isDetail) return runDetail();
     var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT),n,done=0;
     while((n=w.nextNode())){
-      var el=n.parentElement; if(!el || /^(SCRIPT|STYLE)$/.test(el.tagName) || el.closest("header,nav,.mobile_slide_menu_container,.od-ptags")) continue;
+      var el=n.parentElement; if(!el || /^(SCRIPT|STYLE)$/.test(el.tagName) || el.closest("header,nav,.mobile_slide_menu_container,.od-ptags,.odv2")) continue;
       var t=n.nodeValue.trim(); if(t.length>40) continue;
       var rule=null; TAGS.forEach(function(r){ if(r.match.test(t)) rule=r; }); if(!rule) continue;
       if(el.getAttribute("data-od-pn")) continue;
@@ -909,7 +909,7 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
     var out=[];
     [root].concat([].slice.call(root.querySelectorAll("*"))).forEach(function(el){
       /* 페이지 번호(1 2 3)는 "켜진 칸 1개"라 별점으로 오인됨 → 제외 */
-      if(el.closest(".odst, .odrs, .odrv, .odrf, .odpx, select, option, .pagination, .paging-block, nav, [class*=paging]") || el.hasAttribute("data-odst-hide") || el.getAttribute("data-odst")) return;
+      if(el.closest(".odv2, .odst, .odrs, .odrv, .odrf, .odpx, select, option, .pagination, .paging-block, nav, [class*=paging]") || el.hasAttribute("data-odst-hide") || el.getAttribute("data-odst")) return;
       if(!vis(el)) return;
       var v=readGroup(el); if(v<0) return;
       if(out.some(function(o){ return o.el.contains(el) || el.contains(o.el); })) return;
@@ -1017,7 +1017,7 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
   /* 리뷰 사진 썸네일 찾기: 리뷰 영역 안의 작은 정사각형 이미지(사진 칸) */
   function enlargePhotos(sec){
     [].forEach.call(sec.querySelectorAll("img, div, span, a, li"),function(el){
-      if(el.hasAttribute("data-odph") || el.closest(".odrs, .odrv, .odrv-view, .odst")) return;
+      if(el.hasAttribute("data-odph") || el.closest(".odv2, .odrs, .odrv, .odrv-view, .odst")) return;
       var r=el.getBoundingClientRect(); if(r.width<40 || r.width>100 || Math.abs(r.width-r.height)>6) return;
       var isImg = el.tagName==="IMG" && !/svg|icon|star/i.test(el.src||"");
       var bg = el.tagName!=="IMG" && /url\(/.test(getComputedStyle(el).backgroundImage) && !el.querySelector("img");
