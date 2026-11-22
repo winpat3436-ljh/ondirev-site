@@ -521,12 +521,13 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
   }
   function findEditors(){
     return [].slice.call(document.querySelectorAll("textarea, [contenteditable='true']")).filter(function(ed){
-      if(ed.closest(".odrv") || ed.getAttribute("data-odrv") || !visible(ed)) return false;
+      if(ed.closest(".odrv") || ed.getAttribute("data-odrv")) return false;
       /* 남의 리뷰를 열었을 때 나오는 "댓글" 입력칸은 제외 */
       if(/comment/i.test(ed.id||"") || ed.closest('[class*="comment"], [id*="comment"], li.list_review_inner')) return false;
       /* 아임웹 리뷰 작성 창은 아래 "리뷰 작성 창 통합"에서 처리 */
       if(ed.id==="review_modal_body" || ed.closest(".modal_add_review")) return false;
-      return !!reviewScope(ed);
+      /* 화면 크기를 재는 확인(visible)은 맨 마지막에: 대상이 아닌 입력칸 때문에 화면 계산을 강제로 일으키지 않게 함 */
+      return !!reviewScope(ed) && visible(ed);
     });
   }
 
@@ -1239,7 +1240,11 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
         if(m.type==="childList") [].forEach.call(m.addedNodes,function(nd){ if(!skip(nd)) roots.push(nd); });
         else if(!skip(m.target)) roots.push(m.target);
       });
-      if(roots.length){ roots.forEach(function(r){ try{ findGroups(r).forEach(restyle); }catch(e){} }); try{ cleanDropdown(); }catch(e){} }
+      if(roots.length){
+        /* 같은 묶음 안에서 겹치는 대상(같은 것, 또는 다른 대상 안에 들어 있는 것)은 한 번만 처리 */
+        if(roots.length>1) roots=roots.filter(function(r,i){ for(var j=0;j<roots.length;j++){ if(j!==i && (roots[j]===r ? j<i : roots[j].contains(r))) return false; } return true; });
+        roots.forEach(function(r){ try{ findGroups(r).forEach(restyle); }catch(e){} }); try{ cleanDropdown(); }catch(e){}
+      }
     }
     if(t) return; t=setTimeout(function(){ t=null; tick(); },200);
   }).observe(document.documentElement,{childList:true, subtree:true, attributes:true, attributeFilter:["style","class"]});
