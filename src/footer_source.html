@@ -5177,3 +5177,49 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
   .odv2 .kz-sx-quick b{ font-size:15px; font-weight:600; color:#1E2A3A; -webkit-text-fill-color:#1E2A3A; }
 </style>
 <!-- ===================== /V2 장바구니·검색 ===================== -->
+
+<!-- ===================== V2 Direction · Products 목록 ===================== -->
+<script>
+(function(){
+  if(!window.__odV2 || !window.__odV2()) return;
+  if(/[?&]idx=/.test(location.search)) return;
+  var m = /^\/(direction|directions|products|prdouct|IN)\/?$/.exec(location.pathname); if(!m) return;
+  var kind = /^direction/.test(m[1]) ? "dir" : "prod", BASE = "https://winpat3436-ljh.github.io/ondirev-site/dist/v2/", html = null, done = false;
+  function vis(e){ return e && e.offsetParent !== null; }
+  function part(a, b){ var i = html.indexOf("@@" + a + "@@"), j = html.indexOf("@@" + b + "@@"); return i < 0 || j < 0 ? "" : html.slice(i + a.length + 4, j); }
+  function wrap(inner){ var w = document.createElement("div"); w.className = "odv2 odv2-pg"; w.innerHTML = inner; return w; }
+  function mount(){
+    if(done || !html) return;
+    var all = [];
+    if(kind === "dir"){
+      var a = [].filter.call(document.querySelectorAll(".odd"), vis)[0]; if(!a) return;
+      var c = [].filter.call(document.querySelectorAll(".odc"), vis)[0];
+      done = true;
+      var w1 = wrap(part("DIR", "DIRC")); a.parentNode.insertBefore(w1, a.nextSibling); all.push(w1);
+      if(c){ var w2 = wrap(part("DIRC", "PROD")); c.parentNode.insertBefore(w2, c.nextSibling); all.push(w2); }
+    } else {
+      var s = [].filter.call(document.querySelectorAll(".section_wrap"), vis)[0]; if(!s) return;
+      done = true;
+      var w = wrap(part("PROD", "END")); s.parentNode.insertBefore(w, s); all.push(w);
+      var chips = [].slice.call(w.querySelectorAll(".pz-pv-chips button")), cards = [].slice.call(w.querySelectorAll(".pz-pv-grid > *"));
+      function pick(f){ chips.forEach(function(b){ b.classList.toggle("pz-on", b.getAttribute("data-f") === f); }); cards.forEach(function(x){ x.hidden = !(f === "ALL" || x.getAttribute("data-d") === f); }); }
+      chips.forEach(function(b){ b.addEventListener("click", function(){ pick(b.getAttribute("data-f")); }); });
+      pick(m[1] === "IN" ? "IN" : "ALL");
+    }
+    var st = document.createElement("div"); st.innerHTML = html.slice(0, html.indexOf("@@DIR@@")); while(st.firstChild) document.head.appendChild(st.firstChild);
+    document.documentElement.classList.add(kind === "dir" ? "odv2-dir" : "odv2-prod");
+    function bleed(){ all.forEach(function(el){ if(!vis(el)) return; el.style.marginLeft = "0px"; el.style.width = "auto"; var r = el.getBoundingClientRect(), cw = document.documentElement.clientWidth; if(r.left > .5 || Math.abs(r.width - cw) > 1){ el.style.marginLeft = (-r.left) + "px"; el.style.width = cw + "px"; } }); }
+    bleed(); window.addEventListener("resize", bleed); window.addEventListener("load", bleed); setTimeout(bleed, 1500);
+    var els = [].slice.call(document.querySelectorAll(".odv2 .pz-odrv, .odv2 .pz-od-up"));
+    function on(x){ x.classList.add("pz-odrv-on"); x.classList.add("pz-od-in"); x.classList.add("pz-in"); }
+    if("IntersectionObserver" in window){ var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ on(e.target); io.unobserve(e.target); } }); }, { rootMargin:"0px 0px -6% 0px", threshold:.08 }); els.forEach(function(x){ io.observe(x); }); }
+    else els.forEach(on);
+  }
+  function boot(){ mount(); if(done) return; var n = 0, iv = setInterval(function(){ mount(); if(done || ++n > 60) clearInterval(iv); }, 250); }
+  fetch(BASE + "pages.html?v=" + Math.floor(Date.now() / 60000)).then(function(r){ return r.ok ? r.text() : null; }).then(function(t){
+    if(!t) return; html = t;
+    if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot); else boot();
+  })["catch"](function(){});
+})();
+</script>
+<!-- ===================== /V2 Direction · Products ===================== -->
