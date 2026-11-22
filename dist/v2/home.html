@@ -13,8 +13,8 @@
 .odv2 table{border-collapse:separate;border-spacing:2px}.odv2 th,.odv2 td{padding:1px}.odv2 th{font-weight:700;text-align:center}
 .odv2 label{font-weight:inherit;margin:0}.odv2 span,.odv2 div,.odv2 section{font-family:inherit}
 .odv2 .hz-tcard span.hz-li{display:none}.odv2.is-li .hz-tcard span.hz-li{display:inline}.odv2.is-li .hz-tcard span.hz-lo{display:none}
-.odv2{--accent:#4B86B4;--navy:#1E2A3A;--line:rgba(30,42,58,.14);--mute:#6E8299;}.odv2-mv{overflow:hidden}
-html.odv2-home .section_wrap.visual_section,html.odv2-home .odh-story{display:none !important}
+.odv2{--accent:#4B86B4;--navy:#1E2A3A;--line:rgba(30,42,58,.14);--mute:#6E8299;--kakao:#FEE500;--kakao-ink:#191919;}.odv2-mv{overflow:hidden}
+html.odv2-home .section_wrap.visual_section,html.odv2-home .odh-story,html.odv2-home .odh-about,html.odv2-home .odh-product,html.odv2-home .odh-facts{display:none !important}
 .odv2 *{box-sizing: border-box;}
 .odv2 a{color: inherit; text-decoration: none;}
 .odv2 button{font-family: inherit; color: inherit; background: none; border: 0px; cursor: pointer; padding: 0px;}
@@ -33,6 +33,36 @@ html.odv2-home .section_wrap.visual_section,html.odv2-home .odh-story{display:no
 .odv2 .hz-bsd-q{letter-spacing: 0.02em; color: rgb(207, 230, 247); margin-top: 16px !important; font-size: 13px !important; font-weight: 500 !important;}
 .odv2 .hz-bsd-btn{margin-top: 30px !important; height: 40px !important; padding: 0px 22px !important; font-size: 12px !important; letter-spacing: 0.14em !important; border-color: rgba(255, 255, 255, 0.55) !important;}
 }
+@media (max-width: 760px){
+.odv2 .hz-odh-product{padding: 52px 0px 24px !important; background: linear-gradient(rgb(255, 255, 255) 0%, rgb(245, 248, 251) 100%) !important;}
+.odv2 .hz-odh-product .hz-odh-label{margin-bottom: 10px !important;}
+.odv2 .hz-odh-product .hz-odh-name{margin-top: 6px !important; font-size: 16px !important;}
+.odv2 .hz-odh-product .hz-odh-lead{color: rgb(74, 93, 115); margin-top: 6px !important; font-size: 13px !important;}
+.odv2 .hz-odh-card{background: rgb(255, 255, 255); border-radius: 22px; overflow: hidden; box-shadow: rgba(27, 58, 92, 0.45) 0px 18px 40px -28px; border: 1px solid rgb(230, 237, 244); margin-top: 24px !important; gap: 0px !important;}
+.odv2 .hz-odh-card .hz-odh-pic{background: rgb(207, 227, 242); aspect-ratio: 1 / 1 !important; border-radius: 0px !important;}
+.odv2 .hz-odh-card .hz-odh-pic img{object-position: 50% 50% !important;}
+.odv2 .hz-odh-product .hz-odh-card > div:last-child{border-top: 0px !important; padding: 18px 18px 20px !important;}
+.odv2 .hz-odh-product .hz-odh-card .hz-od-ptags{display: none !important;}
+.odv2 .hz-odh-card .hz-odh-kicker{display: inline-block; background: rgb(227, 236, 245); border-radius: 999px; padding: 4px 10px; font-size: 10.5px !important; letter-spacing: 0.1em !important; margin-bottom: 8px !important; color: rgb(27, 58, 92) !important;}
+.odv2 .hz-odh-card h3{font-size: 18px !important; margin-bottom: 6px !important; line-height: 1.35 !important;}
+.odv2 .hz-odh-card > div > p:not(.hz-cro-src){color: rgb(74, 93, 115); font-size: 13.5px !important; line-height: 1.65 !important; opacity: 1 !important;}
+.odv2 .hz-cro-proof{margin-top: 14px !important; border: 0px !important; display: grid !important; grid-template-columns: repeat(3, 1fr) !important; gap: 6px !important; max-width: none !important;}
+.odv2 .hz-cro-proof div{background: rgb(243, 247, 251); border-radius: 12px; padding: 10px 2px !important; border: 0px !important;}
+.odv2 .hz-cro-proof b{font-size: 16px !important; color: rgb(27, 58, 92) !important;}
+.odv2 .hz-cro-proof span{font-size: 10.5px !important;}
+.odv2 .hz-cro-src{text-align: center; font-size: 10px !important; margin-top: 6px !important;}
+.odv2 .hz-cro-price{padding-top: 14px; border-top: 1px solid rgb(238, 242, 246); margin-top: 16px !important; gap: 6px !important;}
+.odv2 .hz-cro-price b{font-size: 24px !important;}
+.odv2 .hz-cro-ctas{grid-template-columns: 1fr 1fr; margin-top: 12px !important; display: grid !important; gap: 8px !important;}
+.odv2 .hz-cro-ctas > a{height: 46px !important; font-size: 13.5px !important; letter-spacing: 0px !important;}
+.odv2 .hz-odh-facts{padding: 16px 0px 40px !important; background: rgb(245, 248, 251) !important;}
+.odv2 .hz-odh-facts .hz-odh-row{background: rgb(255, 255, 255); border-radius: 16px; padding: 4px 16px; display: block !important; border: 1px solid rgb(230, 237, 244) !important;}
+.odv2 .hz-odh-fact{align-items: center; justify-content: space-between; gap: 12px; text-align: left; display: flex !important; padding: 12px 0px !important;}
+.odv2 .hz-odh-fact + .hz-odh-fact{border-left: 0px !important; border-top: 1px solid rgb(238, 242, 246) !important;}
+.odv2 .hz-odh-fact .hz-odh-k{white-space: nowrap; color: rgb(110, 130, 153); font-size: 10px !important; letter-spacing: 0.14em !important; margin: 0px !important;}
+.odv2 .hz-odh-fact .hz-odh-v{text-align: right; font-weight: 600; font-size: 13.5px !important; margin: 0px !important;}
+.odv2 .hz-odh-fact p{display: none !important;}
+}
 @media (max-width: 380px){
 .odv2 .hz-cro-strip li{gap: 8px !important; padding: 9px 8px !important;}
 .odv2 .hz-cro-strip svg{width: 26px !important; height: 26px !important; padding: 5px !important;}
@@ -44,6 +74,10 @@ html.odv2-home .section_wrap.visual_section,html.odv2-home .odh-story{display:no
 .odv2 .hz-p1 .hz-sub,.odv2 .hz-p1 .hz-ptags,.odv2 .hz-p1 .hz-tlink{display: none !important;}
 .odv2 .hz-p1 .hz-h1{margin-bottom: 0px;}
 .odv2 .hz-p1 .hz-buy{margin-top: 44px;}
+}
+.odv2 .hz-dz-pw.hz-r{grid-template-columns: minmax(0px, 1fr) minmax(0px, 1fr);}
+@media (max-width: 760px){
+.odv2 .hz-dz-pw.hz-r{grid-template-columns: 1fr; gap: 24px;}
 }
 .odv2 .hz-mv{position: relative; overflow: hidden; background: rgb(185, 219, 236);}
 .odv2 .hz-track{display: grid;}
@@ -110,13 +144,60 @@ html.odv2-home .section_wrap.visual_section,html.odv2-home .odh-story{display:no
 .odv2 .hz-bsd-q{font-size: 16px;}
 .odv2 .hz-bsd::before{background: radial-gradient(rgba(8, 22, 44, 0.62), rgba(8, 22, 44, 0.25) 75%);}
 }
+.odv2 .hz-ck{max-width: 960px; background: rgb(30, 42, 58); color: rgb(255, 255, 255); border-radius: 20px; display: flex; align-items: center; gap: 28px; margin: 56px auto 0px !important; padding: 26px 30px !important;}
+.odv2 .hz-ck .hz-t{flex: 1 1 0%;}
+.odv2 .hz-ck .hz-k{font-size: 12px; letter-spacing: 0.3em; opacity: 0.6;}
+.odv2 .hz-ck b{display: block; font-size: 22px; font-weight: 600; margin-top: 6px !important;}
+.odv2 .hz-ck p{font-size: 13.5px; opacity: 0.7; margin-top: 4px !important;}
+.odv2 .hz-ck .hz-r{text-align: center;}
+.odv2 .hz-ck small{display: block; font-size: 12px; opacity: 0.7; margin-top: 8px !important;}
+.odv2 .hz-ckbtn{display: inline-flex; align-items: center; justify-content: center; height: 50px; border-radius: 999px; background: rgb(255, 255, 255); font-weight: 700; font-size: 15px; white-space: nowrap; transition: background 0.2s; padding: 0px 30px !important; color: rgb(30, 42, 58) !important;}
+.odv2 .hz-ckbtn:hover{background: rgb(232, 241, 249);}
+.odv2 .hz-ckmore{text-align: center; font-size: 13px; letter-spacing: 0.12em; margin-top: 22px !important;}
+.odv2 .hz-ckmore a{border-bottom: 1px solid rgba(30, 42, 58, 0.35); padding-bottom: 2px !important;}
+@media (max-width: 760px){
+.odv2 .hz-ck{flex-direction: column; align-items: stretch; text-align: left; gap: 16px; padding: 22px !important;}
+.odv2 .hz-ck b{font-size: 19px;}
+.odv2 .hz-ckbtn{width: 100%;}
+}
 .odv2 .hz-cro-strip{background: rgb(255, 255, 255); border-bottom: 1px solid var(--line);}
+.odv2 .hz-odx{display: grid; grid-template-columns: repeat(6, minmax(0px, 1fr)); gap: 12px; margin: 44px 0px 40px;}
+.odv2 .hz-odx-c{display: flex; flex-direction: column; align-items: center; text-align: center; padding: 22px 10px 20px; background: rgb(255, 255, 255); border: 1px solid rgb(227, 234, 242); border-radius: 16px; color: rgb(30, 42, 58); text-decoration: none; transition: border-color 0.2s, transform 0.2s;}
+.odv2 .hz-odx-c:hover{border-color: rgb(27, 58, 92); transform: translateY(-2px);}
+.odv2 .hz-odx-i svg{width: 28px; height: 28px; display: block;}
+.odv2 .hz-odx-i svg *{fill: none; stroke: rgb(27, 58, 92); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;}
+.odv2 .hz-odx-c b{margin-top: 10px; font-size: 18px; font-weight: 700; letter-spacing: 0.1em; color: rgb(27, 58, 92);}
+.odv2 .hz-odx-n{margin-top: 4px; font-size: 12.5px; font-weight: 600; color: rgb(51, 71, 91); word-break: keep-all;}
+.odv2 .hz-odx-d{margin-top: 6px; font-size: 12px; color: rgb(110, 130, 153); word-break: keep-all; line-height: 1.45;}
 .odv2 .hz-cro-strip ul{list-style: none; margin: 0px; padding: 0px; display: grid; grid-template-columns: repeat(4, 1fr);}
 .odv2 .hz-cro-strip li{display: flex; gap: 12px; align-items: center; padding: 22px 18px;}
 .odv2 .hz-cro-strip li + li{border-left: 1px solid var(--line);}
 .odv2 .hz-cro-strip svg{width: 26px; height: 26px; flex: 0 0 auto; fill: none; stroke: var(--accent); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;}
 .odv2 .hz-cro-strip b{display: block; font-size: 15px; font-weight: 600;}
 .odv2 .hz-cro-strip span{font-size: 12.5px; color: var(--mute);}
+.odv2 .hz-odh-cell-head svg *{stroke: rgb(27, 58, 92);}
+.odv2 .hz-odh-cell-head .hz-odh-key{color: rgb(27, 58, 92);}
+.odv2 .hz-cro-proof{display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin-top: 22px; max-width: 30em;}
+.odv2 .hz-cro-proof div{padding: 14px 4px; text-align: center;}
+.odv2 .hz-cro-proof div + div{border-left: 1px solid var(--line);}
+.odv2 .hz-cro-proof b{display: block; font-size: 21px; font-weight: 600; color: var(--accent); font-variant-numeric: tabular-nums;}
+.odv2 .hz-cro-proof span{font-size: 12.5px; color: var(--mute);}
+.odv2 .hz-cro-src{color: var(--mute); margin-top: 8px; font-size: 11.5px !important; opacity: 1 !important;}
+.odv2 .hz-cro-price{display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; margin-top: 22px;}
+.odv2 .hz-cro-price .hz-l{font-size: 13px; color: var(--accent); font-weight: 600;}
+.odv2 .hz-cro-price b{font-size: 30px; font-weight: 700; letter-spacing: -0.03em; font-variant-numeric: tabular-nums;}
+.odv2 .hz-cro-price s{font-size: 14px; color: rgb(154, 166, 179);}
+.odv2 .hz-cro-price em{font-style: normal; font-size: 16px; font-weight: 700; color: rgb(217, 72, 15);}
+.odv2 .hz-cro-ctas{display: flex; flex-flow: wrap; align-items: center; gap: 8px; margin-top: 20px;}
+.odv2 .hz-cro-ctas .hz-cro-kakao{height: 46px; font-size: 14px;}
+.odv2 .hz-odh .hz-cro-ctas a.hz-odh-btn{height: 46px;}
+.odv2 .hz-cro-kakao{display: flex; align-items: center; justify-content: center; height: 52px; border-radius: 999px; background: var(--kakao); font-weight: 700; font-size: 15px; padding: 0px 24px; white-space: nowrap; color: var(--kakao-ink) !important;}
+.odv2 .hz-cro-kakao:hover{filter: brightness(0.97);}
+.odv2 .hz-odh .hz-cro-res a.hz-odh-btn{flex: 0 0 auto; background: rgb(255, 255, 255) !important; color: rgb(30, 42, 58) !important; border-color: rgb(255, 255, 255) !important;}
+.odv2 .hz-cro-price.hz-inv{justify-content: center;}
+.odv2 .hz-cro-price.hz-inv .hz-l{color: rgb(142, 195, 238);}
+.odv2 .hz-cro-price.hz-inv s{color: rgb(129, 147, 168);}
+.odv2 .hz-cro-price.hz-inv em{color: rgb(255, 179, 122);}
 @media (max-width: 991px){
 .odv2 .hz-cro-strip{border-bottom: 0px; padding: 14px 0px 6px;}
 .odv2 .hz-cro-strip .hz-odh-in{padding: 0px 16px;}
@@ -127,6 +208,23 @@ html.odv2-home .section_wrap.visual_section,html.odv2-home .odh-story{display:no
 .odv2 .hz-cro-strip li > div{min-width: 0px;}
 .odv2 .hz-cro-strip b{display: block; font-size: 12.5px; line-height: 1.3; letter-spacing: -0.03em; white-space: nowrap; color: rgb(30, 42, 58);}
 .odv2 .hz-cro-strip span{display: block; font-size: 10.5px; line-height: 1.35; letter-spacing: -0.03em; margin-top: 1px; white-space: nowrap; color: rgb(110, 130, 153);}
+.odv2 .hz-odh-facts{padding-bottom: 48px;}
+.odv2 .hz-odh-fact{display: grid; grid-template-columns: 92px minmax(0px, 1fr); column-gap: 10px; align-items: baseline; padding: 16px 2px !important;}
+.odv2 .hz-odh-fact .hz-odh-k{grid-row: 1 / 3; line-height: 1.5; margin: 0px !important; font-size: 10px !important; letter-spacing: 0.16em !important;}
+.odv2 .hz-odh-fact .hz-odh-v{font-size: 15px !important; margin: 0px 0px 2px !important;}
+.odv2 .hz-odh-fact p{margin: 0px; font-size: 12.5px !important; line-height: 1.6 !important;}
+.odv2 .hz-odx{grid-template-columns: repeat(3, minmax(0px, 1fr)); gap: 8px; margin: 30px 0px 32px;}
+}
+@media (max-width: 760px){
+.odv2 .hz-odx-c{padding: 14px 4px 12px; border-radius: 12px;}
+.odv2 .hz-odx-i svg{width: 22px; height: 22px;}
+.odv2 .hz-odx-c b{margin-top: 6px; font-size: 14.5px; letter-spacing: 0.06em;}
+.odv2 .hz-odx-n{font-size: 11px; margin-top: 2px; letter-spacing: -0.03em;}
+.odv2 .hz-odx-d{display: none;}
+.odv2 .hz-cro-proof b{font-size: 18px;}
+.odv2 .hz-cro-price b{font-size: 27px;}
+.odv2 .hz-cro-ctas{max-width: none;}
+.odv2 .hz-cro-ctas > a{flex: 1 1 0px; min-width: 0px !important; padding: 0px 12px !important;}
 }
 @media (max-width: 991px){
 .odv2 .hz-slide{height: auto; aspect-ratio: 750 / 1180;}
@@ -163,7 +261,119 @@ html.odv2-home .section_wrap.visual_section,html.odv2-home .odh-story{display:no
 @media (max-width: 359px){
 .odv2 .hz-btn::after{display: none;}
 }
+.odv2 .hz-odh{--odh-ink: #1E2A3A; --odh-mute: #6E8299; --odh-accent: #4B86B4; --odh-line: rgba(30,42,58,.14); --odh-sans: "Pretendard Variable",Pretendard,"Apple SD Gothic Neo","Noto Sans KR",sans-serif; font-family: var(--odh-sans); color: var(--odh-ink); line-height: 1.6; letter-spacing: -0.01em; word-break: keep-all; -webkit-font-smoothing: antialiased; width: 100vw; margin-left: calc(50% - 50vw); margin-right: calc(50% - 50vw); overflow-x: hidden;}
+.odv2 .hz-odh *{box-sizing: border-box; margin: 0px; padding: 0px;}
+.odv2 .hz-odh a{color: inherit; text-decoration: none;}
 .odv2 .hz-odh-in{max-width: 1180px; margin: 0px auto; padding: 0px 24px;}
+.odv2 .hz-odh-label{font-weight: 400; font-size: 13px; letter-spacing: 0.32em; text-transform: uppercase; color: var(--odh-mute);}
+.odv2 .hz-odh-h2{font-weight: 600; font-size: clamp(26px, 3.2vw, 40px); line-height: 1.3; letter-spacing: -0.02em;}
+.odv2 .hz-odh-lead{font-size: clamp(15px, 1.2vw, 17px); line-height: 1.85; color: var(--odh-ink); opacity: 0.8;}
+.odv2 .hz-odh a.hz-odh-btn{align-items: center; justify-content: center; min-width: 150px; height: 40px; padding: 0px 26px; border-radius: 999px; font-size: 13px; letter-spacing: 0.12em; font-weight: 500; transition: background 0.2s, color 0.2s; display: inline-flex !important; background: rgb(30, 42, 58) !important; color: rgb(255, 255, 255) !important; border: 1px solid rgb(30, 42, 58) !important; text-decoration: none !important;}
+.odv2 .hz-odh a.hz-odh-btn:hover{background: rgb(255, 255, 255) !important; color: rgb(30, 42, 58) !important;}
+.odv2 .hz-odh-about .hz-odh-cta{display: flex; flex-flow: wrap; justify-content: center; align-items: center; gap: 12px;}
+.odv2 .hz-odh-about .hz-odh-cta a.hz-odh-btn-check::after{content: "→"; margin-left: 8px; font-weight: 400;}
+.odv2 .hz-odh-about .hz-odh-cta a.hz-odh-btn-check:active{background: rgb(255, 255, 255) !important; color: rgb(30, 42, 58) !important;}
+.odv2 .hz-odh-about{background: linear-gradient(rgb(250, 251, 253) 0%, rgb(237, 242, 247) 100%); padding: 96px 0px 104px;}
+.odv2 .hz-odh-about .hz-odh-head{max-width: 640px; margin: 0px auto 64px; text-align: center;}
+.odv2 .hz-odh-about .hz-odh-label{margin-bottom: 22px;}
+.odv2 .hz-odh-about .hz-odh-h2{margin-bottom: 18px;}
+.odv2 .hz-odh-axes{display: grid; grid-template-columns: repeat(3, 1fr); gap: 0px clamp(24px, 4vw, 64px);}
+.odv2 .hz-odh-axis{display: flex; flex-direction: column;}
+.odv2 .hz-odh-cell{padding: 36px 0px;}
+.odv2 .hz-odh-axis .hz-odh-cell + .hz-odh-cell{border-top: 1px solid var(--odh-line); position: relative;}
+.odv2 .hz-odh-axis .hz-odh-cell + .hz-odh-cell::before{content: ""; position: absolute; top: -3px; left: 50%; width: 5px; height: 5px; margin-left: -2.5px; border-radius: 50%; background: var(--odh-accent);}
+.odv2 .hz-odh-cell-head{display: flex; align-items: center; gap: 14px; margin-bottom: 12px;}
+.odv2 .hz-odh-cell-head svg{width: 30px; height: 30px; flex: 0 0 auto;}
+.odv2 .hz-odh-cell-head svg *{fill: none; stroke: var(--odh-accent); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;}
+.odv2 .hz-odh-cell-head .hz-odh-key{font-weight: 600; font-size: clamp(19px, 1.7vw, 24px); letter-spacing: 0.12em; color: var(--odh-accent);}
+.odv2 .hz-odh-cell-head .hz-odh-name{font-weight: 500; font-size: 15px;}
+.odv2 .hz-odh-cell p{font-size: 14.5px; line-height: 1.85; opacity: 0.85;}
+.odv2 .hz-odh-about .hz-odh-cta{text-align: center; margin-top: 56px;}
+@media (max-width: 860px){
+.odv2 .hz-odh-about{padding: 56px 0px 64px;}
+.odv2 .hz-odh-about .hz-odh-head{margin-bottom: 36px;}
+.odv2 .hz-odh-axes{grid-template-columns: 1fr; gap: 0px;}
+.odv2 .hz-odh-axis{flex-direction: row; align-items: stretch;}
+.odv2 .hz-odh-axis + .hz-odh-axis{border-top: 1px solid var(--odh-line);}
+.odv2 .hz-odh-cell{flex: 1 1 0px; min-width: 0px; padding: 22px 0px;}
+.odv2 .hz-odh-axis .hz-odh-cell + .hz-odh-cell{border-top: 0px; border-left: 1px solid var(--odh-line); padding-left: 18px;}
+.odv2 .hz-odh-axis .hz-odh-cell:first-child{padding-right: 18px;}
+.odv2 .hz-odh-axis .hz-odh-cell + .hz-odh-cell::before{top: 50%; left: -3px; margin: -2.5px 0px 0px;}
+.odv2 .hz-odh-cell-head{gap: 8px; margin-bottom: 8px; flex-wrap: wrap;}
+.odv2 .hz-odh-cell-head svg{width: 22px; height: 22px;}
+.odv2 .hz-odh-cell-head .hz-odh-key{font-size: 17px; letter-spacing: 0.06em;}
+.odv2 .hz-odh-cell-head .hz-odh-name{font-size: 12.5px; letter-spacing: -0.02em; width: 100%; padding-left: 30px; margin-top: -4px;}
+.odv2 .hz-odh-cell p{font-size: 12.5px; line-height: 1.65; letter-spacing: -0.02em;}
+.odv2 .hz-odh-cell p br{display: none;}
+.odv2 .hz-odh-about .hz-odh-cta{margin-top: 40px;}
+}
+.odv2 .hz-odh-product{background: rgb(255, 255, 255); padding: 96px 0px 64px; text-align: center;}
+.odv2 .hz-odh-product .hz-odh-label{margin-bottom: 22px;}
+.odv2 .hz-odh-product .hz-odh-h2 b{font-weight: 600; color: var(--odh-accent); letter-spacing: 0.08em; margin-right: 0.25em;}
+.odv2 .hz-odh-product .hz-odh-name{margin-top: 10px; font-weight: 400; font-size: clamp(18px, 2vw, 26px); letter-spacing: 0.06em;}
+.odv2 .hz-odh-product .hz-odh-lead{margin-top: 14px;}
+.odv2 .hz-odh-card{display: grid; grid-template-columns: 1fr 1fr; gap: clamp(32px, 6vw, 96px); align-items: center; max-width: 1000px; margin: 64px auto 0px; text-align: left;}
+.odv2 .hz-odh-card .hz-odh-pic{aspect-ratio: 1 / 1; overflow: hidden; background: rgb(207, 227, 242);}
+.odv2 .hz-odh-card .hz-odh-pic img{display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);}
+.odv2 .hz-odh-card a.hz-odh-pic:hover img{transform: scale(1.03);}
+.odv2 .hz-odh-card .hz-odh-kicker{font-size: 13px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--odh-accent); margin-bottom: 14px;}
+.odv2 .hz-odh-card h3{font-weight: 600; font-size: clamp(20px, 2vw, 26px); line-height: 1.4; margin-bottom: 14px;}
+.odv2 .hz-odh-card p{font-size: 15px; line-height: 1.85; opacity: 0.85; max-width: 30em;}
+.odv2 .hz-odh-card .hz-odh-cta{margin-top: 28px;}
+.odv2 .hz-odh-product .hz-odh-card > div:last-child{border-top: 1px solid rgb(30, 42, 58); padding-top: 16px;}
+.odv2 .hz-odh-product .hz-odh-card .hz-odh-kicker{font-size: 12px; letter-spacing: 0.14em; margin-bottom: 8px;}
+.odv2 .hz-odh-product .hz-odh-card h3{margin-bottom: 12px;}
+.odv2 .hz-odh-product .hz-odh-card .hz-od-ptags{display: flex !important; flex-flow: column !important; gap: 0px !important; margin: 0px 0px 18px !important;}
+.odv2 .hz-odh-product .hz-odh-card .hz-od-ptag{display: flex !important; justify-content: space-between !important; align-items: center !important; width: 100% !important; height: auto !important; border-width: 0px 0px 1px !important; border-style: none none solid !important; border-color: currentcolor currentcolor rgb(227, 234, 242) !important; border-image: none !important; border-radius: 0px !important; background: none !important; box-shadow: none !important; padding: 9px 0px !important; margin: 0px !important; font-size: 13.5px !important; color: rgb(30, 42, 58) !important; -webkit-text-fill-color: rgb(30, 42, 58) !important;}
+.odv2 .hz-odh-product .hz-odh-card .hz-od-ptag svg{width: 13px !important; height: 13px !important;}
+.odv2 .hz-odh-product .hz-odh-card .hz-od-ptag svg path{stroke: rgb(75, 134, 180) !important;}
+.odv2 .hz-odh-product .hz-odh-card .hz-odh-cta{margin-top: 22px;}
+@media (max-width: 760px){
+.odv2 .hz-odh-product{padding: 64px 0px 72px;}
+.odv2 .hz-odh-card{grid-template-columns: 1fr; gap: 28px; margin-top: 40px;}
+}
+.odv2 .hz-odh-facts{background: rgb(255, 255, 255); padding: 0px 0px 104px;}
+.odv2 .hz-odh-facts .hz-odh-row{display: grid; grid-template-columns: repeat(3, 1fr); max-width: 1000px; margin: 0px auto; border-top: 1px solid var(--odh-line); border-bottom: 1px solid var(--odh-line);}
+.odv2 .hz-odh-fact{padding: 36px clamp(20px, 3vw, 40px);}
+.odv2 .hz-odh-fact + .hz-odh-fact{border-left: 1px solid var(--odh-line);}
+.odv2 .hz-odh-fact .hz-odh-k{font-size: 12px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--odh-mute); margin-bottom: 12px;}
+.odv2 .hz-odh-fact .hz-odh-v{font-weight: 600; font-size: clamp(17px, 1.5vw, 21px); line-height: 1.4; margin-bottom: 8px;}
+.odv2 .hz-odh-fact p{font-size: 14px; line-height: 1.8; opacity: 0.8;}
+@media (max-width: 760px){
+.odv2 .hz-odh-facts{padding-bottom: 72px;}
+.odv2 .hz-odh-facts .hz-odh-row{grid-template-columns: 1fr;}
+.odv2 .hz-odh-fact + .hz-odh-fact{border-left: 0px; border-top: 1px solid var(--odh-line);}
+.odv2 .hz-odh-fact{padding: 26px 4px;}
+}
+.odv2 .hz-odh-story{background: linear-gradient(rgb(250, 251, 253) 0%, rgb(230, 237, 245) 100%); padding: 96px 0px 104px;}
+.odv2 .hz-odh-story .hz-odh-grid{display: grid; grid-template-columns: 1fr 1fr; gap: clamp(32px, 6vw, 96px); align-items: center;}
+.odv2 .hz-odh-story .hz-odh-visual{aspect-ratio: 1 / 1; overflow: hidden; background: rgb(12, 21, 38);}
+.odv2 .hz-odh-story .hz-odh-visual img{display: block; width: 100%; height: 100%; object-fit: cover;}
+.odv2 .hz-odh-story .hz-odh-label{margin-bottom: 22px;}
+.odv2 .hz-odh-story .hz-odh-h2{margin-bottom: 22px;}
+.odv2 .hz-odh-story p{font-size: clamp(15px, 1.15vw, 17px); line-height: 1.9; opacity: 0.85; max-width: 34em;}
+.odv2 .hz-odh-story p + p{margin-top: 18px;}
+.odv2 .hz-odh-story .hz-odh-cta{margin-top: 36px;}
+@media (max-width: 860px){
+.odv2 .hz-odh-story{padding: 64px 0px 72px;}
+.odv2 .hz-odh-story .hz-odh-grid{grid-template-columns: 1fr; gap: 32px;}
+.odv2 .hz-odh-story .hz-odh-visual{aspect-ratio: 4 / 3;}
+}
+.odv2 .hz-od-ptags{display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0px 4px; font-family: "Pretendard Variable", Pretendard, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;}
+.odv2 .hz-od-ptag{display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0px 9px 0px 8px; border-radius: 999px; background: rgb(241, 246, 251); border: 1px solid rgba(27, 58, 92, 0.14); font-size: 12px; font-weight: 600; letter-spacing: -0.01em; line-height: 1; white-space: nowrap;}
+.odv2 .hz-od-ptag,.odv2 .hz-od-ptag *{color: rgb(27, 58, 92) !important; -webkit-text-fill-color: rgb(27, 58, 92) !important;}
+.odv2 .hz-od-ptag svg{width: 12px; height: 12px; flex: 0 0 auto;}
+.odv2 .hz-od-ptag svg path{stroke: rgb(75, 134, 180);}
+.odv2 .hz-od-ptags.hz-is-hero{gap: 8px; margin: 14px 0px 22px;}
+.odv2 .hz-od-ptags.hz-is-hero .hz-od-ptag{height: 30px; padding: 0px 13px 0px 12px; gap: 5px; background: rgba(255, 255, 255, 0.42); border: 1px solid rgba(30, 42, 58, 0.22); backdrop-filter: blur(6px); font-size: 13.5px; font-weight: 500; letter-spacing: 0.01em; box-shadow: none;}
+.odv2 .hz-od-ptags.hz-is-hero .hz-od-ptag,.odv2 .hz-od-ptags.hz-is-hero .hz-od-ptag *{color: rgb(30, 42, 58) !important; -webkit-text-fill-color: rgb(30, 42, 58) !important;}
+.odv2 .hz-od-ptags.hz-is-hero .hz-od-ptag svg{width: 13px; height: 13px;}
+.odv2 .hz-od-ptags.hz-is-hero .hz-od-ptag svg path{stroke: rgb(75, 134, 180);}
+@media (max-width: 760px){
+.odv2 .hz-od-ptags.hz-is-hero{gap: 6px; margin: 10px 0px 16px;}
+.odv2 .hz-od-ptags.hz-is-hero .hz-od-ptag{height: 26px; padding: 0px 10px 0px 9px; font-size: 12px;}
+.odv2 .hz-od-ptags.hz-is-hero .hz-od-ptag svg{width: 11px; height: 11px;}
+}
 </style>@@MV@@<section class="hz-mv" id="hzmv" aria-roledescription="carousel" aria-label="메인 비주얼">
   <div class="hz-track" id="hztrack">
     <div class="hz-slide hz-p1 hz-on" aria-label="1 / 2">
@@ -202,4 +412,58 @@ html.odv2-home .section_wrap.visual_section,html.odv2-home .odh-story{display:no
 <h2 class="hz-bsd-h2 hz-odrv">올바른 방향이<br>올바른 결과를 만듭니다</h2>
 <p class="hz-bsd-t hz-odrv">온디레브는 피부에 작용하는 성분의 방향을 연구합니다. 피부에 필요한 성분은 필요한 만큼 전달하고, 불필요한 부담과 자극은 덜어냅니다.</p>
 <p class="hz-bsd-q hz-odrv">화려한 약속 대신, 정확한 방향을 제안합니다.</p>
-<a class="hz-bsd-btn hz-odrv" href="/brand">브랜드 스토리 보기</a></div></section>@@END@@
+<a class="hz-bsd-btn hz-odrv" href="/brand">브랜드 스토리 보기</a></div></section>@@ABOUT@@<section class="hz-odh hz-odh-about">
+  <div class="hz-odh-in">
+    <div class="hz-odh-head">
+      <div class="hz-odh-label hz-od-up hz-odrv" style="transition-delay:0s">About Ondirev</div>
+      <h2 class="hz-odh-h2 hz-od-up hz-odrv" style="transition-delay:.1s">피부의 올바른 방향을 설계합니다</h2>
+      <p class="hz-odh-lead hz-od-up hz-odrv" style="transition-delay:.2s">성분이 피부에 작용하는 방향을 6가지로 나눴어요.</p>
+    </div>
+
+    <div class="hz-odx"><a class="hz-odx-c" href="/direction"><span class="hz-odx-i"><svg viewBox="0 0 34 34"><path d="M5 23h24"></path><path d="M17 5v14"></path><path d="M12 14l5 5 5-5"></path></svg></span><b>IN</b><span class="hz-odx-n">수분 · 영양 공급</span><span class="hz-odx-d">채우고 붙잡아 둡니다</span></a><a class="hz-odx-c" href="/direction"><span class="hz-odx-i"><svg viewBox="0 0 34 34"><path d="M5 23h24"></path><path d="M17 19V5"></path><path d="M12 10l5-5 5 5"></path></svg></span><b>OUT</b><span class="hz-odx-n">노폐물 · 각질 제거</span><span class="hz-odx-d">쌓인 것을 비웁니다</span></a><a class="hz-odx-c" href="/direction"><span class="hz-odx-i"><svg viewBox="0 0 34 34"><path d="M5 23h24"></path><path d="M8 17h18"></path></svg></span><b>ON</b><span class="hz-odx-n">장벽 · 보호 강화</span><span class="hz-odx-d">막을 세워 지킵니다</span></a><a class="hz-odx-c" href="/direction"><span class="hz-odx-i"><svg viewBox="0 0 34 34"><path d="M5 23h24"></path><path d="M8 9h18" stroke-dasharray="3 3"></path></svg></span><b>OFF</b><span class="hz-odx-n">클렌징</span><span class="hz-odx-d">깨끗이 지웁니다</span></a><a class="hz-odx-c" href="/direction"><span class="hz-odx-i"><svg viewBox="0 0 34 34"><path d="M5 25C11 25 13 13 17 13s6 12 12 12"></path></svg></span><b>UP</b><span class="hz-odx-n">리프팅 · 탄력</span><span class="hz-odx-d">탄력을 끌어올립니다</span></a><a class="hz-odx-c" href="/direction"><span class="hz-odx-i"><svg viewBox="0 0 34 34"><path d="M5 11C11 11 13 23 17 23s6-12 12-12"></path></svg></span><b>DOWN</b><span class="hz-odx-n">진정 · 쿨링</span><span class="hz-odx-d">열과 자극을 가라앉힙니다</span></a></div>
+
+    <div class="hz-ck hz-odrv"><div class="hz-t"><div class="hz-k">DIRECTION CHECK</div><b>여섯 방향 중, 지금 내 피부에 필요한 하나는?</b><p>10문항 · 약 3분 · 결과는 하나의 방향으로</p></div>
+<div class="hz-r"><a class="hz-ckbtn" href="/directioncheck">내 피부 방향 찾기 →</a><small>완료하면 가입 쿠폰 5,000원</small></div></div>
+<div class="hz-ckmore hz-odrv"><a href="/direction">6가지 방향 자세히 보기</a></div>
+  </div>
+</section>@@PRODUCT@@<section class="hz-odh hz-odh-product">
+  <div class="hz-odh-in">
+    <div class="hz-odh-label hz-od-up hz-odrv" style="transition-delay:0s">Product</div>
+    <h2 class="hz-odh-h2 hz-od-up hz-odrv" style="transition-delay:.1s"><b>IN</b>Line</h2>
+    <div class="hz-odh-name hz-od-up hz-odrv" style="transition-delay:.2s">Ripple Ectoin Serum</div>
+    <p class="hz-odh-lead hz-od-up hz-odrv" style="transition-delay:.3s">피부 안으로, 수분과 영양을 채우는 첫 번째 방향</p>
+
+    <div class="hz-odh-card">
+      <a class="hz-odh-pic hz-od-up hz-odrv" style="transition-delay:0s" href="https://www.ondirev.com/shop_view/?idx=1"><img src="https://winpat3436-ljh.github.io/ondirev-site/img/home/odh_d6c4f2c4.jpg" alt="온디레브 [IN] 리플 엑토인 세럼 50ml"></a>
+      <div>
+        <div class="hz-odh-kicker hz-od-up hz-odrv" style="transition-delay:.1s">IN · 수분 · 영양 공급</div>
+        <h3 class="hz-od-up hz-odrv" style="transition-delay:.2s">온디레브 [IN] 리플 엑토인 세럼 50ml</h3><div class="hz-od-ptags hz-odrv"><span class="hz-od-ptag">속보습<svg viewBox="0 0 12 12" fill="none"><path d="M6 10V2.5M2.8 5.6 6 2.4l3.2 3.2" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></span><span class="hz-od-ptag">수분 유지<svg viewBox="0 0 12 12" fill="none"><path d="M6 10V2.5M2.8 5.6 6 2.4l3.2 3.2" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></div>
+        <p class="hz-od-up hz-odrv" style="transition-delay:.3s">크기가 다른 히알루론산 8종이 각질층까지 수분을 채우고, 엑토인이 채운 수분을 붙잡아 둡니다. 물처럼 가볍게 스며드는 워터 세럼이에요.</p>
+        <div class="hz-cro-proof hz-od-up hz-odrv"><div><b>+25.15%</b><span>속보습</span></div><div><b>−12.54%</b><span>수분 손실량</span></div><div><b>0.00</b><span>피부 자극</span></div></div>
+        <p class="hz-cro-src hz-odrv">한국피부과학연구원 인체적용시험 · 1회 사용 직후 · 개인차가 있을 수 있어요.</p>
+        <div class="hz-cro-price hz-odrv"><span class="hz-l">첫 구매가</span><b>21,800원</b><s>32,000원</s><em>32%</em></div>
+        <div class="hz-odh-cta hz-cro-ctas hz-odrv"><a class="hz-cro-kakao" href="/shop_view/?idx=1">카카오 가입하고 구매</a><a class="hz-odh-btn" href="/shop_view/?idx=1">제품 보기</a></div>
+      </div>
+    </div>
+  </div>
+</section>@@FACTS@@<section class="hz-odh hz-odh-facts">
+  <div class="hz-odh-in">
+    <div class="hz-odh-row">
+      <div class="hz-odh-fact hz-od-up hz-odrv" style="transition-delay:0s">
+        <div class="hz-odh-k">Key ingredient</div>
+        <div class="hz-odh-v">엑토인 Ectoin</div>
+        <p>미생물이 스스로를 지키려 만드는 아미노산 유래 성분이에요.</p>
+      </div>
+      <div class="hz-odh-fact hz-od-up hz-odrv" style="transition-delay:.1s">
+        <div class="hz-odh-k">Direction</div>
+        <div class="hz-odh-v">IN · 첫 번째 방향</div>
+        <p>피부 안으로 수분을 채우는 IN 라인의 첫 제품이에요.</p>
+      </div>
+      <div class="hz-odh-fact hz-od-up hz-odrv" style="transition-delay:.2s">
+        <div class="hz-odh-k">Texture</div>
+        <div class="hz-odh-v">물결처럼 번지는 워터 세럼</div>
+        <p>묽은 제형이 끈적임 없이 스며들어요.</p>
+      </div>
+    </div>
+  </div>
+</section>@@END@@

@@ -5015,7 +5015,11 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
     vs.parentNode.insertBefore(mv, vs); vs.parentNode.insertBefore(sp, vs);
     var all = [mv, sp];
     var story = [].filter.call(document.querySelectorAll(".odh-story"), vis)[0];
-    if(story){ var bs = wrap("odv2-bsd", part("BSD", "END")); story.parentNode.insertBefore(bs, story.nextSibling); all.push(bs); }
+    if(story){ var bs = wrap("odv2-bsd", part("BSD", "ABOUT")); story.parentNode.insertBefore(bs, story.nextSibling); all.push(bs); }
+    [["odh-about", "ABOUT", "PRODUCT"], ["odh-product", "PRODUCT", "FACTS"], ["odh-facts", "FACTS", "END"]].forEach(function(x){
+      var o = [].filter.call(document.querySelectorAll("." + x[0]), vis)[0]; if(!o) return;
+      var n = wrap("odv2-" + x[0], part(x[1], x[2])); o.parentNode.insertBefore(n, o.nextSibling); all.push(n);
+    });
     document.documentElement.classList.add("odv2-home");
     /* 회원에게는 첫 구매가 대신 회원가 */
     if(!guest()){ var pr = mv.querySelector(".hz-price"); if(pr){ var sm = pr.querySelector("small"), b = pr.querySelector("b"), em = pr.querySelector("em"); if(sm) sm.textContent = "회원가"; if(b) b.textContent = "26,800원"; if(em) em.textContent = "16%"; } }
