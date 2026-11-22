@@ -5232,3 +5232,25 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
 })();
 </script>
 <!-- ===================== /V2 Direction · Products ===================== -->
+
+<!-- ===================== V2: 상품 링크에 마우스를 올리면 하얗게 바뀌는 것 방지 =====================
+     예전에 넣은 규칙(상품으로 가는 링크는 올리면 흰 배경)이 새 디자인 안의 링크에도 걸려서, 원래 모습을 고정해 둠 -->
+<script>
+(function(){
+  if(!window.__odV2 || !window.__odV2()) return;
+  function fix(){
+    [].forEach.call(document.querySelectorAll('.odv2 a[href*="idx=1"]:not([data-odfx])'), function(a){
+      if(a.matches(":hover")) return;
+      var cs = getComputedStyle(a);
+      a.style.setProperty("background", cs.backgroundColor === "rgba(0, 0, 0, 0)" && cs.backgroundImage === "none" ? "transparent" : cs.background, "important");
+      a.style.setProperty("color", cs.color, "important");
+      a.style.setProperty("-webkit-text-fill-color", cs.color, "important");
+      a.style.setProperty("border-color", cs.borderTopColor, "important");
+      a.setAttribute("data-odfx", "1");
+    });
+  }
+  var n = 0, iv = setInterval(function(){ fix(); if(++n > 40) clearInterval(iv); }, 300);
+  document.addEventListener("click", function(){ setTimeout(fix, 400); }, true);
+})();
+</script>
+<!-- ===================== /V2 링크 ===================== -->
