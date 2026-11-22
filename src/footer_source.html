@@ -4863,8 +4863,8 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
   function motion(w){
     var d = w.querySelector("#pdp-d"), pg = w.querySelector("#dxProg"), t = w.querySelector("#dxProgT"), bar = w.querySelector("#dxProgB");
     var IO = "IntersectionObserver" in window;
-    function show(x){ x.classList.add("in"); x.classList.add("odrv-on"); [].forEach.call(x.querySelectorAll("[data-count]"), function(c){ if(!c.closest("[data-replay]")) count(c); }); }
-    var els = [].slice.call(document.querySelectorAll(".odv2 [data-anim], .odv2 .odrv"));
+    function show(x){ x.classList.add("in"); x.classList.add("ozrv-on"); [].forEach.call(x.querySelectorAll("[data-count]"), function(c){ if(!c.closest("[data-replay]")) count(c); }); }
+    var els = [].slice.call(document.querySelectorAll(".odv2 [data-anim], .odv2 .ozrv"));
     if(IO){ var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ show(e.target); io.unobserve(e.target); } }); }, { rootMargin:"0px 0px -10% 0px", threshold:.12 }); els.forEach(function(x){ io.observe(x); }); }
     else els.forEach(show);
     [].forEach.call(document.querySelectorAll(".odv2 [data-replay]"), function(x){
