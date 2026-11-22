@@ -4899,6 +4899,9 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
     var cat = document.querySelector("#prod_detail .categorize.review-box"), s = null;
     if(cat){ s = document.createElement("div"); s.className = "odv2 odv2-s"; s.innerHTML = '<div class="pdp">' + part("SUM", "DETAIL") + "</div>"; cat.parentNode.insertBefore(s, cat); }
     document.documentElement.classList.add("odv2-on");
+    /* 화면 폭 전체 사용: 아임웹 좌우 여백만큼 바깥으로 넓힘 */
+    function bleed(){ [w, s].forEach(function(el){ if(!el || el.offsetParent === null) return; el.style.marginLeft = "0px"; el.style.width = "auto"; var r = el.getBoundingClientRect(), cw = document.documentElement.clientWidth; if(r.left > .5 || Math.abs(r.width - cw) > 1){ el.style.marginLeft = (-r.left) + "px"; el.style.width = cw + "px"; } }); }
+    bleed(); window.addEventListener("resize", bleed); window.addEventListener("load", bleed); setTimeout(bleed, 1500);
     /* 리뷰 수: 실제 탭의 숫자로 */
     var rv = document.querySelector('a[href="#prod_detail_review"]'), m = rv && /(\d+)/.exec(rv.textContent), ln = s && s.querySelector("[data-odv2-rv]");
     if(ln && m) ln.innerHTML = ln.innerHTML.replace(/리뷰\s*\d+개/, "리뷰 " + m[1] + "개");
