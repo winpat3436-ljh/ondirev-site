@@ -5386,3 +5386,12 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
 })();
 </script>
 <!-- ===================== /V2 내 방향 기록 ===================== -->
+
+<!-- V2: 모바일 상세 탭(리뷰·상세정보·Q&A) 높이 줄임 — 포토리뷰 포인트 배지는 모바일 탭에서만 숨김(리뷰 영역 안내는 그대로) -->
+<style>
+@media (max-width:991px){
+  html body .odtab{ padding:3px !important; margin-bottom:10px !important; }
+  html body .odtab > .odtab-i{ height:36px !important; min-height:0 !important; font-size:13px !important; line-height:1 !important; }
+  html body .odtab > .odtab-i .od-rvtag[data-rv]{ display:none !important; }
+}
+</style>
