@@ -748,11 +748,11 @@ const arrowR = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stro
 /* 나침반(단순형): 얇은 원 + 방향 점 6개 + 바늘. 방향 이름은 둘레에 글자만, 가리키는 방향만 네이비 알약으로 켠다. */
 function compass(W, o={}){
   const on = o.on ?? (coreDone()>0 ? show(dir) : null), lit = !!o.lit;
-  const R = W*0.43, s = W*0.70;
+  const R = W*0.43, s = Math.round(W*0.70/2)*2, off = (W - s)/2;
   const labels = Object.keys(BASE).map(k=>{ const a=BASE[k]*Math.PI/180; return `<span class="chip ${k===on?"on":""} ${lit&&k!==on?"dim":""}" style="left:${fx(W/2+Math.sin(a)*R)}px;top:${fx(W/2-Math.cos(a)*R)}px">${k}</span>`; }).join("");
   const dots = Object.keys(BASE).map(k=>{ const a=BASE[k]*Math.PI/180; return `<circle cx="${fx(150+Math.sin(a)*132)}" cy="${fx(150-Math.cos(a)*132)}" r="${k===on?6:3.5}" fill="${k===on?"#1B3A5C":"#C3D0DE"}"/>`; }).join("");
   return `<div class="compass" style="width:${W}px;height:${W}px">
-    <svg width="${s}" height="${s}" viewBox="0 0 300 300" role="img" aria-label="${on?`바늘이 ${on} 쪽을 가리키는 나침반`:"아직 방향이 정해지지 않은 나침반"}">
+    <svg width="${s}" height="${s}" style="left:${off}px;top:${off}px" viewBox="0 0 300 300" role="img" aria-label="${on?`바늘이 ${on} 쪽을 가리키는 나침반`:"아직 방향이 정해지지 않은 나침반"}">
       <circle cx="150" cy="150" r="132" fill="#FFFFFF" stroke="#DCE4ED" stroke-width="1.5"/>
       ${dots}
       <g class="needle ${o.wob?"wob":""}" id="needle" style="transform:rotate(${o.from ?? angle ?? 0}deg)">
