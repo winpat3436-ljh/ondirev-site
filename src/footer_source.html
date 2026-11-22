@@ -4994,3 +4994,52 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
 })();
 </script>
 <!-- ===================== /V2 ===================== -->
+
+<!-- ===================== V2 홈: 메인 비주얼(2장) + 혜택 띠 + 브랜드 스토리 =====================
+     · 내용은 dist/v2/home.html · 스위치는 맨 위 __OD_V2_ALL / ?od_v2=1 -->
+<script>
+(function(){
+  if(!window.__odV2 || !window.__odV2()) return;
+  if(!/^\/(home\/?)?$/.test(location.pathname) || /[?&](mode|idx)=/.test(location.search)) return;
+  var BASE = "https://winpat3436-ljh.github.io/ondirev-site/dist/v2/", html = null, done = false;
+  function vis(e){ return e && e.offsetParent !== null; }
+  function part(a, b){ var i = html.indexOf("@@" + a + "@@"), j = html.indexOf("@@" + b + "@@"); return i < 0 || j < 0 ? "" : html.slice(i + a.length + 4, j); }
+  function guest(){ try{ if(typeof window.__odIsGuest === "function") return !!window.__odIsGuest(); }catch(e){} return !document.body.classList.contains("loggedin"); }
+  function wrap(cls, inner){ var w = document.createElement("div"); w.className = "odv2 " + cls + (guest() ? "" : " is-li"); w.innerHTML = inner; return w; }
+  function mount(){
+    if(done || !html) return;
+    var vs = [].filter.call(document.querySelectorAll(".section_wrap.visual_section"), vis)[0]; if(!vs) return;
+    done = true;
+    var st = document.createElement("div"); st.innerHTML = html.slice(0, html.indexOf("@@MV@@")); while(st.firstChild) document.head.appendChild(st.firstChild);
+    var mv = wrap("odv2-mv", part("MV", "STRIP")), sp = wrap("odv2-strip", part("STRIP", "BSD"));
+    vs.parentNode.insertBefore(mv, vs); vs.parentNode.insertBefore(sp, vs);
+    var all = [mv, sp];
+    var story = [].filter.call(document.querySelectorAll(".odh-story"), vis)[0];
+    if(story){ var bs = wrap("odv2-bsd", part("BSD", "END")); story.parentNode.insertBefore(bs, story.nextSibling); all.push(bs); }
+    document.documentElement.classList.add("odv2-home");
+    /* 회원에게는 첫 구매가 대신 회원가 */
+    if(!guest()){ var pr = mv.querySelector(".hz-price"); if(pr){ var sm = pr.querySelector("small"), b = pr.querySelector("b"), em = pr.querySelector("em"); if(sm) sm.textContent = "회원가"; if(b) b.textContent = "26,800원"; if(em) em.textContent = "16%"; } }
+    function bleed(){ all.forEach(function(el){ if(!vis(el)) return; el.style.marginLeft = "0px"; el.style.width = "auto"; var r = el.getBoundingClientRect(), cw = document.documentElement.clientWidth; if(r.left > .5 || Math.abs(r.width - cw) > 1){ el.style.marginLeft = (-r.left) + "px"; el.style.width = cw + "px"; } }); }
+    bleed(); window.addEventListener("resize", bleed); window.addEventListener("load", bleed); setTimeout(bleed, 1500);
+    /* 등장 모션 */
+    var els = [].slice.call(document.querySelectorAll(".odv2 .hz-odrv"));
+    if("IntersectionObserver" in window){ var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add("hz-odrv-on"); io.unobserve(e.target); } }); }, { rootMargin:"0px 0px -8% 0px", threshold:.1 }); els.forEach(function(x){ io.observe(x); }); }
+    else els.forEach(function(x){ x.classList.add("hz-odrv-on"); });
+    /* 메인 비주얼 넘김 */
+    var track = mv.querySelector("#hztrack"), dots = [].slice.call(mv.querySelectorAll("#hzdots button")), i = 0, timer, sx = null;
+    if(!track) return;
+    function go(n){ i = (n + 2) % 2; [].forEach.call(track.children, function(sl, k){ sl.classList.toggle("hz-on", k === i); sl.setAttribute("aria-hidden", k === i ? "false" : "true"); }); dots.forEach(function(d, k){ d.setAttribute("aria-current", k === i ? "true" : "false"); }); }
+    function auto(){ clearInterval(timer); timer = setInterval(function(){ if(!document.hidden) go(i + 1); }, 5000); }
+    dots.forEach(function(d, k){ d.addEventListener("click", function(){ go(k); auto(); }); });
+    track.addEventListener("touchstart", function(e){ sx = e.touches[0].clientX; }, { passive:true });
+    track.addEventListener("touchend", function(e){ if(sx === null) return; var dx = e.changedTouches[0].clientX - sx; if(Math.abs(dx) > 40){ go(i + (dx < 0 ? 1 : -1)); auto(); } sx = null; });
+    go(0); auto();
+  }
+  function boot(){ mount(); if(done) return; var n = 0, iv = setInterval(function(){ mount(); if(done || ++n > 60) clearInterval(iv); }, 250); }
+  fetch(BASE + "home.html?v=" + Math.floor(Date.now() / 60000)).then(function(r){ return r.ok ? r.text() : null; }).then(function(tx){
+    if(!tx) return; html = tx;
+    if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot); else boot();
+  })["catch"](function(){});
+})();
+</script>
+<!-- ===================== /V2 홈 ===================== -->
