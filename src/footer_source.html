@@ -5262,7 +5262,7 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
     function bleed(){ all.forEach(function(el){ if(!vis(el)) return; el.style.marginLeft = "0px"; el.style.width = "auto"; var r = el.getBoundingClientRect(), cw = document.documentElement.clientWidth; if(r.left > .5 || Math.abs(r.width - cw) > 1){ el.style.marginLeft = (-r.left) + "px"; el.style.width = cw + "px"; } }); }
     bleed(); window.addEventListener("resize", bleed); window.addEventListener("load", bleed); setTimeout(bleed, 1500);
     var els = [].slice.call(document.querySelectorAll(".odv2 .pz-odrv, .odv2 .pz-od-up"));
-    function on(x){ x.classList.add("pz-odrv-on"); x.classList.add("pz-od-in"); x.classList.add("pz-in"); }
+    function on(x){ x.classList.add("pz-odrv-on"); x.classList.add("pz-od-in"); }
     if("IntersectionObserver" in window){ var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ on(e.target); io.unobserve(e.target); } }); }, { rootMargin:"0px 0px -6% 0px", threshold:.08 }); els.forEach(function(x){ io.observe(x); }); }
     else els.forEach(on);
   }
