@@ -5143,7 +5143,9 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
   function vis(e){ return e && e.offsetParent !== null; }
   function part(a, b){ var i = html.indexOf("@@" + a + "@@"), j = html.indexOf("@@" + b + "@@"); return i < 0 || j < 0 ? "" : html.slice(i + a.length + 4, j); }
   function guest(){ try{ if(typeof window.__odIsGuest === "function") return !!window.__odIsGuest(); }catch(e){} return !document.body.classList.contains("loggedin"); }
-  function wrap(cls, inner){ var w = document.createElement("div"); w.className = "odv2 " + cls + (guest() ? "" : " is-li"); w.innerHTML = inner; return w; }
+  function wrap(cls, inner){ var w = document.createElement("div"); w.className = "odv2 " + cls + (guest() ? "" : " is-li"); w.innerHTML = inner; pics(w); return w; }
+  /* 사진 묶음(picture)의 기본 주소를 지금 화면에 맞는 것으로 맞춰 둠: 아임웹의 사진 확인 코드가 기본 주소를 따로 한 번 더 받아서, 안 쓰는 큰 사진까지 내려받던 것 방지 */
+  function pics(w){ [].forEach.call(w.querySelectorAll("picture"), function(p){ var im = p.querySelector("img"), ss = p.querySelectorAll("source"); if(!im) return; for(var i = 0; i < ss.length; i++){ var m = ss[i].getAttribute("media"), u = ss[i].getAttribute("srcset"); if(!u || /[\s,]/.test(u) || (m && !(window.matchMedia && window.matchMedia(m).matches))) continue; var fb = im.getAttribute("src"); if(fb !== u){ im.onerror = function(){ im.onerror = null; im.src = fb; }; im.setAttribute("src", u); } break; } }); }
   function mount(){
     if(done || !html) return;
     var vs = [].filter.call(document.querySelectorAll(".section_wrap.visual_section"), vis)[0]; if(!vs) return;
