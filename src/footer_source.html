@@ -5021,8 +5021,6 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
       var n = wrap("odv2-" + x[0], part(x[1], x[2])); o.parentNode.insertBefore(n, o.nextSibling); all.push(n);
     });
     document.documentElement.classList.add("odv2-home");
-    /* 회원에게는 첫 구매가 대신 회원가 */
-    if(!guest()){ var pr = mv.querySelector(".hz-price"); if(pr){ var sm = pr.querySelector("small"), b = pr.querySelector("b"), em = pr.querySelector("em"); if(sm) sm.textContent = "회원가"; if(b) b.textContent = "26,800원"; if(em) em.textContent = "16%"; } }
     function bleed(){ all.forEach(function(el){ if(!vis(el)) return; el.style.marginLeft = "0px"; el.style.width = "auto"; var r = el.getBoundingClientRect(), cw = document.documentElement.clientWidth; if(r.left > .5 || Math.abs(r.width - cw) > 1){ el.style.marginLeft = (-r.left) + "px"; el.style.width = cw + "px"; } }); }
     bleed(); window.addEventListener("resize", bleed); window.addEventListener("load", bleed); setTimeout(bleed, 1500);
     /* 등장 모션 */
