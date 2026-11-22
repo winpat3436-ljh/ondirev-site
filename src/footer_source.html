@@ -5387,12 +5387,8 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
 </script>
 <!-- ===================== /V2 내 방향 기록 ===================== -->
 
-<!-- V2: 모바일 상세 탭(리뷰·상세정보·Q&A) 높이 줄임 — 포토리뷰 포인트 배지는 모바일 탭에서만 숨김(리뷰 영역 안내는 그대로) -->
-<style>
-@media (max-width:991px){
-  html body .odtab.odtab{ padding:3px !important; margin-bottom:10px !important; }
-  html body .odtab.odtab > .odtab-i.odtab-i{ height:36px !important; min-height:0 !important; max-height:36px !important; padding-top:0 !important; padding-bottom:0 !important; font-size:13px !important; line-height:1 !important; flex-direction:row !important; }
-  html body .odtab.odtab > .odtab-i.odtab-i > a, html body .odtab.odtab > .odtab-i.odtab-i a{ height:36px !important; min-height:0 !important; padding-top:0 !important; padding-bottom:0 !important; line-height:36px !important; }
-  html body .odtab.odtab > .odtab-i.odtab-i .od-rvtag.od-rvtag[data-rv], html body .odtab.odtab > .odtab-i.odtab-i .od-rvtag.od-rvtag[data-rv].m{ display:none !important; }
-}
-</style>
+<!-- V2: 모바일 상세 탭(리뷰·상세정보·Q&A) 높이 줄임 — 포토리뷰 포인트 배지는 모바일 탭에서만 숨김.
+     (스타일 파일은 브라우저에 10분씩 저장되므로, 바로 반영되게 스크립트로 넣음) -->
+<script>
+(function(){ var st = document.createElement("style"); st.textContent = "@media (max-width:991px){ html body .odtab.odtab{ padding:3px !important; margin-bottom:10px !important; } html body .odtab.odtab > .odtab-i.odtab-i{ height:36px !important; min-height:0 !important; max-height:36px !important; padding-top:0 !important; padding-bottom:0 !important; font-size:13px !important; line-height:1 !important; flex-direction:row !important; } html body .odtab.odtab > .odtab-i.odtab-i > a, html body .odtab.odtab > .odtab-i.odtab-i a{ height:36px !important; min-height:0 !important; padding-top:0 !important; padding-bottom:0 !important; line-height:36px !important; } html body .odtab.odtab > .odtab-i.odtab-i .od-rvtag.od-rvtag[data-rv], html body .odtab.odtab > .odtab-i.odtab-i .od-rvtag.od-rvtag[data-rv].m{ display:none !important; } }"; document.head.appendChild(st); })();
+</script>
