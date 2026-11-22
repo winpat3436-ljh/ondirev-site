@@ -4849,7 +4849,7 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
 
   function vis(e){ return e && e.offsetParent !== null; }
   function target(){ var a = document.querySelectorAll('[id="prod_detail_body"]'), i; for(i = 0; i < a.length; i++) if(vis(a[i].parentNode)) return a[i]; return null; }
-  function part(a, b){ var i = html.indexOf("<!--" + a + "-->"), j = html.indexOf("<!--" + b + "-->"); return i < 0 || j < 0 ? "" : html.slice(i + a.length + 7, j); }
+  function part(a, b){ var i = html.indexOf("@@" + a + "@@"), j = html.indexOf("@@" + b + "@@"); return i < 0 || j < 0 ? "" : html.slice(i + a.length + 4, j); }
   function topOff(){
     var t = 0, f = document.getElementById("fixed_tab"), els = [f, document.querySelector("#doz_header_wrap"), document.querySelector("header#doz_header")], i, r, cs;
     var all = document.querySelectorAll("#fixed_tab, #fixed_tab *, #doz_header_wrap, #doz_header_wrap *, ._categorize_mobile, ._categorize_mobile *");
@@ -4892,7 +4892,7 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
     if(done || !html) return;
     var tb = target(); if(!tb) return;
     done = true;
-    var st = document.createElement("div"); st.innerHTML = html.slice(0, html.indexOf("<!--SUM-->"));
+    var st = document.createElement("div"); st.innerHTML = html.slice(0, html.indexOf("@@SUM@@"));
     while(st.firstChild) document.head.appendChild(st.firstChild);
     var w = document.createElement("div"); w.className = "odv2 odv2-d"; w.innerHTML = '<div class="pdp">' + part("DETAIL", "SHIP") + part("SHIP", "END") + "</div>";
     tb.parentNode.insertBefore(w, tb.nextSibling);
