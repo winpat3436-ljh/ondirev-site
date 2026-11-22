@@ -5242,7 +5242,8 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
     [].forEach.call(document.querySelectorAll('.odv2 a[href*="idx=1"]:not([data-odfx])'), function(a){
       if(a.matches(":hover")) return;
       var cs = getComputedStyle(a);
-      a.style.setProperty("background", cs.backgroundColor === "rgba(0, 0, 0, 0)" && cs.backgroundImage === "none" ? "transparent" : cs.background, "important");
+      a.style.setProperty("background-color", cs.backgroundColor, "important");
+      a.style.setProperty("background-image", cs.backgroundImage, "important");
       a.style.setProperty("color", cs.color, "important");
       a.style.setProperty("-webkit-text-fill-color", cs.color, "important");
       a.style.setProperty("border-color", cs.borderTopColor, "important");
