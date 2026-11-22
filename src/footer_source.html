@@ -4851,10 +4851,16 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
   function target(){ var a = document.querySelectorAll('[id="prod_detail_body"]'), i; for(i = 0; i < a.length; i++) if(vis(a[i].parentNode)) return a[i]; return null; }
   function part(a, b){ var i = html.indexOf("@@" + a + "@@"), j = html.indexOf("@@" + b + "@@"); return i < 0 || j < 0 ? "" : html.slice(i + a.length + 4, j); }
   function topOff(){
-    var t = 0, f = document.getElementById("fixed_tab"), els = [f, document.querySelector("#doz_header_wrap"), document.querySelector("header#doz_header")], i, r, cs;
-    var all = document.querySelectorAll("#fixed_tab, #fixed_tab *, #doz_header_wrap, #doz_header_wrap *, ._categorize_mobile, ._categorize_mobile *");
-    for(i = 0; i < all.length && i < 400; i++){ cs = getComputedStyle(all[i]); if(cs.position !== "fixed" && cs.position !== "sticky") continue; r = all[i].getBoundingClientRect(); if(r.height > 0 && r.top <= 2 + t && r.bottom > t && r.bottom < 260) t = r.bottom; }
-    return t;
+    var t = 0, cw = document.documentElement.clientWidth, n, el, f, cs, r, tab;
+    for(n = 0; n < 4; n++){
+      el = document.elementFromPoint(cw / 2, t + 4); f = null;
+      while(el && el !== document.body){ if(el.classList && el.classList.contains("odv2")){ f = null; break; } cs = getComputedStyle(el); if(cs.position === "fixed" || cs.position === "sticky") f = el; el = el.parentElement; }
+      if(!f) break;
+      tab = f.querySelector(".odtab"); r = (tab || f).getBoundingClientRect();
+      if(r.bottom <= t + 1 || r.bottom > 260) break;
+      t = r.bottom + (tab ? 8 : 0);
+    }
+    return Math.round(t);
   }
   function count(el){ var to = parseFloat(el.getAttribute("data-count")), dec = (el.getAttribute("data-count").split(".")[1] || "").length, pre = el.getAttribute("data-pre") || "", int = el.getAttribute("data-fmt") === "int", t0 = null;
     function f(ts){ if(!t0) t0 = ts; var k = Math.min(1, (ts - t0) / 1400), e = 1 - Math.pow(1 - k, 3), v = to * e; el.textContent = pre + (int ? Math.round(v).toLocaleString("en-US") : v.toFixed(dec)); if(k < 1) requestAnimationFrame(f); }
