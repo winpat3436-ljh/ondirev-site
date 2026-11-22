@@ -1,4 +1,6 @@
-<script>window.__OD_V2_ALL = false; window.__odV2 = function(){ try{ return !!window.__OD_V2_ALL || localStorage.getItem("od_v2") === "1"; }catch(e){ return !!window.__OD_V2_ALL; } };</script>
+<script>window.__OD_V2_ALL = true; (function(){ try{ var q = /[?&]od_v2=([01])/.exec(location.search); if(q) localStorage.setItem("od_v2", q[1]); }catch(e){} })(); window.__odV2 = function(){ try{ var v = localStorage.getItem("od_v2"); if(v === "0") return false; return !!window.__OD_V2_ALL || v === "1"; }catch(e){ return !!window.__OD_V2_ALL; } };</script>
+<style>html:not(.od-ready):not(.odv2-home):not(.odv2-off) body._body_menu_m2026073170a0802cfc8b8 .section_wrap.visual_section{ opacity:0 !important; }</style>
+<script>(function(){ if(!window.__odV2()) document.documentElement.classList.add("odv2-off"); setTimeout(function(){ document.documentElement.classList.add("odv2-off"); }, 3000); })();</script>
 <style>
   #od-kakao{
     position:fixed !important; right:20px !important; bottom:20px !important; z-index:2147483000 !important;
@@ -4880,12 +4882,10 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
 (function(){
   var V2_ALL = false;
   try{
-    var q = /[?&]od_v2=([01])/.exec(location.search);
-    if(q){ if(q[1] === "1") localStorage.setItem("od_v2", "1"); else localStorage.removeItem("od_v2"); }
   }catch(e){}
   V2_ALL = !!window.__OD_V2_ALL;
   if(!window.__odV2()) return;
-  if(!/\/shop_view\/?/.test(location.pathname) || !/[?&]idx=1(&|$)/.test(location.search)) return;
+  if(!/[?&]idx=1(&|#|$)/.test(location.search) || (document.body && !document.body.classList.contains("shop_view"))) return;
   var BASE = "https://winpat3436-ljh.github.io/ondirev-site/dist/v2/", done = false, html = null;
 
   function vis(e){ return e && e.offsetParent !== null; }
