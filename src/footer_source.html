@@ -666,14 +666,20 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
       p=n.parentElement; if(!p || p.isContentEditable || p.closest(".odrv, .odrv-view")) continue;
       if(TAG_RE.test(n.nodeValue)) hits.push(n);
     }
+    /* 먼저 전부 읽고(어느 줄 앞에 넣을지 계산) → 그 다음에 한꺼번에 고침: 고치고-재고를 리뷰마다 반복해 화면 계산이 리뷰 수만큼 다시 일어나던 것 방지 */
+    var jobs=[];
     hits.forEach(function(n){
       var data=parseTag(n.nodeValue); if(!data) return;
-      n.nodeValue=n.nodeValue.replace(TAG_RE,"");
-      var nx=n.nextSibling; if(!n.nodeValue.trim() && nx && nx.nodeName==="BR") nx.parentNode.removeChild(nx);
       var block=n.parentElement;
       while(block && getComputedStyle(block).display==="inline" && block.parentElement) block=block.parentElement;
+      jobs.push([n, data, block]);
+    });
+    jobs.forEach(function(j){
+      var n=j[0], block=j[2];
+      n.nodeValue=n.nodeValue.replace(TAG_RE,"");
+      var nx=n.nextSibling; if(!n.nodeValue.trim() && nx && nx.nodeName==="BR") nx.parentNode.removeChild(nx);
       if(block.previousElementSibling && block.previousElementSibling.classList.contains("odrv-view")) return;
-      var vw=renderView(data); block.parentNode.insertBefore(vw, block); fixWrap(vw);
+      var vw=renderView(j[1]); block.parentNode.insertBefore(vw, block); fixWrap(vw);
     });
   }
 
