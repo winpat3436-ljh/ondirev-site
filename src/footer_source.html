@@ -29,6 +29,7 @@
 (function(){
   try{ var q = /[?&]od_prof=([01])/.exec(location.search); if(q) localStorage.setItem("od_prof", q[1]); if(localStorage.getItem("od_prof") !== "1") return; }catch(e){ return; }
   var P = window.__odp = {};
+  var LN = window.__odl = []; window.__odL = function(n){ LN.push([n, performance.now()]); };
   try{ var MG = window.__odm = {}, mo0 = new MutationObserver(function(rs){ MG.__batches = (MG.__batches || 0) + 1; rs.forEach(function(r){ var t = r.target; if(t.nodeType === 3) t = t.parentNode; if(!t) return; var k = r.type + (r.attributeName ? "[" + r.attributeName + "]" : "") + " " + (t.tagName || "").toLowerCase() + (t.id ? "#" + t.id : "") + "." + String(t.className && t.className.baseVal !== undefined ? t.className.baseVal : t.className || "").trim().split(/\s+/).slice(0, 3).join("."); MG[k] = (MG[k] || 0) + 1; }); }); mo0.observe(document.documentElement, { childList:true, subtree:true, attributes:true, characterData:true }); setTimeout(function(){ mo0.disconnect(); }, 10000); }catch(e){}
   function rec(k, t){ var o = P[k] || (P[k] = [0, 0, 0]); o[0] += t; o[1]++; if(t > o[2]) o[2] = t; }
   function wrap(type, fn){ if(typeof fn !== "function") return fn; var at = ""; try{ var m = /main\.js[^:]*:(\d+):(\d+)/.exec(((new Error).stack || "").split("\n").slice(3).join("\n")); if(m) at = "@" + m[1] + ":" + m[2] + " "; }catch(e){} var k = at + type + ":" + String(fn).replace(/\s+/g, " ").slice(0, 70); return function(){ var t0 = performance.now(); try{ return fn.apply(this, arguments); } finally { rec(k, performance.now() - t0); } }; }

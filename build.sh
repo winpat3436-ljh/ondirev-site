@@ -7,7 +7,8 @@ cd "$(dirname "$0")"
 B=${BUILD_DIST:-/tmp/claude-0/-home-claude/07494ea6-6213-55ee-a7e3-8c3741738a35/scratchpad/min}
 T=$(mktemp -d)
 (cd "$B" && node build_dist.js "$OLDPWD/src/footer_source.html" "$T")
-cp "$T/footer.js" dist/main.js
+# 각 블록 앞에 진단용 표시(평소에는 아무 일도 안 함)
+awk '{print ";window.__odL&&__odL(" NR ")" $0} END{print ";window.__odL&&__odL(0);"}' "$T/footer.js" > dist/main.js
 cp "$T/footer.css" dist/main.css
 cp "$T/footer.css" dist/footer.css
 cat > dist/footer.js <<'JS'
