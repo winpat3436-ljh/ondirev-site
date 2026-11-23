@@ -44,6 +44,16 @@
 .odv-root .cta svg{stroke:#fff}
 .odv-root .cta.light{background:var(--paper);color:var(--navy);box-shadow:none;border:1.5px solid var(--line)}
 .odv-root .cta.light svg{stroke:var(--navy)}
+/* 결과 하단: 자동 저장 안내 + 다음 행동 카드(비회원) */
+.odv-root .svd{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:14px 6px 0;font-size:13.5px;line-height:1.5;color:var(--mute)}
+.odv-root .svd i{flex:none;width:20px;height:20px;border-radius:50%;background:var(--sky);color:var(--navy);display:grid;place-items:center;font-size:11px;font-weight:700;font-style:normal}
+.odv-root .svd a{margin-left:auto;color:var(--navy);font-weight:700;text-decoration:none;white-space:nowrap}
+.odv-root .nxc .nxe{font-size:11.5px;font-weight:700;letter-spacing:.04em;color:var(--navy);margin-bottom:6px}
+.odv-root .nxc h3{display:block;line-height:1.4;word-break:keep-all}
+.odv-root a.cta.kk{margin-top:14px;background:#FEE500;color:#191919;-webkit-text-fill-color:#191919;text-decoration:none;box-shadow:0 14px 30px -18px rgba(150,130,0,.6)}
+.odv-root .kic{flex:none;width:18px;height:18px;border-radius:50%;background:#191919;display:inline-grid;place-items:center;color:#FEE500;-webkit-text-fill-color:#FEE500;font-size:10px;font-weight:800}
+.odv-root .svs{font-size:12.5px;line-height:1.6;color:var(--soft);text-align:center;margin:10px 0 0}
+.odv-root .svs a{color:var(--navy);font-weight:700;text-decoration:underline;text-underline-offset:2px}
 .odv-root .pop{animation:odv-pop .45s cubic-bezier(.2,.8,.2,1) both}
 .odv-root .pop.d1{animation-delay:.05s}
 .odv-root .pop.d2{animation-delay:.1s}
@@ -994,6 +1004,40 @@ function productSection(){
   </div>`;
 }
 
+/* 결과 하단: 저장은 자동(이 기기)이라 알려주기만 하고, 비회원에게는 결과에 맞는 다음 행동 하나를 보여준다.
+   IN → 가입 쿠폰(첫 구매가) · 그 외 방향 → 카카오 채널 출시 알림. 회원은 기록 보기 링크만. */
+function odGuest(){
+  try{
+    if(!/(^|\.)ondirev\.com$/i.test(location.hostname)) return true;
+    if(document.querySelector(".member-info.guest")) return true;
+    if(document.body.classList.contains("member_login")) return false;
+    if(document.querySelector(".profile-area .member-info")) return false;
+  }catch(e){}
+  return true;   // 판단이 안 되면 비회원으로 본다
+}
+function odSite(){ return /(^|\.)ondirev\.com$/i.test(location.hostname) ? "" : "https://www.ondirev.com"; }
+function odLogin(back){
+  try{ return odSite() + "/login?back_url=" + encodeURIComponent(btoa(back)) + "&used_login_btn=Y"; }
+  catch(e){ return odSite() + "/login"; }
+}
+function nextCard(){
+  const name = show(dir), guest = odGuest();
+  const saved = `<p class="svd"><i>✓</i><span>결과가 이 기기에 저장됐어요</span>${guest ? "" : `<a data-what="mydir" href="${odSite()}/shop_mypage/?m2=order#mydir">내 방향 기록 보기 ›</a>`}</p>`;
+  if(!guest) return saved;
+  if(name==="IN") return saved + `
+  <div class="card nxc"><div class="nxe">첫 구매 혜택</div>
+    <h3>내 방향 IN 세럼, 첫 구매 21,800원</h3>
+    <p class="p m">카카오 1초 가입 쿠폰 5,000원을 적용한 가격이에요. (정가 32,000원 · 회원가 26,800원)</p>
+    <a class="cta kk" data-what="join_coupon" href="${odLogin("/shop_view/?idx=1")}"><span class="kic">K</span>카카오 1초 가입하고 쿠폰 받기</a>
+    <p class="svs">가입하면 마이페이지에서 내 방향 기록도 볼 수 있어요</p></div>`;
+  return saved + `
+  <div class="card nxc"><div class="nxe">${name} 제품 출시 알림</div>
+    <h3>${lbl(dir)} 방향 제품, 나오면 먼저 알려드릴게요</h3>
+    <p class="p m">카카오 채널을 추가해 두면 출시 소식을 카카오톡으로 받아요.</p>
+    <a class="cta kk" data-what="notify_ch" href="${tagged(NOTIFY_URL, lbl(dir), "notify")}" target="_blank" rel="noopener"><span class="kic">K</span>카카오 채널 추가하고 알림 받기</a>
+    <p class="svs">카카오 1초 가입 시 5,000원 쿠폰 · <a data-what="join_coupon" href="${odLogin("/directioncheck")}">가입하기</a></p></div>`;
+}
+
 function result(){
   app.classList.add("rs");
   const r = R[dir], name = show(dir), nx = nextOf(r), mod = M[dir];
@@ -1094,6 +1138,7 @@ function result(){
       <button type="button" class="cta light" id="saveBtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>이미지 저장</button>
     </div>
     <p class="shmsg" id="shmsg" aria-live="polite"></p></div>
+  ${nextCard()}
 
   <div style="margin-top:16px"><button class="cta light" id="again">처음부터 다시</button></div>
   <details class="refs"><summary>참고한 피부과학 문헌</summary><ol>${REFS.map(x=>`<li><b>${x[0]}</b><span>${x[1]}</span></li>`).join("")}</ol></details>
