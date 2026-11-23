@@ -5037,15 +5037,16 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
   function liteOn(){ document.documentElement.classList.add("odv2-lite"); }
   (function(){
     try{
-      var nv = navigator, rm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      if(rm || (nv.deviceMemory && nv.deviceMemory <= 2) || (nv.hardwareConcurrency && nv.hardwareConcurrency <= 2)){ liteOn(); return; }
+      /* 기기 설정의 "움직임 줄이기"는 기준으로 쓰지 않음: 윈도우에서 애니메이션 효과를 꺼 둔 PC가 많아 멀쩡한 기기에서도 모션이 멈춰 보였음 */
+      var nv = navigator;
+      if((nv.deviceMemory && nv.deviceMemory <= 2) || (nv.hardwareConcurrency && nv.hardwareConcurrency <= 2)){ liteOn(); return; }
     }catch(e){}
-    /* 스크롤하는 동안 화면 갱신 간격을 재서, 절반 이상이 초당 30장에도 못 미치면 가벼운 모드로 바꿈 (두 번 연속일 때만) */
+    /* 스크롤하는 동안 화면 갱신 간격을 재서, 절반 이상이 초당 24장에도 못 미치면 가벼운 모드로 바꿈 (세 번 연속일 때만) */
     var bad = 0, busy = false, tries = 0;
     function probe(){
       if(busy || tries >= 6 || document.documentElement.classList.contains("odv2-lite")) return; busy = true; tries++;
       var prev = 0, ds = [], n = 0;
-      function fr(ts){ if(prev) ds.push(ts - prev); prev = ts; if(++n < 26) requestAnimationFrame(fr); else { busy = false; ds.sort(function(a, b){ return a - b; }); var med = ds[Math.floor(ds.length / 2)] || 0; if(med > 36){ if(++bad >= 2) liteOn(); } else bad = 0; } }
+      function fr(ts){ if(prev) ds.push(ts - prev); prev = ts; if(++n < 26) requestAnimationFrame(fr); else { busy = false; ds.sort(function(a, b){ return a - b; }); var med = ds[Math.floor(ds.length / 2)] || 0; if(med > 42){ if(++bad >= 3) liteOn(); } else bad = 0; } }
       requestAnimationFrame(fr);
     }
     var st = 0; window.addEventListener("scroll", function(){ var now = Date.now(); if(now - st < 1500) return; st = now; probe(); }, { passive:true });
