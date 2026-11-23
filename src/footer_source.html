@@ -41,6 +41,8 @@
 </script>
 <script>
 /* 새 디자인 묶음 파일: 로더(footer.js)가 미리 받아 둔 것이 있으면 그것을 쓰고, 없으면 바로 받음 */
+/* 페이지를 여는 동안(약 1~12초 구간)에는 화면 정리 코드들이 0.15초마다가 아니라 0.45초마다 돌게 함: 로딩 중 계속 바뀌는 화면을 따라 수십 번씩 다시 훑던 것을 줄임. 그 뒤에는 원래 간격 */
+window.__odWait = (function(){ var t0 = Date.now(); return function(base){ var age = Date.now() - t0; return (age > 1200 && age < 12000) ? Math.max(base, 450) : base; }; })();
 window.__odGet = function(name){
   function net(){ return fetch("https://winpat3436-ljh.github.io/ondirev-site/dist/v2/" + name + "?v=" + Math.floor(Date.now() / 60000)).then(function(r){ return r.ok ? r.text() : null; }); }
   var p = window.__odPre && window.__odPre[name];
@@ -362,7 +364,7 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
   /* 아임웹이 늦게 그리거나 다시 그려도 15초 동안 계속 확인해서 붙여 둠 */
   /* 처음 3초는 0.2초마다, 그 뒤 12초는 1초마다 확인 (늦게 그려지는 상품명 대비는 그대로, 반복 횟수만 줄임) */
   var tries=0;
-  function poll(){ run(); if(heroes.length && !syncing){ syncing=true; requestAnimationFrame(sync); } if(++tries>=27) return; setTimeout(poll, tries<15 ? 200 : 1000); }
+  function poll(){ run(); if(heroes.length && !syncing){ syncing=true; requestAnimationFrame(sync); } if(++tries>=20) return; setTimeout(poll, tries<8 ? 250 : 1200); }
   setTimeout(poll, 200);
 })();
 </script>
@@ -685,7 +687,7 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
 
   function tick(){ try{ findEditors().forEach(makeForm); scanList(); }catch(e){} }
   var t=null;
-  new MutationObserver(function(){ if(t) return; t=setTimeout(function(){ t=null; tick(); },150); }).observe(document.documentElement,{childList:true, subtree:true});
+  new MutationObserver(function(){ if(t) return; t=setTimeout(function(){ t=null; tick(); }, (window.__odWait ? window.__odWait(150) : 150)); }).observe(document.documentElement,{childList:true, subtree:true});
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", tick); else tick();
 })();
 </script>
@@ -1252,7 +1254,7 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
         roots.forEach(function(r){ try{ findGroups(r).forEach(restyle); }catch(e){} }); try{ cleanDropdown(); }catch(e){}
       }
     }
-    if(t) return; t=setTimeout(function(){ t=null; tick(); },200);
+    if(t) return; t=setTimeout(function(){ t=null; tick(); }, (window.__odWait ? window.__odWait(200) : 200));
   }).observe(document.documentElement,{childList:true, subtree:true, attributes:true, attributeFilter:["style","class"]});
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", tick); else tick();
   /* 처음 4초는 0.5초마다, 그 뒤 16초는 2초마다 (화면 변화가 있으면 위 감시 코드가 따로 다시 돌림) */
@@ -2672,7 +2674,7 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
     try{ collapse(); }catch(e){}
   }
   var t=null;
-  new MutationObserver(function(){ if(t) return; t=setTimeout(function(){ t=null; run(); },120); }).observe(document.documentElement,{childList:true, subtree:true});
+  new MutationObserver(function(){ if(t) return; t=setTimeout(function(){ t=null; run(); }, (window.__odWait ? window.__odWait(120) : 120)); }).observe(document.documentElement,{childList:true, subtree:true});
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", run); else run();
   window.addEventListener("load", run);
   var c=0, iv=setInterval(function(){ run(); if(++c>=10) clearInterval(iv); }, 500);   /* 늦게 그려지는 경우 대비 5초간 */
@@ -2955,7 +2957,7 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
     }catch(e){}
   }
   var tm=null;
-  new MutationObserver(function(){ if(tm) return; tm=setTimeout(function(){ tm=null; run(); },120); }).observe(document.documentElement,{childList:true, subtree:true});
+  new MutationObserver(function(){ if(tm) return; tm=setTimeout(function(){ tm=null; run(); }, (window.__odWait ? window.__odWait(120) : 120)); }).observe(document.documentElement,{childList:true, subtree:true});
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", run); else run();
 })();
 </script>
@@ -2990,7 +2992,7 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
   }
   function run(){ try{ fixBanner(); fixSurvey(); }catch(e){} }
   var t=null;
-  new MutationObserver(function(){ if(t) return; t=setTimeout(function(){ t=null; run(); },150); }).observe(document.documentElement,{childList:true, subtree:true});
+  new MutationObserver(function(){ if(t) return; t=setTimeout(function(){ t=null; run(); }, (window.__odWait ? window.__odWait(150) : 150)); }).observe(document.documentElement,{childList:true, subtree:true});
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", run); else run();
 })();
 </script>
@@ -4182,7 +4184,7 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
   }
   function run(){ if(!document.body) return; roots().forEach(function(r){ try{ fix(r); }catch(e){} }); }
   var tm = 0;
-  function schedule(){ if(tm) return; tm = setTimeout(function(){ tm = 0; run(); }, 150); }
+  function schedule(){ if(tm) return; tm = setTimeout(function(){ tm = 0; run(); }, (window.__odWait ? window.__odWait(150) : 150)); }
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", run); else run();
   new MutationObserver(schedule).observe(document.documentElement, { childList:true, subtree:true, characterData:true });
 })();
@@ -4477,7 +4479,7 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
   var timer = null;
   function schedule(){
     if(timer) return;
-    timer = setTimeout(function(){ timer = null; run(); }, 120);
+    timer = setTimeout(function(){ timer = null; run(); }, (window.__odWait ? window.__odWait(120) : 120));
   }
 
   if(window.innerWidth <= 991){
@@ -4676,7 +4678,7 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
   }
 
   var t = null;
-  function kick(){ if(t) return; t = setTimeout(function(){ t = null; run(); }, 120); }
+  function kick(){ if(t) return; t = setTimeout(function(){ t = null; run(); }, (window.__odWait ? window.__odWait(120) : 120)); }
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", kick); else kick();
   new MutationObserver(kick).observe(document.documentElement, { childList:true, subtree:true, characterData:true });
 })();
@@ -4780,7 +4782,7 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
     dbg("적용 완료 · 공유 " + !!share + "\n" + info);
   }
   var t = null;
-  function kick(){ if(t) return; t = setTimeout(function(){ t = null; run(); }, 150); }
+  function kick(){ if(t) return; t = setTimeout(function(){ t = null; run(); }, (window.__odWait ? window.__odWait(150) : 150)); }
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", kick); else kick();
   new MutationObserver(kick).observe(document.documentElement, { childList:true, subtree:true, attributes:true, attributeFilter:["class"], characterData:true });
   window.addEventListener("resize", kick);
