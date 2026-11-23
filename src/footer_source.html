@@ -2227,6 +2227,16 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
           l.classList.add("od-my-sub"); if(subFirst){ l.classList.add("first"); subFirst = false; }
         }
       });
+      /* 로그아웃: 아래쪽 작은 메뉴(정보 수정 · 로그아웃 · 회원탈퇴)에 추가. 페이지에 이미 있는 로그아웃 주소가 있으면 그대로 사용 */
+      if(!ul.querySelector(".od-my-out")){
+        var subs = ul.querySelectorAll("li.od-my-sub"), bye = null, out = document.createElement("li"), href = "/logout.cm";
+        [].forEach.call(subs, function(l){ var a = l.querySelector("a"); if(a && /openGoodbye/.test(a.getAttribute("onclick")||"")) bye = l; });
+        try{ var ex = document.querySelector('a[href*="logout.cm"]'); href = ex ? ex.getAttribute("href") : "/logout.cm?back_url=" + encodeURIComponent(btoa("/")); }catch(e){}
+        out.className = "od-my-sub od-my-out";
+        out.innerHTML = '<a href="' + href + '" class="text-gray-dark">로그아웃</a>';
+        if(bye){ if(bye.classList.contains("first")){ bye.classList.remove("first"); out.classList.add("first"); } bye.parentNode.insertBefore(out, bye); }
+        else { if(!subs.length) out.classList.add("first"); ul.appendChild(out); }
+      }
       if(isCoupon){
         [].forEach.call(ul.querySelectorAll("li.on"), function(l){ l.classList.remove("on"); });
         ul.querySelector(".od-cp-li").classList.add("on");
