@@ -5031,7 +5031,7 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
     if(isNaN(to)) return;
     if(document.documentElement.classList.contains("odv2-lite")){ put(to); return; }
     var last = 0;
-    function f(ts){ if(!t0) t0 = ts; var k = Math.min(1, (ts - t0) / 1400), e = 1 - Math.pow(1 - k, 3); if(k >= 1 || ts - last >= 48){ last = ts; put(to * e); } if(k < 1) requestAnimationFrame(f); }
+    function f(ts){ if(!t0) t0 = ts; var k = Math.min(1, (ts - t0) / 700), e = 1 - Math.pow(1 - k, 3); if(k >= 1 || ts - last >= 48){ last = ts; put(to * e); } if(k < 1) requestAnimationFrame(f); }
     requestAnimationFrame(f); }
   /* 가벼운 모드: 움직임 줄이기 설정, 사양이 낮은 기기, 또는 스크롤 중 화면이 실제로 끊기는 기기에서 장식용 반복 모션을 멈춤 */
   function liteOn(){ document.documentElement.classList.add("odv2-lite"); }
@@ -5056,15 +5056,14 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
     var IO = "IntersectionObserver" in window;
     function show(x){ x.classList.add("in"); x.classList.add("ozrv-on"); [].forEach.call(x.querySelectorAll("[data-count]"), function(c){ if(!c.closest("[data-replay]")) count(c); }); }
     var els = [].slice.call(document.querySelectorAll(".odv2 [data-anim], .odv2 .ozrv"));
-    if(IO){ var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ show(e.target); io.unobserve(e.target); } }); }, { rootMargin:"0px 0px -10% 0px", threshold:.12 }); els.forEach(function(x){ io.observe(x); }); }
+    if(IO){ var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ show(e.target); io.unobserve(e.target); } }); }, { rootMargin:"0px 0px 12% 0px", threshold:.01 }); els.forEach(function(x){ io.observe(x); }); }
     else els.forEach(show);
     [].forEach.call(document.querySelectorAll(".odv2 [data-replay]"), function(x){
       if(!IO){ x.classList.add("go"); return; }
       var tg = x.querySelector(".ch,.rg") || x;
       new IntersectionObserver(function(es){ es.forEach(function(e){
-        if(e.isIntersecting && e.intersectionRatio >= .8){ if(!x.classList.contains("go")){ x.classList.add("go"); [].forEach.call(x.querySelectorAll("[data-count]"), count); } }
-        else if(!e.isIntersecting) x.classList.remove("go");
-      }); }, { threshold:[0, .8], rootMargin:"-120px 0px -70px 0px" }).observe(tg);
+        if(e.isIntersecting && e.intersectionRatio >= .15 && !x.classList.contains("go")){ x.classList.add("go"); [].forEach.call(x.querySelectorAll("[data-count]"), count); }
+      }); }, { threshold:[0, .15], rootMargin:"0px 0px 0px 0px" }).observe(tg);
     });
     var hk = d && d.querySelector(".dz-hero .key");
     if(hk && IO){ var io2 = new IntersectionObserver(function(es){ if(es[0].isIntersecting){ [].forEach.call(hk.querySelectorAll("[data-count]"), count); io2.disconnect(); } }); io2.observe(hk); }
@@ -5185,9 +5184,8 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
     if(!("IntersectionObserver" in window)){ b.classList.add("go"); return; }
     var tg = b.querySelector(".od-st3") || b;
     new IntersectionObserver(function(es){ es.forEach(function(e){
-      if(e.isIntersecting && e.intersectionRatio >= .75){ if(!b.classList.contains("go")){ b.classList.add("go"); [].forEach.call(b.querySelectorAll("[data-count]"), count); } }
-      else if(!e.isIntersecting) b.classList.remove("go");
-    }); }, { threshold:[0, .75], rootMargin:"-70px 0px -60px 0px" }).observe(tg);
+      if(e.isIntersecting && e.intersectionRatio >= .15 && !b.classList.contains("go")){ b.classList.add("go"); [].forEach.call(b.querySelectorAll("[data-count]"), count); }
+    }); }, { threshold:[0, .15] }).observe(tg);
   }
   function buy(){
     if(!html) return false;

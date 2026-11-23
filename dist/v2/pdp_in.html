@@ -980,6 +980,29 @@ html.odv2-lite .odv2 .dz-mol *, html.odv2-lite .odv2 .dz-nx svg{animation:none !
 html.odv2-lite .odv2 .dz-tss li::after{animation:none !important; opacity:0 !important;}
 html.odv2-lite .odv2 .ozrv{transform:none !important; transition:opacity .35s linear !important;}
 @media (prefers-reduced-motion:reduce){ .odv2 .dz-mol *, .odv2 .dz-nx svg{animation:none !important;} .odv2 .dz-tss li::after{animation:none !important; opacity:0 !important;} }
+
+/* ===== 스크롤하면 바로 보이게: 등장·그래프 모션의 대기 시간과 길이를 줄임 (모양은 그대로) ===== */
+div.odv2 .ozrv{transform:translateY(14px); transition:opacity .4s cubic-bezier(.2,.7,.2,1), transform .4s cubic-bezier(.2,.7,.2,1);}
+div.odv2 .ozrv.ozrv-on{transform:none;}
+div.odv2 [data-anim]{transform:translateY(14px); transition:opacity .4s, transform .45s cubic-bezier(.22,.61,.36,1);}
+div.odv2 [data-anim].in{transform:none;}
+/* 임상 결과 그래프 (상세 본문) */
+div.odv2 .dz-st .ch span{transition:height .7s cubic-bezier(.16,.84,.3,1) 0s !important;}
+div.odv2 .dz-st .ch .on span{transition-delay:.12s !important;}
+div.odv2 .dz-st .ch em{transition:opacity .3s .15s !important;}
+div.odv2 .dz-st .ch .on em{transition-delay:.5s !important;}
+div.odv2 .dz-st .ar{transition:opacity .3s .7s, transform .4s cubic-bezier(.34,1.56,.64,1) .7s !important;}
+div.odv2 .dz-st .rg .fg{transition:stroke-dashoffset .8s cubic-bezier(.22,.61,.36,1) !important;}
+div.odv2 .dz-st .rg .ck{transition:stroke-dashoffset .4s .5s !important;}
+div.odv2 .dz-stat .ch span{transition:height .7s cubic-bezier(.22,.61,.36,1) !important;}
+div.odv2 .dz-stat .it.in .ch .on span{transition-delay:.1s !important;}
+/* 임상 결과 박스 (구매 영역) */
+div.odv2 .odx2.go .od-st3 .ch span{transition:height .7s cubic-bezier(.16,.84,.3,1) 0s !important;}
+div.odv2 .odx2.go .od-st3 .ch span.on{transition-delay:.12s !important;}
+div.odv2 .odx2.go .od-st3 .ch span::before{transition:opacity .3s .15s !important;}
+div.odv2 .odx2.go .od-st3 .ch span.on::before{transition-delay:.55s !important;}
+div.odv2 .odx2.go .od-st3 .rg{transition:transform .45s cubic-bezier(.34,1.56,.64,1) .05s, opacity .3s .05s !important;}
+div.odv2 .pdp .odx2.go .od-st3 .rg svg path{transition:stroke-dashoffset .4s .3s !important;}
 </style>
 @@SUM@@<section class="odsum" id="pdp-sum"><div class="in2">
  <div class="hd2"><span class="eb2">30초 요약</span><h2 class="ozrv">이런 피부라면, IN부터 시작하세요</h2></div>
