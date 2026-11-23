@@ -5027,8 +5027,29 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
     return Math.round(t);
   }
   function count(el){ var to = parseFloat(el.getAttribute("data-count")), dec = (el.getAttribute("data-count").split(".")[1] || "").length, pre = el.getAttribute("data-pre") || "", int = el.getAttribute("data-fmt") === "int", t0 = null;
-    function f(ts){ if(!t0) t0 = ts; var k = Math.min(1, (ts - t0) / 1400), e = 1 - Math.pow(1 - k, 3), v = to * e; el.textContent = pre + (int ? Math.round(v).toLocaleString("en-US") : v.toFixed(dec)); if(k < 1) requestAnimationFrame(f); }
+    function put(v){ var tx = pre + (int ? Math.round(v).toLocaleString("en-US") : v.toFixed(dec)); if(el.__tx !== tx){ el.__tx = tx; el.textContent = tx; } }
+    if(isNaN(to)) return;
+    if(document.documentElement.classList.contains("odv2-lite")){ put(to); return; }
+    var last = 0;
+    function f(ts){ if(!t0) t0 = ts; var k = Math.min(1, (ts - t0) / 1400), e = 1 - Math.pow(1 - k, 3); if(k >= 1 || ts - last >= 48){ last = ts; put(to * e); } if(k < 1) requestAnimationFrame(f); }
     requestAnimationFrame(f); }
+  /* 가벼운 모드: 움직임 줄이기 설정, 사양이 낮은 기기, 또는 스크롤 중 화면이 실제로 끊기는 기기에서 장식용 반복 모션을 멈춤 */
+  function liteOn(){ document.documentElement.classList.add("odv2-lite"); }
+  (function(){
+    try{
+      var nv = navigator, rm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if(rm || (nv.deviceMemory && nv.deviceMemory <= 2) || (nv.hardwareConcurrency && nv.hardwareConcurrency <= 2)){ liteOn(); return; }
+    }catch(e){}
+    /* 스크롤하는 동안 화면 갱신 간격을 재서, 절반 이상이 초당 30장에도 못 미치면 가벼운 모드로 바꿈 (두 번 연속일 때만) */
+    var bad = 0, busy = false, tries = 0;
+    function probe(){
+      if(busy || tries >= 6 || document.documentElement.classList.contains("odv2-lite")) return; busy = true; tries++;
+      var prev = 0, ds = [], n = 0;
+      function fr(ts){ if(prev) ds.push(ts - prev); prev = ts; if(++n < 26) requestAnimationFrame(fr); else { busy = false; ds.sort(function(a, b){ return a - b; }); var med = ds[Math.floor(ds.length / 2)] || 0; if(med > 36){ if(++bad >= 2) liteOn(); } else bad = 0; } }
+      requestAnimationFrame(fr);
+    }
+    var st = 0; window.addEventListener("scroll", function(){ var now = Date.now(); if(now - st < 1500) return; st = now; probe(); }, { passive:true });
+  })();
 
   function motion(w){
     var d = w.querySelector("#pdp-d"), pg = w.querySelector("#dxProg"), t = w.querySelector("#dxProgT"), bar = w.querySelector("#dxProgB");
@@ -5052,7 +5073,7 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
     function up(){ tk = 0; if(!vis(d)) return; var r = d.getBoundingClientRect(), vh = window.innerHeight;
       var now = Date.now(); if(!up.__t || now - up.__t > 400){ up.__t = now; var to = topOff() + "px"; if(up.__o !== to){ up.__o = to; w.style.setProperty("--odtop", to); } }
       var on = !!(toc && toc.getBoundingClientRect().bottom < 140 && r.bottom > vh * .6); if(pg.__on !== on){ pg.__on = on; pg.classList.toggle("on", on); }
-      var p = Math.min(1, Math.max(0, (-r.top) / (r.height - vh))), pw = (p * 100).toFixed(0) + "%"; if(bar.__w !== pw){ bar.__w = pw; bar.style.width = pw; }
+      var p = Math.min(1, Math.max(0, (-r.top) / (r.height - vh))), pw = (Math.round(p * 100) / 100).toFixed(2); if(bar.__w !== pw){ if(!bar.__s){ bar.__s = 1; bar.style.width = "100%"; bar.style.transformOrigin = "0 50%"; bar.style.transition = "transform .15s linear"; } bar.__w = pw; bar.style.transform = "scaleX(" + pw + ")"; }
       var cur = chs[0]; chs.forEach(function(c){ if(c.getBoundingClientRect().top < vh * .45) cur = c; }); var lab = cur ? cur.getAttribute("data-ch") : ""; if(lab && t.__t !== lab){ t.__t = lab; t.textContent = lab; } }
     function req(){ if(!tk) tk = requestAnimationFrame(up); }
     window.addEventListener("scroll", req, { passive:true }); window.addEventListener("resize", req); up();
@@ -5067,10 +5088,47 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
     var w = document.createElement("div"); w.className = "odv2 odv2-d"; w.style.minHeight = "900px";
     tb.parentNode.insertBefore(w, tb.nextSibling);
     var filled = false;
-    function fill(){
+    function fill(ev){
       if(filled) return; filled = true;
-      w.innerHTML = '<div class="pdp">' + part("DETAIL", "SHIP") + part("SHIP", "FP") + "</div>"; w.style.minHeight = "";
-      motion(w); bleed();
+      var src = '<div class="pdp">' + part("DETAIL", "SHIP") + part("SHIP", "FP") + "</div>", rest = [], sync = !!(ev && ev.type);   /* 주소(#)로 바로 찾아온 경우는 한 번에 */
+      try{
+        if(!sync && "content" in document.createElement("template") && window.requestAnimationFrame){
+          var tp = document.createElement("template"); tp.innerHTML = src;
+          var pdp = tp.content.firstElementChild, root = pdp && pdp.querySelector("#pdp-d");
+          if(root && root.children.length > 2){
+            while(root.children.length > 1) rest.unshift(root.removeChild(root.lastElementChild));
+            var tail = []; while(pdp.lastElementChild && pdp.lastElementChild !== root) tail.unshift(pdp.removeChild(pdp.lastElementChild));
+            w.innerHTML = ""; w.appendChild(pdp);
+            var step = function(){
+              var c = rest.shift(); if(c) root.appendChild(c);
+              if(rest.length){ var go = false, nx = function(){ if(go) return; go = true; step(); }; requestAnimationFrame(nx); setTimeout(nx, 120); return; }
+              tail.forEach(function(x){ pdp.appendChild(x); }); w.style.minHeight = ""; ready();
+            };
+            step(); return;
+          }
+        }
+      }catch(e){ rest = []; }
+      w.innerHTML = src; w.style.minHeight = ""; ready();
+    }
+    /* 분자 모형: 한 그림 안에서 고리를 돌리면 매 화면 갱신마다 그림 전체를 다시 그려야 함 → 고리·가운데 원을 겹친 낱장으로 나눠 낱장째 돌림(다시 그리지 않음). 겉모습은 같음 */
+    function molLayers(){
+      [].forEach.call(w.querySelectorAll(".dz-mol"), function(m){
+        try{
+          var svg = m.querySelector("svg"); if(!svg || m.__ly) return; m.__ly = 1;
+          var kids = [].slice.call(svg.children), box = document.createElement("div"), cur = null, curAnim = null, n = 0;
+          if(!kids.some(function(k){ return k.classList && (k.classList.contains("rg") || k.classList.contains("core")); })) return;
+          box.className = "dz-molx";
+          kids.forEach(function(k){
+            var cl = k.classList, nm = cl && cl.contains("core") ? "core" : (cl && cl.contains("r1") ? "r1" : (cl && cl.contains("r2") ? "r2" : (cl && cl.contains("r3") ? "r3" : "")));
+            if(!cur || nm || curAnim){ cur = svg.cloneNode(false); cur.removeAttribute("id"); if(n++){ cur.setAttribute("aria-hidden", "true"); cur.removeAttribute("role"); cur.removeAttribute("aria-label"); } cur.setAttribute("class", ((cur.getAttribute("class") || "") + " dz-ly" + (nm ? " dz-ly-" + nm : "") + (n > 1 ? " dz-lyo" : "")).trim()); box.appendChild(cur); curAnim = nm; }
+            cur.appendChild(k);
+          });
+          svg.parentNode.replaceChild(box, svg); m.classList.add("dz-lyd");
+        }catch(e){}
+      });
+    }
+    function ready(){
+      molLayers(); motion(w); bleed();
       /* 화면 밖 챕터의 반복 모션은 멈춰 둠 */
       if("IntersectionObserver" in window){ var vo = new IntersectionObserver(function(es){ es.forEach(function(e){ e.target.classList.toggle("odv2-vis", e.isIntersecting); }); }, { rootMargin:"200px 0px" }); [].forEach.call(w.querySelectorAll(".dz, .dz-hero"), function(x){ vo.observe(x); }); }
       else [].forEach.call(w.querySelectorAll(".dz, .dz-hero"), function(x){ x.classList.add("odv2-vis"); });
