@@ -3522,7 +3522,7 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
   .odpx-lb{ align-self:center; font-size:11.5px; font-weight:600; color:#fff; -webkit-text-fill-color:#fff; background:#1B3A5C; border-radius:4px; padding:2px 6px; }
   .odpx-gs{ margin-top:4px; font-size:11.5px; color:#8494A7; -webkit-text-fill-color:#8494A7; }
   .odpx-tg{ display:flex; flex-wrap:wrap; gap:6px; margin:10px 0 14px; }
-  /* 쿠폰 티켓 (최저가 안내) — 시험 중: 주소에 ?od_lp=1 을 붙인 기기에서만 보임 */
+  /* 쿠폰 티켓 (최저가 안내) */
   html body header.odpx-lp > .prod-detail-coupon-container-style-a{ display:none !important; }
   html.od-lp-on .odv2-fp{ display:none !important; }   /* 같은 내용의 노란 "첫 구매가" 띠는 티켓이 있을 때 숨김 */
   html body .odpx a.odpx-tk, .odpx-tk{ display:flex; margin-top:12px; border-radius:14px; overflow:hidden; text-decoration:none !important; box-shadow:0 6px 14px -8px rgba(27,58,92,.35); }
@@ -3644,16 +3644,16 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
     }, 150);
   }
 
-  /* ===== 쿠폰 티켓 (시험 중) =====
-     주소에 ?od_lp=1 → 이 기기에서 켜짐 / ?od_lp=0 → 꺼짐
+  /* ===== 쿠폰 티켓 =====
+     모든 방문자에게 보임. 주소에 ?od_lp=0 → 이 기기에서만 꺼짐 / ?od_lp=1 → 다시 켜짐
      ?od_lp=guest · get · coupon · bundle → 그 상태 화면을 강제로 보기 (확인용, 그 한 번만) */
   var LP_ON = false, LP_FORCE = "", LP_HELD = null, LP_ASK = false;
   (function(){
     var m = /[?&]od_lp=([a-z0-9]+)/.exec(location.search), v = m ? m[1] : "";
     try{
-      if(v === "0") localStorage.removeItem("od_lp"); else if(v) localStorage.setItem("od_lp", "1");
-      LP_ON = localStorage.getItem("od_lp") === "1";
-    }catch(e){ LP_ON = !!v && v !== "0"; }
+      if(v === "0") localStorage.setItem("od_lp", "0"); else if(v) localStorage.removeItem("od_lp");
+      LP_ON = localStorage.getItem("od_lp") !== "0";
+    }catch(e){ LP_ON = v !== "0"; }
     if(/^(guest|get|coupon|bundle)$/.test(v)){ LP_FORCE = v; LP_ON = true; }
   })();
   function lpJoinUrl(){
