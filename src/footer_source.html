@@ -3522,6 +3522,22 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
   .odpx-lb{ align-self:center; font-size:11.5px; font-weight:600; color:#fff; -webkit-text-fill-color:#fff; background:#1B3A5C; border-radius:4px; padding:2px 6px; }
   .odpx-gs{ margin-top:4px; font-size:11.5px; color:#8494A7; -webkit-text-fill-color:#8494A7; }
   .odpx-tg{ display:flex; flex-wrap:wrap; gap:6px; margin:10px 0 14px; }
+  /* 쿠폰 티켓 (최저가 안내) — 시험 중: 주소에 ?od_lp=1 을 붙인 기기에서만 보임 */
+  html body header.odpx-lp > .prod-detail-coupon-container-style-a{ display:none !important; }
+  html.od-lp-on .odv2-fp{ display:none !important; }   /* 같은 내용의 노란 "첫 구매가" 띠는 티켓이 있을 때 숨김 */
+  html body .odpx a.odpx-tk, .odpx-tk{ display:flex; margin-top:12px; border-radius:14px; overflow:hidden; text-decoration:none !important; box-shadow:0 6px 14px -8px rgba(27,58,92,.35); }
+  .odpx-tk .l{ flex:0 0 34%; min-width:0; display:flex; flex-direction:column; justify-content:center; background:#1B3A5C; padding:13px 8px; text-align:center; border-right:2px dashed rgba(255,255,255,.55); }
+  .odpx-tk.q .l{ background:#1667A8; }
+  .odpx-tk .l small{ display:block; font-size:10.5px; letter-spacing:.06em; color:#BBD3E8; -webkit-text-fill-color:#BBD3E8; }
+  .odpx-tk .l b{ display:block; margin-top:2px; font-size:19px; font-weight:800; color:#fff; -webkit-text-fill-color:#fff; white-space:nowrap; }
+  .odpx-tk .r{ flex:1; min-width:0; display:flex; flex-direction:column; justify-content:center; background:#EAF2F9; padding:11px 12px; }
+  .odpx-tk .r span{ font-size:12px; line-height:1.4; color:#55667A; -webkit-text-fill-color:#55667A; }
+  .odpx-tk .r strong{ font-size:19px; font-weight:800; line-height:1.3; color:#1667A8; -webkit-text-fill-color:#1667A8; white-space:nowrap; }
+  .odpx-tk .r em{ font-style:normal; margin-top:3px; font-size:12px; line-height:1.4; font-weight:700; color:#1B3A5C; -webkit-text-fill-color:#1B3A5C; }
+  .odpx-tk .r em.pl{ font-weight:500; color:#55667A; -webkit-text-fill-color:#55667A; }
+  .odpx-tk:focus-visible{ outline:3px solid #4B86B4; outline-offset:2px; }
+  .odpx-tn{ margin-top:8px; font-size:11.5px; color:#8494A7; -webkit-text-fill-color:#8494A7; }
+  @media (max-width:340px){ .odpx-tk .l b, .odpx-tk .r strong{ font-size:17px; } .odpx-tk .l{ padding:13px 5px; } }
   .odpx-tg span{ font-size:11.5px; color:#55667A; -webkit-text-fill-color:#55667A; background:#F3F6F9; border-radius:6px; padding:3px 8px; }
 
   .odpx-ev{ display:block; margin:18px 0 4px; --pw:17px; }
@@ -3565,6 +3581,9 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
     .odpx-pc{ font-size:26px; }
     .odpx-pv{ font-size:28px; }
     .odpx-gs{ font-size:12.5px; }
+    .odpx-tk .r span, .odpx-tk .r em{ font-size:13px; }
+    .odpx-tk .l b, .odpx-tk .r strong{ font-size:21px; }
+    .odpx-tn{ font-size:12.5px; }
     .odpx-ev .hd{ font-size:20px; }
     .odpx-ev .g, .odpx-ev .zr{ padding:15px 18px; }
     .odpx-ev .pr em{ flex-basis:64px; font-size:13.5px; }
@@ -3584,6 +3603,8 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
       title: "온디레브 [IN] 리플 엑토인 세럼 50ml",
       sub: "세안 후 당김 없이, 속까지 채우는 워터 세럼",
       tags: ["속보습", "수분 유지", "워터 제형"],
+      /* 쿠폰 티켓: 가입 쿠폰 금액 · 쿠폰 이름(아임웹 쿠폰 이름과 같아야 함) · 여러 개 살 때 개당 가격 · 배송 문구 */
+      lp: { coupon: 5000, name: /회원가입\s*기념\s*쿠폰/, qty: [[2, 25460], [3, 24120]], ship: "배송비 3,000원 별도 · 2개부터 무료배송", ship1: "1개 구매 시 배송비 3,000원 별도" },
       clinical: {
         eyebrow: "CLINICAL TEST",
         head: "한 번 발랐을 때, 피부 속 수분",
@@ -3623,6 +3644,57 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
     }, 150);
   }
 
+  /* ===== 쿠폰 티켓 (시험 중) =====
+     주소에 ?od_lp=1 → 이 기기에서 켜짐 / ?od_lp=0 → 꺼짐
+     ?od_lp=guest · get · coupon · bundle → 그 상태 화면을 강제로 보기 (확인용, 그 한 번만) */
+  var LP_ON = false, LP_FORCE = "", LP_HELD = null, LP_ASK = false;
+  (function(){
+    var m = /[?&]od_lp=([a-z0-9]+)/.exec(location.search), v = m ? m[1] : "";
+    try{
+      if(v === "0") localStorage.removeItem("od_lp"); else if(v) localStorage.setItem("od_lp", "1");
+      LP_ON = localStorage.getItem("od_lp") === "1";
+    }catch(e){ LP_ON = !!v && v !== "0"; }
+    if(/^(guest|get|coupon|bundle)$/.test(v)){ LP_FORCE = v; LP_ON = true; }
+  })();
+  function lpJoinUrl(){
+    var b = ""; try{ b = btoa(location.pathname + location.search.replace(/([?&])od_lp=[a-z0-9]+&?/, "$1").replace(/[?&]$/, "")); }catch(e){}
+    return "/login?back_url=" + encodeURIComponent(b) + "&used_login_btn=Y";
+  }
+  /* 보유 쿠폰 확인 (로그인 회원만, 한 번) */
+  function lpAsk(L){
+    if(LP_ASK) return; LP_ASK = true;
+    fetch("/shop/mypage_coupon_list.cm", { method:"POST", credentials:"include", headers:{ "X-Requested-With":"XMLHttpRequest" } })
+    .then(function(r){ return r.json(); })
+    .then(function(res){
+      var d = new DOMParser().parseFromString((res && res.html) || "", "text/html");
+      LP_HELD = [].some.call(d.querySelectorAll(".sale-coupon-name-text"), function(e){ return L.name.test(e.textContent || ""); });
+    })["catch"](function(){ LP_HELD = false; })
+    .then(function(){ try{ schedule(); }catch(e){} });
+  }
+  /* 상태: guest(비회원) · get(회원, 아직 안 받은 쿠폰) · coupon(회원, 보유 쿠폰) · bundle(쿠폰 없음) · ""(아직 모름 → 안 그림) */
+  function lpState(L, logged){
+    if(LP_FORCE) return LP_FORCE;
+    if(!logged) return "guest";
+    if(!window.OD_KK) return "";                     /* 카카오 회원인지 확인이 끝날 때까지 대기 */
+    if(window.OD_KK === "normal") return "bundle";   /* 카카오 가입 쿠폰은 카카오 회원만 */
+    var nb = document.querySelector(".goods_form > header > .prod-detail-coupon-container-style-a");
+    if(nb && !nb.classList.contains("od-kk-hide") && nb.querySelector(".btn-coupon-square") && L.name.test(nb.textContent || "")) return "get";
+    if(LP_HELD === null){ lpAsk(L); return ""; }
+    return LP_HELD ? "coupon" : "bundle";
+  }
+  function lpHTML(L, mem, logged){
+    var st = lpState(L, logged); if(!st) return "";
+    var low = won(mem - L.coupon), cp = won(L.coupon);
+    function tk(tag, attr, cls, k, v, a, b, c, plain){
+      return '<'+tag+' class="odpx-tk'+cls+'"'+attr+'><span class="l"><small>'+k+'</small><b>'+v+'</b></span><span class="r"><span>'+a+'</span><strong>'+b+'</strong><em'+(plain?' class="pl"':'')+'>'+c+'</em></span></'+tag+'>';
+    }
+    if(st === "guest")  return tk("a", ' href="'+esc(lpJoinUrl())+'"', "", "WELCOME", cp, "가입하고 쿠폰 받으면 첫 구매", low, "카카오 1초 가입하고 받기 ›") + '<div class="odpx-tn">'+esc(L.ship)+'</div>';
+    if(st === "get")    return tk("a", ' href="#" data-odpx="tk-get"', "", "WELCOME", cp, "쿠폰 받으면 첫 구매", low, "쿠폰 받기 ›") + '<div class="odpx-tn">'+esc(L.ship)+'</div>';
+    if(st === "coupon") return tk("div", "", "", "MY COUPON", cp, "보유 쿠폰을 쓰면", low, "주문서에서 쿠폰 선택", 1) + '<div class="odpx-tn">'+esc(L.ship)+'</div>';
+    var q = L.qty || []; if(!q.length) return "";
+    return tk("div", "", " q", q[0][0]+"개부터", "무료배송", q[0][0]+"개 담으면 개당", won(q[0][1]), q[1] ? q[1][0]+"개 담으면 개당 "+won(q[1][1]) : "", 1) + '<div class="odpx-tn">'+esc(L.ship1)+'</div>';
+  }
+
   function headHTML(C){
     var pd = document.querySelector(".goods_form > header .pay_detail");
     /* 로그인 회원은 정가가 .sale_price, 비회원은 .real_price 에 있음 → 둘 중 큰 값이 정가 */
@@ -3630,7 +3702,7 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
     var mEl = pd && pd.querySelector(".member_pay");
     var mem = mEl ? num(mEl.childNodes[0] && mEl.childNodes[0].nodeValue || mEl.textContent) : 0;
     if(!sale) return "";
-    var logged = document.body.classList.contains("loggedin");
+    var logged = document.body.classList.contains("loggedin") && LP_FORCE !== "guest";
     var h = '<div class="odpx-eb"><b>'+esc(C.dir)+'</b>'+esc(C.dirText)+'</div>' +
             '<div class="odpx-tt">'+esc(C.title)+'</div>' +
             (C.sub ? '<div class="odpx-sub">'+esc(C.sub)+'</div>' : '');
@@ -3642,6 +3714,7 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
       h += '<div class="odpx-st">'+won(sale)+'</div>' +
            '<div class="odpx-mn"><span class="odpx-pc">'+pct+'%</span><span class="odpx-pv">'+won(mem)+'</span><span class="odpx-lb">회원가</span></div>' +
            '<div class="odpx-gs">'+(logged ? '회원가로 적용돼요' : '비회원 '+won(sale)+' · 카카오 1초 가입하면 회원가 적용')+'</div>';
+      if(LP_ON && C.lp && mem > C.lp.coupon) h += lpHTML(C.lp, mem, logged);
     } else {
       h += '<div class="odpx-mn"><span class="odpx-pv">'+won(sale)+'</span></div>';
     }
@@ -3702,6 +3775,9 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
     }
     if(box.__h !== html){ box.innerHTML = html; box.__h = html; }
     hd.classList.add("odpx-on");
+    var lpOn = !!box.querySelector(".odpx-tk");
+    hd.classList.toggle("odpx-lp", lpOn);
+    document.documentElement.classList.toggle("od-lp-on", lpOn);
 
     if(C.clinical){
       var ev = hd.querySelector(":scope > .odpx-ev");
@@ -3722,13 +3798,21 @@ html body .od-rvtag[data-rv].m svg{ width:10px; height:10px; }
 
   document.addEventListener("click", function(e){
     var t = e.target.closest && e.target.closest('[data-odpx="rv"]');
-    if(t){ e.preventDefault(); goReviews(); }
+    if(t){ e.preventDefault(); goReviews(); return; }
+    /* 쿠폰 티켓 "쿠폰 받기": 아임웹 원래 쿠폰받기 버튼을 대신 눌러줌 → 받은 뒤 보유 상태로 다시 확인 */
+    var k = e.target.closest && e.target.closest('[data-odpx="tk-get"]');
+    if(k){
+      e.preventDefault();
+      var nb = document.querySelector(".goods_form > header > .prod-detail-coupon-container-style-a .btn-coupon-square");
+      if(nb){ nb.click(); setTimeout(function(){ LP_HELD = null; LP_ASK = false; schedule(); }, 1800); }
+    }
   });
 
   var tm = 0;
   function schedule(){ clearTimeout(tm); tm = setTimeout(run, 100); }
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", run); else run();
   new MutationObserver(schedule).observe(document.documentElement, { childList:true, subtree:true });
+  if(LP_ON) window.addEventListener("od:kk", schedule);
 })();
 </script>
 <!-- ===================== /상품 상단 ===================== -->
